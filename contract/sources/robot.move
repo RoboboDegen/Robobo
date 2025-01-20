@@ -226,13 +226,20 @@ module robobo::robot {
         abort E_ELEMENT_NOT_EQUIPPED
     }
 
+    /// 设置机器人的能量值
+    public(package) fun set_robot_energy(robot: &mut Robot, energy: u8) {
+        robot.energy = energy;
+    }
+
     public fun get_robot_attack(robot: &Robot): u8 {robot.attack}
     public fun get_robot_defense(robot: &Robot): u8 {robot.defense}
     public fun get_robot_speed(robot: &Robot): u8 {robot.speed}
     public fun get_robot_energy(robot: &Robot): u8 {robot.energy}
+    public fun get_robot_personality(robot: &Robot): u8 {robot.personality}
 
     public fun get_robot_mirror_attack(mirror: &Robot_Mirror): u8 {mirror.attack}
     public fun get_robot_mirror_defense(mirror: &Robot_Mirror): u8 {mirror.defense}
     public fun get_robot_mirror_speed(mirror: &Robot_Mirror): u8 {mirror.speed}
     public fun get_robot_mirror_energy(mirror: &Robot_Mirror): u8 {mirror.energy}
+    public fun get_robot_mirror_personality(mirror: &Robot_Mirror): u8 {mirror.personality}
 }

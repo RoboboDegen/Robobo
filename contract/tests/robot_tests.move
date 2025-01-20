@@ -34,7 +34,7 @@ module robobo::robot_tests {
             );
             
             // 验证机器人属性
-            assert!(robot::get_robot_personality(&robot) != string::utf8(b""), 0);
+            assert!(robot::get_robot_personality(&robot) > 0, 0);
             
             transfer::public_transfer(robot, ZERO_ADDRESS);
             transfer::public_transfer(pool, ZERO_ADDRESS);
