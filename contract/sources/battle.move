@@ -1,5 +1,5 @@
 module robobo::battle {
-    use robobo::robot::{Robot, Robot_Pool, get_robot_stats, get_robot_mirror_stats};
+    use robobo::robot::{Robot, Robot_Pool, get_robot_stats, get_robot_mirror_stats, set_robot_energy};
     use sui::{
         clock::{Self, Clock},
         hash,
@@ -30,9 +30,9 @@ module robobo::battle {
         let (winner, attacker_final_energy, defender_final_energy) = calculate_battle_result(battle_hash, &mut attacker_energy, &mut defender_energy, attacker_attack, attacker_defense, attacker_speed, attacker_personality, defender_attack, defender_defense, defender_speed, defender_personality);
 
         if(winner) {
-            attacker.energy = attacker_final_energy;
+            set_robot_energy(attacker, attacker_final_energy);
         } else {
-            attacker.energy = 128;
+            set_robot_energy(attacker, 128);
         };
 
         let battle_result = BattleResult {
