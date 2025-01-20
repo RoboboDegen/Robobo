@@ -113,7 +113,7 @@ module robobo::robot {
 
     /// 内部函数：计算单个属性值
     fun calculate_stat(base: u8, delta: u8): u8 {
-        let zero_point = 128;
+        let zero_point = 127;
         if (delta >= zero_point) {
             // 增加属性
             let increase = (delta as u64) - (zero_point as u64);
