@@ -180,7 +180,7 @@ module robobo::calculate {
         let mut isFighting = true;
         let mut round = 0;
         while (isFighting) {
-            if(*attacker_energy <= 128 || *defender_energy <= 128) {
+            if(*attacker_energy <= 127 || *defender_energy <= 127) {
                 isFighting = false;
                 break
             };
