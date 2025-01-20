@@ -176,9 +176,11 @@ module robobo::calculate {
     public fun calculate_battle_result(battle_hash: vector<u8>, attacker_energy: &mut u8, defender_energy: &mut u8, attacker_attack: u8, attacker_defense: u8, attacker_speed: u8, attacker_personality: u8, defender_attack: u8, defender_defense: u8, defender_speed: u8, defender_personality: u8): (bool, u8, u8) {
         let (attacker_moves, defender_moves) = split_and_convert_hash(battle_hash);
 
+
+        let zero_point = 128;
         let mut round = 0;
         while (true) {
-            if(*attacker_energy <= 127 || *defender_energy <= 127) {
+            if(*attacker_energy <= zero_point || *defender_energy <= zero_point) {
                 break
             };
             
@@ -204,7 +206,7 @@ module robobo::calculate {
                 );
                 
                 // 如果防御者还活着，则进行反击
-                if (*defender_energy > 128) {
+                if (*defender_energy > zero_point) {
                     process_action(
                         defender_energy,
                         attacker_energy,
@@ -226,7 +228,7 @@ module robobo::calculate {
                 );
                 
                 // 如果攻击者还活着，则进行反击
-                if (*attacker_energy > 128) {
+                if (*attacker_energy > zero_point) {
                     process_action(
                         attacker_energy,
                         defender_energy,

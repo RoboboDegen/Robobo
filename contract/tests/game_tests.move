@@ -637,8 +637,7 @@ module robobo::game_tests {
                 &mut game_state,
                 &mut robot_pool,
                 &mut robot,
-                element_id1,
-                ts::ctx(&mut scenario)
+                element_id1
             );
             
             // 验证还剩一个零件
@@ -650,8 +649,7 @@ module robobo::game_tests {
                 &mut game_state,
                 &mut robot_pool,
                 &mut robot,
-                element_id2,
-                ts::ctx(&mut scenario)
+                element_id2
             );
             
             // 验证没有剩余零件
