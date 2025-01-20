@@ -8,14 +8,14 @@ module robobo::game {
     use robobo::user::{Self, Passport};
     use robobo::trash::{Self, TrashTokenCap, TRASH};
     use robobo::robot::{Self, Robot, Robot_Pool};
+    use robobo::element::{Self, Element};
+    use robobo::config::{Self, GameConfig};
     use sui::token::{Self, Token, TokenPolicy};
 
     // Error codes
-    const E_ALREADY_INITIALIZED: u64 = 0;
-    const E_NOT_INITIALIZED: u64 = 1;
-    const E_ALREADY_HAS_PASSPORT: u64 = 2;
-    const E_NO_PASSPORT: u64 = 3;
-    const E_ALREADY_CLAIMED_TODAY: u64 = 4;
+    const E_ALREADY_HAS_PASSPORT: u64 = 0;
+    const E_NO_PASSPORT: u64 = 1;
+    const E_ALREADY_CLAIMED_TODAY: u64 = 2;
 
     /// 定义游戏中的 TRASH token 数值
     const TRASH_AMOUNT_MINT_ROBOT: u64 = 10;
@@ -23,12 +23,20 @@ module robobo::game {
     // 可以添加更多的数值...
     // const TRASH_AMOUNT_UPGRADE_ROBOT: u64 = 200;
 
+    /// 游戏管理员权限凭证
+    public struct AdminCap has key, store {
+        id: UID
+    }
+
     /// GameState stores the global state of the game
-    public struct GameState has key,store {
+    public struct GameState has key, store {
         id: UID,
         // 记录所有用户的 passport
         passports: Table<address, ID>,
-        // 其他全局状态...
+        // 记录所有机器人的所有者
+        robots: vector<ID>,
+        // 记录机器人拥有的零件
+        elements: vector<ID>,
     }
 
     /// One-Time-Witness for the module
@@ -37,14 +45,27 @@ module robobo::game {
     // ======== 初始化函数 ========
 
     fun init(otw: GAME, ctx: &mut TxContext) {
+        // 创建管理员权限凭证
+        let admin_cap = AdminCap {
+            id: object::new(ctx)
+        };
+        
         let game_state = GameState {
             id: object::new(ctx),
             passports: table::new(ctx),
+            robots: vector::empty(),
+            elements: vector::empty(),
         };
+
         let robot_pool = robot::create_robot_pool(ctx);
+        let game_config = config::create_config(ctx);
+        
+        // 转移管理员权限给部署者
+        transfer::transfer(admin_cap, tx_context::sender(ctx));
         // Share the GameState object
         transfer::public_share_object(game_state);
         transfer::public_share_object(robot_pool);
+        transfer::public_share_object(game_config);
     }
 
     // ======== 测试函数 ========
@@ -83,7 +104,7 @@ module robobo::game {
 
     /// 用户创建初始机器人,需要收取TRASH
     public entry fun mint_robot(
-        game_state: &GameState,
+        game_state: &mut GameState,
         robot_pool: &mut Robot_Pool,
         passport: &mut Passport,
         robot_name: String,
@@ -92,9 +113,6 @@ module robobo::game {
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
-        // 验证 passport 确实属于该用户
-        assert!(table::contains(&game_state.passports, sender), E_NO_PASSPORT);
-        
         // 分割出正确数量的token作为支付，剩余的返还给用户
         let payment_value = token::value(&payment);
         if (payment_value > TRASH_AMOUNT_MINT_ROBOT) {
@@ -107,7 +125,11 @@ module robobo::game {
         
         // 创建初始机器人并获取其 ID
         let robot = robot::create_robot(robot_name, robot_pool, ctx);
-        let robot_id = robot::get_robot_id(&robot);        
+        let robot_id = robot::get_robot_id(&robot);
+        
+        // 记录机器人所有者
+        vector::push_back(&mut game_state.robots, robot_id);
+        
         // 添加机器人到 passport
         user::add_robot(passport, robot_id);
         
@@ -130,6 +152,90 @@ module robobo::game {
         user::update_last_mint_token_time(passport, ctx);
         // 铸造 TRASH token 给用户
         trash::mint(token_cap, TRASH_AMOUNT_DAILY_CLAIM, ctx);
+    }
+
+    // ======== 零件管理功能 ========
+
+    /// 装备零件
+    /// * `game_config` - 游戏配置
+    /// * `robot_pool` - 机器人池
+    /// * `robot` - 要装备零件的机器人
+    /// * `element` - 要装备的零件
+    public entry fun equip_element(
+        game_state: &mut GameState,
+        game_config: &GameConfig,
+        robot_pool: &mut Robot_Pool,
+        robot: &mut Robot,
+        element: Element,
+        ctx: &mut TxContext
+    ) {
+        let robot_id = robot::get_robot_id(robot);
+        let element_id = element::get_element_id(&element);
+        
+        // 装备零件
+        robot::equip_element(robot, element, robot_pool, game_config);
+        
+        // 更新机器人的零件列表
+        vector::push_back(&mut game_state.elements, element_id);
+    }
+
+    /// 从机器人上卸下零件（零件会被销毁）
+    /// * `game_state` - 游戏状态
+    /// * `robot_pool` - 机器人池
+    /// * `robot` - 要卸下零件的机器人
+    /// * `element_idx` - 要卸下的零件索引
+    /// * `ctx` - 交易上下文
+    public entry fun unequip_element(
+        game_state: &mut GameState,
+        robot_pool: &mut Robot_Pool,
+        robot: &mut Robot,
+        element_idx: u64,
+        ctx: &mut TxContext
+    ) {
+        let robot_id = robot::get_robot_id(robot);
+        
+        // 卸下零件
+        let element = robot::unequip_element(robot, element_idx, robot_pool);
+        
+        // 更新机器人的零件列表
+        vector::remove(&mut game_state.elements, element_idx);
+        
+        // 销毁零件
+        element::delete_element(element);
+    }
+
+    // ======== 管理员功能 ========
+
+    /// 设置机器人可装备的最大零件数量
+    public entry fun set_max_elements(
+        _: &AdminCap,
+        game_config: &mut GameConfig,
+        new_max: u64,
+    ) {
+        config::set_max_elements(game_config, new_max);
+    }
+
+    /// 创建零件
+    /// * `admin_cap` - 管理员权限凭证
+    /// * `name` - 零件名称
+    /// * `description` - 零件描述
+    /// * `abilities` - 零件属性数组
+    /// * `ctx` - 交易上下文
+    public entry fun create_element(
+        _: &AdminCap,
+        name: String,
+        description: String,
+        abilities: vector<u8>,
+        ctx: &mut TxContext
+    ) {
+        let element = element::create_element(
+            name,
+            description,
+            abilities,
+            ctx
+        );
+        // 将创建的零件转移给管理员
+        transfer::public_transfer(element, tx_context::sender(ctx));
     }
 
     // ======== 视图函数 ========
