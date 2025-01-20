@@ -1,7 +1,5 @@
 module robobo::element {
     use std::string::String;
-    use sui::object::{Self, UID, ID};
-    use std::vector;
     // Weapon, Armor, Engine, Power, Core
     /// 零件属性数量 (攻击力[0], 防御力[1], 速度[2], 能量[3], 核心[4])
     const ABILITY_SIZE: u64 = 5;

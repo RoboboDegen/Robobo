@@ -1,16 +1,14 @@
 module robobo::game {
-    use sui::object::{Self, UID, ID};
-    use sui::tx_context::{Self, TxContext};
-    use sui::transfer;
-    use sui::clock::{Self, Clock};
-    use sui::table::{Self, Table};
+    use sui::{
+        table::{Self, Table},
+        token::{Self, Token, TokenPolicy},
+    };
     use std::string::String;
     use robobo::user::{Self, Passport};
     use robobo::trash::{Self, TrashTokenCap, TRASH};
     use robobo::robot::{Self, Robot, Robot_Pool};
     use robobo::element::{Self, Element};
     use robobo::config::{Self, GameConfig};
-    use sui::token::{Self, Token, TokenPolicy};
 
     // Error codes
     const E_ALREADY_HAS_PASSPORT: u64 = 0;
@@ -47,7 +45,7 @@ module robobo::game {
 
     // ======== 初始化函数 ========
 
-    fun init(otw: GAME, ctx: &mut TxContext) {
+    fun init(_: GAME, ctx: &mut TxContext) {
         // 创建管理员权限凭证
         let admin_cap = AdminCap {
             id: object::new(ctx)
@@ -210,7 +208,6 @@ module robobo::game {
         robot_pool: &mut Robot_Pool,
         robot: &mut Robot,
         element_id: ID,
-        ctx: &mut TxContext
     ) {
         let robot_id = robot::get_robot_id(robot);
         

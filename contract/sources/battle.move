@@ -17,7 +17,7 @@ module robobo::battle {
         attacker: &mut Robot, 
         defender: ID, 
         clock: &Clock, 
-        pool: &mut Robot_Pool
+        pool: &Robot_Pool
     ): BattleResult {
         let mut battle_timestamp = clock::timestamp_ms(clock).to_string();
         let (attacker_attack, attacker_defense, attacker_speed, mut attacker_energy, attacker_personality) = get_robot_stats(attacker);

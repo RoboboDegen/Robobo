@@ -1,6 +1,5 @@
 module robobo::user {
     use std::string::String;
-    use std::vector;
 
     const E_ROBOT_EXISTS: u64 = 0;
     const E_ELEMENT_EXISTS: u64 = 1;
@@ -33,7 +32,7 @@ module robobo::user {
         passport.name = name;
     }
 
-    public(package) fun update_last_mint_token_time(passport: &mut Passport, ctx: &mut TxContext){
+    public(package) fun update_last_mint_token_time(passport: &mut Passport, ctx: &TxContext){
         passport.last_mint_token_time = tx_context::epoch_timestamp_ms(ctx);
     }
 

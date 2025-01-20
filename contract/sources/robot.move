@@ -1,9 +1,12 @@
 module robobo::robot {
     use robobo::element::{Self, Element};
-    use robobo::calculate::{Self, calculate_robot_stats_from_hash};
+    use robobo::calculate::{calculate_robot_stats_from_hash};
     use robobo::config::{Self, GameConfig};
-    use std::{string::String, vector};
-    use sui::{object::{Self, ID, UID}, hash, table::{Self, Table}};
+    use std::{string::String};
+    use sui::{
+        hash,
+        table::{Self, Table},
+    };
 
     const E_ROBOT_NOT_EXISTS: u64 = 0;
     const E_ELEMENT_NOT_EQUIPPED: u64 = 1;

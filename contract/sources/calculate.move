@@ -68,8 +68,7 @@ module robobo::calculate {
         move_value: u8,
         attack: u8,
         defense: u8,
-        personality: u8,
-        is_attacker: bool
+        personality: u8
     ) {
         // 根据move_value决定行动类型
         if (move_value <= 3) {
@@ -104,10 +103,10 @@ module robobo::calculate {
     fun calculate_damage(base_stat: u64, multiplier: u64, personality: u8, is_attack: bool): u8 {
         let personality_modifier = if (is_attack) {
             // 攻击型动作：高personality加成，但限制在1-2之间
-            ((personality as u64) * 1) / 100 + 1  // 降低personality的影响
+            (personality as u64) / 100 + 1  // 降低personality的影响
         } else {
             // 防御型动作：低personality加成
-            ((100 - (personality as u64)) * 1) / 100 + 1  // 降低personality的影响
+            ((100 - personality as u64)) / 100 + 1  // 降低personality的影响
         };
         
         // 验证计算过程，防止溢出
@@ -177,11 +176,9 @@ module robobo::calculate {
     public fun calculate_battle_result(battle_hash: vector<u8>, attacker_energy: &mut u8, defender_energy: &mut u8, attacker_attack: u8, attacker_defense: u8, attacker_speed: u8, attacker_personality: u8, defender_attack: u8, defender_defense: u8, defender_speed: u8, defender_personality: u8): (bool, u8, u8) {
         let (attacker_moves, defender_moves) = split_and_convert_hash(battle_hash);
 
-        let mut isFighting = true;
         let mut round = 0;
-        while (isFighting) {
+        while (true) {
             if(*attacker_energy <= 127 || *defender_energy <= 127) {
-                isFighting = false;
                 break
             };
             
@@ -203,8 +200,7 @@ module robobo::calculate {
                     attacker_moves[round],
                     attacker_attack,
                     attacker_defense,
-                    attacker_personality,
-                    true
+                    attacker_personality
                 );
                 
                 // 如果防御者还活着，则进行反击
@@ -215,8 +211,7 @@ module robobo::calculate {
                         defender_moves[round],
                         defender_attack,
                         defender_defense,
-                        defender_personality,
-                        false
+                        defender_personality
                     );
                 };
             } else {
@@ -227,8 +222,7 @@ module robobo::calculate {
                     defender_moves[round],
                     defender_attack,
                     defender_defense,
-                    defender_personality,
-                    false
+                    defender_personality
                 );
                 
                 // 如果攻击者还活着，则进行反击
@@ -239,8 +233,7 @@ module robobo::calculate {
                         attacker_moves[round],
                         attacker_attack,
                         attacker_defense,
-                        attacker_personality,
-                        true
+                        attacker_personality
                     );
                 };
             };
@@ -254,7 +247,7 @@ module robobo::calculate {
         // 计算战斗结果
         let attacker_final_energy = *attacker_energy;
         let defender_final_energy = *defender_energy;
-        let winner = if (*attacker_energy > *defender_energy) { true } else { false };
+        let winner = *attacker_energy > *defender_energy;
         (winner, attacker_final_energy, defender_final_energy)
     }
 }

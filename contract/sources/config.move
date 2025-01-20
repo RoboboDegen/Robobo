@@ -1,6 +1,4 @@
 module robobo::config {
-    use sui::object::{Self, UID};
-    use sui::tx_context::TxContext;
 
     /// 游戏配置结构
     public struct GameConfig has key, store {
