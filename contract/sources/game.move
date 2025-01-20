@@ -23,6 +23,9 @@ module robobo::game {
     // 可以添加更多的数值...
     // const TRASH_AMOUNT_UPGRADE_ROBOT: u64 = 200;
 
+    /// 添加新的常量
+    const TRASH_AMOUNT_EQUIP_ELEMENT: u64 = 5;
+
     /// 游戏管理员权限凭证
     public struct AdminCap has key, store {
         id: UID
@@ -33,10 +36,10 @@ module robobo::game {
         id: UID,
         // 记录所有用户的 passport
         passports: Table<address, ID>,
-        // 记录所有机器人的所有者
+        // 记录所有机器人
         robots: vector<ID>,
-        // 记录机器人拥有的零件
-        elements: vector<ID>,
+        // 记录所有的零件
+        elements: Table<ID, vector<ID>>,
     }
 
     /// One-Time-Witness for the module
@@ -54,7 +57,7 @@ module robobo::game {
             id: object::new(ctx),
             passports: table::new(ctx),
             robots: vector::empty(),
-            elements: vector::empty(),
+            elements: table::new(ctx),
         };
 
         let robot_pool = robot::create_robot_pool(ctx);
@@ -161,22 +164,39 @@ module robobo::game {
     /// * `robot_pool` - 机器人池
     /// * `robot` - 要装备零件的机器人
     /// * `element` - 要装备的零件
+    /// * `payment` - 支付的 TRASH token
     public entry fun equip_element(
         game_state: &mut GameState,
         game_config: &GameConfig,
         robot_pool: &mut Robot_Pool,
         robot: &mut Robot,
         element: Element,
+        mut payment: Token<TRASH>,
+        token_policy: &mut TokenPolicy<TRASH>,
         ctx: &mut TxContext
     ) {
         let robot_id = robot::get_robot_id(robot);
         let element_id = element::get_element_id(&element);
         
+        // 处理支付
+        let payment_value = token::value(&payment);
+        if (payment_value > TRASH_AMOUNT_EQUIP_ELEMENT) {
+            let remaining = token::split(&mut payment, payment_value - TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+            token::keep(remaining, ctx);
+        };
+        
+        // 支付 TRASH token
+        trash::spend(payment, token_policy, TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+        
         // 装备零件
         robot::equip_element(robot, element, robot_pool, game_config);
         
         // 更新机器人的零件列表
-        vector::push_back(&mut game_state.elements, element_id);
+        if (!table::contains(&game_state.elements, robot_id)) {
+            table::add(&mut game_state.elements, robot_id, vector::empty());
+        };
+        let elements = table::borrow_mut(&mut game_state.elements, robot_id);
+        vector::push_back(elements, element_id);
     }
 
     /// 从机器人上卸下零件（零件会被销毁）
@@ -189,19 +209,80 @@ module robobo::game {
         game_state: &mut GameState,
         robot_pool: &mut Robot_Pool,
         robot: &mut Robot,
-        element_idx: u64,
+        element_id: ID,
         ctx: &mut TxContext
     ) {
         let robot_id = robot::get_robot_id(robot);
         
         // 卸下零件
-        let element = robot::unequip_element(robot, element_idx, robot_pool);
+        let element = robot::unequip_element_by_id(robot, element_id, robot_pool);
         
         // 更新机器人的零件列表
-        vector::remove(&mut game_state.elements, element_idx);
+        let elements = table::borrow_mut(&mut game_state.elements, robot_id);
+        let (exists, index) = vector::index_of(elements, &element_id);
+        if (exists) {
+            vector::remove(elements, index);
+        };
         
         // 销毁零件
         element::delete_element(element);
+    }
+
+    /// 替换零件（卸下旧零件并装备新零件）
+    /// * `game_state` - 游戏状态
+    /// * `game_config` - 游戏配置
+    /// * `robot_pool` - 机器人池
+    /// * `robot` - 要替换零件的机器人
+    /// * `old_element_id` - 要替换的零件ID
+    /// * `new_element` - 新的零件
+    /// * `payment` - 支付的 TRASH token
+    public entry fun replace_element(
+        game_state: &mut GameState,
+        game_config: &GameConfig,
+        robot_pool: &mut Robot_Pool,
+        robot: &mut Robot,
+        old_element_id: ID,
+        new_element: Element,
+        mut payment: Token<TRASH>,
+        token_policy: &mut TokenPolicy<TRASH>,
+        ctx: &mut TxContext
+    ) {
+        let robot_id = robot::get_robot_id(robot);
+
+        // 卸下旧零件
+        let old_element = robot::unequip_element_by_id(robot, old_element_id, robot_pool);
+        
+        // 更新机器人的零件列表
+        let elements = table::borrow_mut(&mut game_state.elements, robot_id);
+        let (exists, index) = vector::index_of(elements, &old_element_id);
+        if (exists) {
+            vector::remove(elements, index);
+        };
+        
+        // 销毁旧零件
+        element::delete_element(old_element);
+
+        // 处理支付
+        let payment_value = token::value(&payment);
+        if (payment_value > TRASH_AMOUNT_EQUIP_ELEMENT) {
+            let remaining = token::split(&mut payment, payment_value - TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+            token::keep(remaining, ctx);
+        };
+        
+        // 支付 TRASH token
+        trash::spend(payment, token_policy, TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+        
+        let element_id = element::get_element_id(&new_element);
+        
+        // 装备新零件
+        robot::equip_element(robot, new_element, robot_pool, game_config);
+        
+        // 更新机器人的零件列表
+        if (!table::contains(&game_state.elements, robot_id)) {
+            table::add(&mut game_state.elements, robot_id, vector::empty());
+        };
+        let elements = table::borrow_mut(&mut game_state.elements, robot_id);
+        vector::push_back(elements, element_id);
     }
 
     // ======== 管理员功能 ========
@@ -220,12 +301,14 @@ module robobo::game {
     /// * `name` - 零件名称
     /// * `description` - 零件描述
     /// * `abilities` - 零件属性数组
+    /// * `recipient` - 接收者地址
     /// * `ctx` - 交易上下文
     public entry fun create_element(
         _: &AdminCap,
         name: String,
         description: String,
         abilities: vector<u8>,
+        recipient: address,
         ctx: &mut TxContext
     ) {
         let element = element::create_element(
@@ -234,8 +317,24 @@ module robobo::game {
             abilities,
             ctx
         );
-        // 将创建的零件转移给管理员
-        transfer::public_transfer(element, tx_context::sender(ctx));
+        // 将创建的零件转移给指定用户
+        transfer::public_transfer(element, recipient);
+    }
+
+    /// 管理员创建并发送 TRASH token 给指定用户
+    /// * `admin_cap` - 管理员权限凭证
+    /// * `token_cap` - TRASH token 铸造权限
+    /// * `amount` - 要创建的 token 数量
+    /// * `recipient` - 接收者地址
+    public entry fun admin_mint_and_transfer(
+        _: &AdminCap,
+        token_cap: &mut TrashTokenCap,
+        amount: u64,
+        recipient: address,
+        ctx: &mut TxContext
+    ) {
+        // 铸造指定数量的 TRASH token
+        trash::mint_and_transfer(token_cap, amount, recipient, ctx);
     }
 
     // ======== 视图函数 ========

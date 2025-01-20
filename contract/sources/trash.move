@@ -26,9 +26,6 @@ module robobo::trash {
 
     fun init(otw: TRASH, ctx: &mut TxContext) {
         let deployer = ctx.sender();
-        let admin_cap = Trash_AdminCap {
-            id: object::new(ctx)
-        };
         let (treasury_cap, metadata) = coin::create_currency<TRASH>(
             otw,
             DECIMALS,
@@ -52,7 +49,6 @@ module robobo::trash {
         token::allow(&mut policy, &cap, token::spend_action(), ctx);
         token::share_policy<TRASH>(policy);
 
-        transfer::transfer(admin_cap, deployer);
         transfer::share_object(token_cap);
         transfer::public_transfer(cap, deployer);
         transfer::public_freeze_object(metadata);
@@ -73,5 +69,11 @@ module robobo::trash {
         assert!(token::value<TRASH>(&payment) == amount, EInvalidAmount);
         let req = token::spend(payment, ctx);
         token::confirm_request_mut(token_policy, req, ctx);
+    }
+
+    public(package) fun mint_and_transfer(token_cap: &mut TrashTokenCap, amount: u64, recipient: address, ctx: &mut TxContext) {
+        let t_token = token::mint(&mut token_cap.cap, amount, ctx);
+        let req = token::transfer<TRASH>(t_token, recipient, ctx);
+        token::confirm_with_treasury_cap<TRASH>(&mut token_cap.cap, req, ctx);
     }
 }
