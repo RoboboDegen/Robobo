@@ -35,6 +35,7 @@ module robobo::robot {
         personality: u8,
     }
 
+//game
     public(package) fun create_robot(name: String, pool: &mut Robot_Pool, ctx: &mut TxContext): Robot {
         let name_hash = hash::keccak256(name.as_bytes());
         let (attack, defense, speed, energy, personality) = calculate_robot_stats_from_hash(name_hash);

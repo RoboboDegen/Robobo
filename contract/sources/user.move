@@ -9,7 +9,7 @@ module robobo::user {
     const E_ROBOT_NOT_EXISTS: u64 = 2;
     const E_ELEMENT_NOT_EXISTS: u64 = 3;
 
-    public struct Passport has key {
+    public struct Passport has key, store {
         id: UID,
         name: String,
         robots: vector<ID>,
@@ -17,6 +17,7 @@ module robobo::user {
         last_mint_token_time: u64,
     }
 
+    //game
     public(package) fun mint(name: String, clock: &Clock, ctx: &mut TxContext): Passport {
         let passport = Passport {
             id: object::new(ctx),
@@ -28,6 +29,7 @@ module robobo::user {
         passport
     }
 
+    //game
     public fun edit_name(passport: &mut Passport, name: String) {
         passport.name = name;
     }

@@ -5,6 +5,7 @@ module robobo::battle {
         hash,
     };
 
+    //game
     public fun start_battle(
         attacker: &mut Robot, 
         defender: ID, 

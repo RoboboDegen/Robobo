@@ -58,6 +58,7 @@ module robobo::trash {
         transfer::public_freeze_object(metadata);
     }
 
+//game
     public(package) fun mint(token_cap: &mut TrashTokenCap, amount: u64, ctx: &mut TxContext) {
         let t_token = token::mint(&mut token_cap.cap, amount, ctx);
         let req = token::transfer<TRASH>(t_token, ctx.sender(), ctx);

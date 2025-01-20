@@ -14,6 +14,7 @@ module robobo::element {
         abilities: vector<u8>,
     }
 
+//game
     public(package) fun create_element(
         name: String,
         abilities: vector<u8>,
@@ -44,6 +45,8 @@ module robobo::element {
         }
     }
 
+    //game
+    // 销毁
     public(package) fun delete_element(element: Element) {
         let Element {id, abilities: abilities_vec, ..} = element;
         object::delete(id);
