@@ -1,10 +1,5 @@
 module robobo::user {
     use std::string::String;
-    use sui::{ 
-        object::{Self, UID, ID},
-        tx_context::{Self, TxContext},
-        transfer
-    };
     use std::vector;
 
     const E_ROBOT_EXISTS: u64 = 0;

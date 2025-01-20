@@ -96,15 +96,15 @@ module robobo::robot {
         robot_mirror
     }
 
-    ///  Getter for robot personality
-    public(package) fun get_robot_personality(robot: &Robot): String {
-        robot.personality.to_string()
+    ///  Getter for robot stats
+    public(package) fun get_robot_stats(robot: &Robot): (u8, u8, u8, u8, u8) {
+        (robot.attack, robot.defense, robot.speed, robot.energy, robot.personality)
     }
 
-    public(package) fun get_robot_mirror_personality(robot_mirror_id: ID, pool: &Robot_Pool): String {
+    public(package) fun get_robot_mirror_stats(robot_mirror_id: ID, pool: &Robot_Pool): (u8, u8, u8, u8, u8) {
         assert!(table::contains(&pool.mirrors_pool, robot_mirror_id), E_ROBOT_NOT_EXISTS);
         let robot_mirror = table::borrow(&pool.mirrors_pool, robot_mirror_id);
-        robot_mirror.personality.to_string()
+        (robot_mirror.attack, robot_mirror.defense, robot_mirror.speed, robot_mirror.energy, robot_mirror.personality)
     }
 
     public(package) fun get_robot_id(robot: &Robot): ID {
