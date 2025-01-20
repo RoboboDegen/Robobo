@@ -35,6 +35,13 @@ module robobo::robot {
         personality: u8,
     }
 
+    public(package) fun create_robot_pool(ctx: &mut TxContext): Robot_Pool {
+        Robot_Pool {
+            id: object::new(ctx),
+            mirrors_pool: table::new(ctx),
+        }
+    }
+
     public(package) fun create_robot(name: String, pool: &mut Robot_Pool, ctx: &mut TxContext): Robot {
         let name_hash = hash::keccak256(name.as_bytes());
         let (attack, defense, speed, energy, personality) = calculate_robot_stats_from_hash(name_hash);
@@ -95,5 +102,9 @@ module robobo::robot {
         assert!(table::contains(&pool.mirrors_pool, robot_mirror_id), E_ROBOT_NOT_EXISTS);
         let robot_mirror = table::borrow(&pool.mirrors_pool, robot_mirror_id);
         robot_mirror.personality.to_string()
+    }
+
+    public(package) fun get_robot_id(robot: &Robot): ID {
+        robot.id.to_inner()
     }
 }
