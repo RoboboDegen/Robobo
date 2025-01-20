@@ -469,6 +469,7 @@ module robobo::game_tests {
             let mut robot_pool = ts::take_shared<Robot_Pool>(&scenario);
             let game_config = ts::take_shared<GameConfig>(&scenario);
             let mut robot = ts::take_from_sender<Robot>(&scenario);
+            let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             
             // 记录初始属性
             let initial_attack = robot::get_robot_attack(&robot);
@@ -481,6 +482,11 @@ module robobo::game_tests {
                 create_attack_abilities(),
                 ts::ctx(&mut scenario)
             );
+
+            // 获取token用于支付装备费用
+            let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            ts::return_to_sender(&scenario, token);
             
             // 装备零件
             game::equip_element(
@@ -489,6 +495,8 @@ module robobo::game_tests {
                 &mut robot_pool,
                 &mut robot,
                 element,
+                payment,
+                &mut token_policy,
                 ts::ctx(&mut scenario)
             );
             
@@ -503,6 +511,7 @@ module robobo::game_tests {
             ts::return_shared(game_state);
             ts::return_shared(robot_pool);
             ts::return_shared(game_config);
+            ts::return_shared(token_policy);
         };
 
         ts::end(scenario);
@@ -571,6 +580,7 @@ module robobo::game_tests {
             let mut robot_pool = ts::take_shared<Robot_Pool>(&scenario);
             let game_config = ts::take_shared<GameConfig>(&scenario);
             let mut robot = ts::take_from_sender<Robot>(&scenario);
+            let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             
             // 记录初始属性
             let initial_attack = robot::get_robot_attack(&robot);
@@ -590,6 +600,12 @@ module robobo::game_tests {
                 ts::ctx(&mut scenario)
             );
             
+            // 获取token用于支付装备费用
+            let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            let payment1 = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            let payment2 = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            ts::return_to_sender(&scenario, token);
+            
             // 装备零件
             game::equip_element(
                 &mut game_state,
@@ -597,6 +613,8 @@ module robobo::game_tests {
                 &mut robot_pool,
                 &mut robot,
                 element1,
+                payment1,
+                &mut token_policy,
                 ts::ctx(&mut scenario)
             );
             game::equip_element(
@@ -605,6 +623,8 @@ module robobo::game_tests {
                 &mut robot_pool,
                 &mut robot,
                 element2,
+                payment2,
+                &mut token_policy,
                 ts::ctx(&mut scenario)
             );
             
@@ -617,7 +637,7 @@ module robobo::game_tests {
                 &mut game_state,
                 &mut robot_pool,
                 &mut robot,
-                0,
+                element_id1,
                 ts::ctx(&mut scenario)
             );
             
@@ -630,18 +650,22 @@ module robobo::game_tests {
                 &mut game_state,
                 &mut robot_pool,
                 &mut robot,
-                0,
+                element_id2,
                 ts::ctx(&mut scenario)
             );
             
+            // 验证没有剩余零件
+            assert!(robot::get_robot_elements_count(&robot) == 0, 1);
+            
             // 验证属性完全恢复
-            assert!(robot::get_robot_attack(&robot) == initial_attack, 1);
-            assert!(robot::get_robot_defense(&robot) == initial_defense, 2);
+            assert!(robot::get_robot_attack(&robot) == initial_attack, 2);
+            assert!(robot::get_robot_defense(&robot) == initial_defense, 3);
             
             ts::return_to_sender(&scenario, robot);
             ts::return_shared(game_state);
             ts::return_shared(robot_pool);
             ts::return_shared(game_config);
+            ts::return_shared(token_policy);
         };
 
         ts::end(scenario);
@@ -710,9 +734,14 @@ module robobo::game_tests {
             let mut robot_pool = ts::take_shared<Robot_Pool>(&scenario);
             let game_config = ts::take_shared<GameConfig>(&scenario);
             let mut robot = ts::take_from_sender<Robot>(&scenario);
+            let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             
             let mut i = 0;
             let max_elements = config::get_max_elements(&game_config);
+
+            // 获取足够的token用于支付装备费用
+            let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            
             while (i <= max_elements) {
                 let element = element::create_element(
                     string::utf8(b"Element"),
@@ -720,21 +749,27 @@ module robobo::game_tests {
                     create_attack_abilities(),
                     ts::ctx(&mut scenario)
                 );
+                let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+                
                 game::equip_element(
                     &mut game_state,
                     &game_config,
                     &mut robot_pool,
                     &mut robot,
                     element,
+                    payment,
+                    &mut token_policy,
                     ts::ctx(&mut scenario)
                 );
                 i = i + 1;
             };
             
+            ts::return_to_sender(&scenario, token);
             ts::return_to_sender(&scenario, robot);
             ts::return_shared(game_state);
             ts::return_shared(robot_pool);
             ts::return_shared(game_config);
+            ts::return_shared(token_policy);
         };
 
         ts::end(scenario);
@@ -748,28 +783,29 @@ module robobo::game_tests {
         // 初始化游戏
         init_game(&mut scenario);
         
-        // 管理员创建零件
+        // 管理员创建零件并发送给 USER1
         ts::next_tx(&mut scenario, ADMIN);
         {
             let admin_cap = ts::take_from_sender<game::AdminCap>(&scenario);
             
-            // 创建一个攻击型零件
+            // 创建一个攻击型零件并发送给 USER1
             game::create_element(
                 &admin_cap,
                 string::utf8(b"Test Attack Element"),
                 string::utf8(b"A test attack element"),
                 create_attack_abilities(),
+                USER1,
                 ts::ctx(&mut scenario)
             );
             
             ts::return_to_sender(&scenario, admin_cap);
         };
         
-        // 验证零件创建成功并转移给了管理员
-        ts::next_tx(&mut scenario, ADMIN);
+        // 验证零件创建成功并转移给了 USER1
+        ts::next_tx(&mut scenario, USER1);
         {
-            // 验证管理员确实拥有这个零件
-            assert!(ts::has_most_recent_for_address<element::Element>(ADMIN), 0);
+            // 验证 USER1 确实拥有这个零件
+            assert!(ts::has_most_recent_for_address<element::Element>(USER1), 0);
             
             // 获取并检查零件属性
             let element = ts::take_from_sender<element::Element>(&scenario);
@@ -787,6 +823,210 @@ module robobo::game_tests {
             ts::return_to_sender(&scenario, element);
         };
         
+        ts::end(scenario);
+    }
+
+    #[test]
+    /// 测试替换零件功能
+    fun test_replace_element() {
+        let mut scenario = ts::begin(ADMIN);
+        let mut element_id1: ID;  // 声明模块级变量
+        
+        // 初始化游戏
+        init_game(&mut scenario);
+        
+        // 创建用户护照
+        ts::next_tx(&mut scenario, USER1);
+        {
+            let mut game_state = ts::take_shared<GameState>(&scenario);
+            let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            
+            game::create_passport(
+                string::utf8(b"User One"),
+                &mut game_state,
+                &mut token_cap,
+                ts::ctx(&mut scenario)
+            );
+
+            ts::return_shared(game_state);
+            ts::return_shared(token_cap);
+        };
+
+        // 创建初始机器人
+        ts::next_tx(&mut scenario, USER1);
+        {
+            let mut game_state = ts::take_shared<GameState>(&scenario);
+            let mut robot_pool = ts::take_shared<Robot_Pool>(&scenario);
+            let mut passport = ts::take_from_sender<Passport>(&scenario);
+            let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
+            let token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+
+            // 获取token并支付
+            let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            let payment = token::split(&mut token, 10, ts::ctx(&mut scenario));
+            ts::return_to_sender(&scenario, token);
+
+            game::mint_robot(
+                &mut game_state,
+                &mut robot_pool,
+                &mut passport,
+                string::utf8(b"Test Robot"),
+                payment,
+                &mut token_policy,
+                ts::ctx(&mut scenario)
+            );
+
+            ts::return_to_sender(&scenario, passport);
+            ts::return_shared(game_state);
+            ts::return_shared(robot_pool);
+            ts::return_shared(token_policy);
+            ts::return_shared(token_cap);
+        };
+
+        // 装备第一个零件
+        ts::next_tx(&mut scenario, USER1);
+        {
+            let mut game_state = ts::take_shared<GameState>(&scenario);
+            let mut robot_pool = ts::take_shared<Robot_Pool>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
+            let mut robot = ts::take_from_sender<Robot>(&scenario);
+            let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
+            
+            // 记录初始属性
+            let initial_attack = robot::get_robot_attack(&robot);
+            let initial_defense = robot::get_robot_defense(&robot);
+            
+            // 创建一个攻击型零件
+            let element = element::create_element(
+                string::utf8(b"Attack Element"),
+                string::utf8(b"Attack Element Description"),
+                create_attack_abilities(),
+                ts::ctx(&mut scenario)
+            );
+
+            // 获取token用于支付装备费用
+            let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            ts::return_to_sender(&scenario, token);
+            
+            // 装备零件
+            game::equip_element(
+                &mut game_state,
+                &game_config,
+                &mut robot_pool,
+                &mut robot,
+                element,
+                payment,
+                &mut token_policy,
+                ts::ctx(&mut scenario)
+            );
+            
+            // 验证属性变化
+            assert!(robot::get_robot_attack(&robot) == initial_attack + 10, 0);
+            assert!(robot::get_robot_defense(&robot) == initial_defense - 10, 1);
+
+            // 获取第一个零件的ID，用于后续替换
+            let (_, id) = robot::get_element_and_id_at(&robot, 0);
+            element_id1 = id;  // 存储到模块级变量
+            
+            ts::return_to_sender(&scenario, robot);
+            ts::return_shared(game_state);
+            ts::return_shared(robot_pool);
+            ts::return_shared(game_config);
+            ts::return_shared(token_policy);
+        };
+
+        // 替换零件
+        ts::next_tx(&mut scenario, USER1);
+        {
+            let mut game_state = ts::take_shared<GameState>(&scenario);
+            let mut robot_pool = ts::take_shared<Robot_Pool>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
+            let mut robot = ts::take_from_sender<Robot>(&scenario);
+            let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
+            
+            // 记录替换前的属性
+            let initial_attack = robot::get_robot_attack(&robot);
+            let initial_defense = robot::get_robot_defense(&robot);
+            
+            // 创建一个防御型零件
+            let new_element = element::create_element(
+                string::utf8(b"Defense Element"),
+                string::utf8(b"Defense Element Description"),
+                create_defense_abilities(),
+                ts::ctx(&mut scenario)
+            );
+
+            // 获取token用于支付装备费用
+            let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            ts::return_to_sender(&scenario, token);
+            
+            // 替换零件
+            game::replace_element(
+                &mut game_state,
+                &game_config,
+                &mut robot_pool,
+                &mut robot,
+                element_id1,  // 替换第一个零件
+                new_element,
+                payment,
+                &mut token_policy,
+                ts::ctx(&mut scenario)
+            );
+            
+            // 验证属性变化（从攻击型变为防御型）
+            assert!(robot::get_robot_attack(&robot) == initial_attack - 20, 0); // -10 (移除旧的) -10 (新的)
+            assert!(robot::get_robot_defense(&robot) == initial_defense + 20, 1); // +10 (移除旧的) +10 (新的)
+            
+            // 验证零件数量仍然是1
+            assert!(robot::get_robot_elements_count(&robot) == 1, 2);
+            
+            ts::return_to_sender(&scenario, robot);
+            ts::return_shared(game_state);
+            ts::return_shared(robot_pool);
+            ts::return_shared(game_config);
+            ts::return_shared(token_policy);
+        };
+
+        ts::end(scenario);
+    }
+
+    #[test]
+    /// 测试管理员铸造和转移 token 功能
+    fun test_admin_mint_and_transfer() {
+        let mut scenario = ts::begin(ADMIN);
+        
+        // 初始化游戏
+        init_game(&mut scenario);
+        
+        // 管理员铸造并转移 token 给用户
+        ts::next_tx(&mut scenario, ADMIN);
+        {
+            let admin_cap = ts::take_from_sender<game::AdminCap>(&scenario);
+            let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            
+            // 铸造 1000 个 token 并转移给 USER1
+            game::admin_mint_and_transfer(
+                &admin_cap,
+                &mut token_cap,
+                1000,
+                USER1,
+                ts::ctx(&mut scenario)
+            );
+            
+            ts::return_to_sender(&scenario, admin_cap);
+            ts::return_shared(token_cap);
+        };
+        
+        // 验证用户收到了正确数量的 token
+        ts::next_tx(&mut scenario, USER1);
+        {
+            let token = ts::take_from_sender<Token<TRASH>>(&scenario);
+            assert!(token::value(&token) == 1000, 0);
+            ts::return_to_sender(&scenario, token);
+        };
+
         ts::end(scenario);
     }
 }

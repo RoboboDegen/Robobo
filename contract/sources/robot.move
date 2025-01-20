@@ -236,6 +236,7 @@ module robobo::robot {
     public fun get_robot_speed(robot: &Robot): u8 {robot.speed}
     public fun get_robot_energy(robot: &Robot): u8 {robot.energy}
     public fun get_robot_personality(robot: &Robot): u8 {robot.personality}
+    public fun get_robot_elements_count(robot: &Robot): u64 {vector::length(&robot.elements)}
 
     public fun get_robot_mirror_attack(mirror: &Robot_Mirror): u8 {mirror.attack}
     public fun get_robot_mirror_defense(mirror: &Robot_Mirror): u8 {mirror.defense}
