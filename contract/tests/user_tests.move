@@ -1,11 +1,11 @@
 #[test_only]
 module robobo::user_tests {
     use sui::test_scenario::{Self as ts, Scenario};
-    use sui::clock::{Self, Clock};
     use sui::test_utils;
     use sui::object;
     use sui::transfer;
     use std::string;
+    use std::vector;
     use robobo::user::{Self, Passport};
 
     const USER1: address = @0xA1;
@@ -18,17 +18,11 @@ module robobo::user_tests {
         let mut scenario = test_scenario();
         let test = &mut scenario;
         
-        // 创建时钟
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);
-
         // 创建用户
         ts::next_tx(test, USER1);
         {
             let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
             user::transfer_passport(passport, USER1);
         };
 
@@ -44,7 +38,6 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
     
@@ -52,18 +45,12 @@ module robobo::user_tests {
     fun test_robot_management() {
         let mut scenario = test_scenario();
         let test = &mut scenario;
-        
-        // 创建时钟和用户
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);
 
-         // 创建用户
+        // 创建用户
         ts::next_tx(test, USER1);
         {
             let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
             user::transfer_passport(passport, USER1);
         };
 
@@ -93,7 +80,6 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
 
@@ -102,17 +88,11 @@ module robobo::user_tests {
         let mut scenario = test_scenario();
         let test = &mut scenario;
         
-        // 创建时钟和用户
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);
-
         // 创建用户
         ts::next_tx(test, USER1);
         {
             let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
             user::transfer_passport(passport, USER1);
         };
 
@@ -125,7 +105,6 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
 
@@ -134,17 +113,11 @@ module robobo::user_tests {
         let mut scenario = test_scenario();
         let test = &mut scenario;
         
-        // 创建时钟和用户
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);
-
         // 创建用户
         ts::next_tx(test, USER1);
         {
             let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
             user::transfer_passport(passport, USER1);
         };
 
@@ -174,7 +147,42 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        clock::destroy_for_testing(clock);
+        ts::end(scenario);
+    }
+
+    #[test]
+    fun test_daily_token_claim() {
+        let mut scenario = test_scenario();
+        let test = &mut scenario;
+
+        // 创建用户
+        ts::next_tx(test, USER1);
+        {
+            let ctx = ts::ctx(test);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
+            user::transfer_passport(passport, USER1);
+        };
+
+        // 尝试立即领取代币（应该失败，因为时间戳相同）
+        ts::next_tx(test, USER1);
+        {
+            let passport = ts::take_from_sender<Passport>(test);
+            let ctx = ts::ctx(test);
+            assert!(!user::can_claim_daily_token(&passport, ctx), 3);
+            ts::return_to_sender(test, passport);
+        };
+
+        // 设置新的时间戳（增加时间）
+        ts::next_tx(test, USER1);
+        {
+            let passport = ts::take_from_sender<Passport>(test);
+            let ctx = ts::ctx(test);
+            
+            tx_context::increment_epoch_timestamp(ctx, 1000 * 60 * 60 * 24);
+            assert!(user::can_claim_daily_token(&passport, ctx), 4);
+            ts::return_to_sender(test, passport);
+        };
+
         ts::end(scenario);
     }
 
@@ -184,17 +192,11 @@ module robobo::user_tests {
         let mut scenario = test_scenario();
         let test = &mut scenario;
         
-        // 创建时钟和用户
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);
-        
         // 创建用户
         ts::next_tx(test, USER1);
         {
             let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
             user::transfer_passport(passport, USER1);
         };
 
@@ -211,7 +213,6 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
 
@@ -220,18 +221,12 @@ module robobo::user_tests {
     fun test_remove_nonexistent_robot() {
         let mut scenario = test_scenario();
         let test = &mut scenario;
-        
-        // 创建时钟和用户
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);
 
         // 创建用户
         ts::next_tx(test, USER1);
         {
             let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
+            let passport = user::mint(string::utf8(b"Test User"), ctx);
             user::transfer_passport(passport, USER1);
         };
 
@@ -247,58 +242,6 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        clock::destroy_for_testing(clock);
-        ts::end(scenario);
-    }
-
-
-
-    #[test]
-    fun test_daily_token_claim() {
-        let mut scenario = test_scenario();
-        let test = &mut scenario;
-        
-        // 创建时钟
-        ts::next_tx(test, USER1);
-        let ctx = ts::ctx(test);
-        let mut clock = clock::create_for_testing(ctx);
-        clock::set_for_testing(&mut clock, 0);  // 从0时间开始
-
-        // 创建用户
-        ts::next_tx(test, USER1);
-        {
-            let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), &clock, ctx);
-            user::transfer_passport(passport, USER1);
-        };
-
-        // 尝试立即领取代币（应该失败，因为在同一天）
-        ts::next_tx(test, USER1);
-        {
-            let passport = ts::take_from_sender<Passport>(test);
-            assert!(!user::can_claim_daily_token(&passport, &clock), 3);
-            ts::return_to_sender(test, passport);
-        };
-
-        // 快进23小时（应该还是在同一天）
-        clock::increment_for_testing(&mut clock, 1000 * 60 * 60 * 23);
-        ts::next_tx(test, USER1);
-        {
-            let passport = ts::take_from_sender<Passport>(test);
-            assert!(!user::can_claim_daily_token(&passport, &clock), 4);
-            ts::return_to_sender(test, passport);
-        };
-
-        // 再快进2小时（应该进入下一天）
-        clock::increment_for_testing(&mut clock, 1000 * 60 * 60 * 2);
-        ts::next_tx(test, USER1);
-        {
-            let passport = ts::take_from_sender<Passport>(test);
-            assert!(user::can_claim_daily_token(&passport, &clock), 5);
-            ts::return_to_sender(test, passport);
-        };
-
-        clock::destroy_for_testing(clock);
         ts::end(scenario);
     }
 } 

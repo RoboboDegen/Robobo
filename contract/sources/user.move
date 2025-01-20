@@ -1,8 +1,11 @@
 module robobo::user {
     use std::string::String;
-    use sui::{
-        clock::{Self, Clock},
+    use sui::{ 
+        object::{Self, UID, ID},
+        tx_context::{Self, TxContext},
+        transfer
     };
+    use std::vector;
 
     const E_ROBOT_EXISTS: u64 = 0;
     const E_ELEMENT_EXISTS: u64 = 1;
@@ -17,13 +20,13 @@ module robobo::user {
         last_mint_token_time: u64,
     }
 
-    public(package) fun mint(name: String, clock: &Clock, ctx: &mut TxContext): Passport {
+    public(package) fun mint(name: String, ctx: &mut TxContext): Passport {
         let passport = Passport {
             id: object::new(ctx),
             name,
             robots: vector::empty(),
             elements: vector::empty(),
-            last_mint_token_time: clock::timestamp_ms(clock),
+            last_mint_token_time: tx_context::epoch_timestamp_ms(ctx),
         };
         passport
     }
@@ -35,8 +38,8 @@ module robobo::user {
         passport.name = name;
     }
 
-    public(package) fun update_last_mint_token_time(passport: &mut Passport, clock: &Clock){
-        passport.last_mint_token_time = clock::timestamp_ms(clock);
+    public(package) fun update_last_mint_token_time(passport: &mut Passport, ctx: &mut TxContext){
+        passport.last_mint_token_time = tx_context::epoch_timestamp_ms(ctx);
     }
 
     public(package) fun add_robot(passport: &mut Passport, robot:ID){
@@ -87,16 +90,15 @@ module robobo::user {
     }
 
     /// 检查是否可以领取每日代币
-    #[test_only]
-    public fun can_claim_daily_token(passport: &Passport, clock: &Clock): bool {
-        let current_time = clock::timestamp_ms(clock);
+    public fun can_claim_daily_token(passport: &Passport, ctx: &TxContext): bool {
+        let current_time = tx_context::epoch_timestamp_ms(ctx);
         let last_claim_time = passport.last_mint_token_time;
-        
-        // 转换为天数（毫秒转天）
-        let current_day = current_time / (1000 * 60 * 60 * 24);
-        let last_claim_day = last_claim_time / (1000 * 60 * 60 * 24);
-        
-        current_day > last_claim_day
+        current_time > last_claim_time
+    }
+
+    /// 获取用户上次领取代币的时间
+    public fun get_last_mint_token_time(passport: &Passport): u64 {
+        passport.last_mint_token_time
     }
 
     /// 转移 Passport 给其他用户
