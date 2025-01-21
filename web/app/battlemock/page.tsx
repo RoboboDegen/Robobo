@@ -36,9 +36,22 @@ export default function BattleMockPage() {
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [attackerName, setAttackerName] = useState("");
   const [defenderName, setDefenderName] = useState("");
+  const [battleHashInput, setBattleHashInput] = useState<string>("");
+  const [currentBattleHash, setCurrentBattleHash] = useState<number[]>([]);
 
   function generateRandomHash(): number[] {
-    return Array.from({ length: 32 }, () => Math.floor(Math.random() * 256));
+    const newHash = Array.from({ length: 32 }, () => Math.floor(Math.random() * 256));
+    setCurrentBattleHash(newHash);
+    setBattleHashInput(newHash.join(','));
+    return newHash;
+  }
+
+  function handleHashInput(input: string) {
+    setBattleHashInput(input);
+    const hashArray = input.split(',').map(num => parseInt(num.trim()));
+    if (hashArray.length === 32 && hashArray.every(num => !isNaN(num) && num >= 0 && num <= 255)) {
+      setCurrentBattleHash(hashArray);
+    }
   }
 
   function calculateDamage(
@@ -112,7 +125,7 @@ export default function BattleMockPage() {
   }
 
   function simulateBattle() {
-    const battleHash = generateRandomHash();
+    const battleHash = currentBattleHash.length === 32 ? currentBattleHash : generateRandomHash();
     let currentAttackerEnergy = attacker.energy;
     let currentDefenderEnergy = defender.energy;
     const logs: string[] = [];
@@ -323,6 +336,30 @@ export default function BattleMockPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="p-4">
+        <h2 className="text-xl font-semibold mb-4">Battle Hash</h2>
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              value={battleHashInput}
+              onChange={(e) => handleHashInput(e.target.value)}
+              placeholder="Enter 32 comma-separated numbers (0-255)"
+              className="flex-1"
+            />
+            <Button 
+              onClick={generateRandomHash}
+              className="whitespace-nowrap"
+            >
+              Generate Random Hash
+            </Button>
+          </div>
+          <div className="text-sm text-gray-500">
+            Current Hash: {currentBattleHash.length === 32 ? "Valid" : "Invalid"} 
+            ({currentBattleHash.length} bytes)
+          </div>
+        </div>
+      </Card>
 
       <Button onClick={simulateBattle} className="w-full">
         Simulate Battle
