@@ -1,8 +1,5 @@
 module robobo::user {
     use std::string::String;
-    
-    const E_ROBOT_EXISTS: u64 = 0;
-    const E_ROBOT_NOT_EXISTS: u64 = 1;
 
     public struct Passport has key {
         id: UID,

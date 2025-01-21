@@ -1,13 +1,10 @@
 module robobo::battle {
     use sui::{
         event,
-        object::{Self, ID},
         random::{Self, Random},
         clock::{Self, Clock},
         hash,
-        tx_context::TxContext
     };
-    use std::vector;
     use robobo::calculate::calculate_battle_result;
     use robobo::robot::{Self, Robot, Robot_Pool};
     use robobo::trash::{Self, TrashTokenCap};

@@ -292,7 +292,6 @@ module robobo::game_tests {
             let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::claim_daily_token(
-                &game_state,
                 &game_config,
                 &mut passport,
                 &mut token_cap,
@@ -367,7 +366,6 @@ module robobo::game_tests {
             let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::claim_daily_token(
-                &game_state,
                 &game_config,
                 &mut passport,
                 &mut token_cap,
@@ -389,7 +387,6 @@ module robobo::game_tests {
             let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::claim_daily_token(
-                &game_state,
                 &game_config,
                 &mut passport,
                 &mut token_cap,
