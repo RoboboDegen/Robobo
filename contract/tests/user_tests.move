@@ -18,6 +18,13 @@ module robobo::user_tests {
         let mut scenario = test_scenario();
         let test = &mut scenario;
         
+        // 设置初始时间戳
+        ts::next_tx(test, USER1);
+        {
+            let ctx = ts::ctx(test);
+            tx_context::increment_epoch_timestamp(ctx, 1000); // 设置一个非零的时间戳
+        };
+        
         // 创建用户
         ts::next_tx(test, USER1);
         {
@@ -31,7 +38,7 @@ module robobo::user_tests {
         {
             let passport = ts::take_from_sender<Passport>(test);
             assert!(user::get_name(&passport) == string::utf8(b"Test User"), 0);
-            assert!(user::get_last_mint_token_time(&passport) > 0, 1);
+            assert!(user::get_last_mint_token_time(&passport) == 1000, 1); // 验证时间戳是否正确
             ts::return_to_sender(test, passport);
         };
 

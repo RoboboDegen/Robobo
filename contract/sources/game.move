@@ -2,10 +2,8 @@ module robobo::game {
     use sui::{
         table::{Self, Table},
         token::{Self, Token, TokenPolicy},
-        clock::{Self, Clock},
-        event,
-        object::{Self, ID, UID},
-        random::{Self, Random}
+        clock::{ Clock },
+        random::{ Random }
     };
     use std::string::String;
     use robobo::user::{Self, Passport};
@@ -13,22 +11,16 @@ module robobo::game {
     use robobo::robot::{Self, Robot, Robot_Pool};
     use robobo::element::{Self, Element};
     use robobo::config::{Self, GameConfig};
-    use robobo::battle::{Self, BattleResult};
+    use robobo::battle::{Self};
 
     // Error codes
     const E_ALREADY_HAS_PASSPORT: u64 = 0;
     const E_NO_PASSPORT: u64 = 1;
     const E_ALREADY_CLAIMED_TODAY: u64 = 2;
 
-    /// 定义游戏中的 TRASH token 数值
-    const TRASH_AMOUNT_MINT_ROBOT: u64 = 10;
-    const TRASH_AMOUNT_DAILY_CLAIM: u64 = 100;
-    // 可以添加更多的数值...
-    // const TRASH_AMOUNT_UPGRADE_ROBOT: u64 = 200;
 
     /// 添加新的常量
     const TRASH_AMOUNT_EQUIP_ELEMENT: u64 = 5;
-    const TRASH_AMOUNT_BATTLE: u64 = 10;
 
     /// 游戏管理员权限凭证
     public struct AdminCap has key, store {
@@ -66,10 +58,8 @@ module robobo::game {
 
     fun init(_: GAME, ctx: &mut TxContext) {
         // 创建管理员权限凭证
-        let admin_cap = AdminCap {
-            id: object::new(ctx)
-        };
-        
+        let admin_cap = AdminCap {id: object::new(ctx)};
+
         let game_state = GameState {
             id: object::new(ctx),
             passports: table::new(ctx),
@@ -81,7 +71,7 @@ module robobo::game {
 
         let robot_pool = robot::create_robot_pool(ctx);
         let game_config = config::create_config(ctx);
-        
+
         // 转移管理员权限给部署者
         transfer::transfer(admin_cap, tx_context::sender(ctx));
         // Share the GameState object
@@ -96,7 +86,6 @@ module robobo::game {
         init(GAME {}, ctx)
     }
 
-
     // ======== 入口函数 ========
 
     /// 创建新用户的 Passport
@@ -109,17 +98,28 @@ module robobo::game {
     ) {
         let sender = tx_context::sender(ctx);
         // 确保用户还没有 passport
-        assert!(!table::contains(&game_state.passports, sender), E_ALREADY_HAS_PASSPORT);
-        
+        assert!(
+            !table::contains(&game_state.passports, sender),
+            E_ALREADY_HAS_PASSPORT
+        );
+
         // 创建新的 passport 并获取其 ID
         let passport = user::mint(name, ctx);
         let passport_id = user::get_passport_id(&passport);
-        
+
         // 记录用户的 passport
-        table::add(&mut game_state.passports, sender, passport_id);
-        
+        table::add(
+            &mut game_state.passports,
+            sender,
+            passport_id
+        );
+
         // 铸造 TRASH token 给用户
-        trash::mint(token_cap, config::get_trash_amount_daily_claim(game_config), ctx);
+        trash::mint(
+            token_cap,
+            config::get_trash_amount_daily_claim(game_config),
+            ctx
+        );
 
         // 转移 passport 给用户
         user::transfer_passport(passport, sender);
@@ -136,51 +136,63 @@ module robobo::game {
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
-        assert!(table::contains(&game_state.passports, sender), E_NO_PASSPORT);
-        
+        assert!(
+            table::contains(&game_state.passports, sender),
+            E_NO_PASSPORT
+        );
+
         let mint_cost = config::get_trash_amount_mint_robot(game_config);
         // 分割出正确数量的token作为支付，剩余的返还给用户
         let payment_value = token::value(&payment);
         if (payment_value > mint_cost) {
-            let remaining = token::split(&mut payment, payment_value - mint_cost, ctx);
+            let remaining = token::split(
+                &mut payment,
+                payment_value - mint_cost,
+                ctx
+            );
             token::keep(remaining, ctx);
         };
-        
+
         // 支付 TRASH token
         trash::spend(payment, token_policy, mint_cost, ctx);
-        
+
         // 创建初始机器人并获取其 ID
         let robot = robot::create_robot(robot_name, robot_pool, ctx);
         let robot_id = robot::get_robot_id(&robot);
-        
+
         // 记录机器人
         vector::push_back(&mut game_state.robots, robot_id);
-        
+
         // 转移机器人给用户
         transfer::public_transfer(robot, sender);
     }
 
     /// 每日领取 TRASH token
     public entry fun claim_daily_token(
-        game_state: &GameState,
         game_config: &GameConfig,
         passport: &mut Passport,
         token_cap: &mut TrashTokenCap,
         ctx: &mut TxContext
     ) {
-        let sender = tx_context::sender(ctx);
-        assert!(user::can_claim_daily_token(passport,ctx), E_ALREADY_CLAIMED_TODAY);
+        assert!(
+            user::can_claim_daily_token(passport, ctx),
+            E_ALREADY_CLAIMED_TODAY
+        );
         // 更新最后领取时间
         user::update_last_mint_token_time(passport, ctx);
         // 铸造 TRASH token 给用户
-        trash::mint(token_cap, config::get_trash_amount_daily_claim(game_config), ctx);
+        trash::mint(
+            token_cap,
+            config::get_trash_amount_daily_claim(game_config),
+            ctx
+        );
     }
 
     /// 随机战斗入口函数
-    public entry fun random_battle(
+    entry fun random_battle(
         game_state: &mut GameState,
         game_config: &GameConfig,
-        robot_pool: &mut Robot_Pool,
+        robot_pool: &Robot_Pool,
         robot: &mut Robot,
         payment: Token<TRASH>,
         token_policy: &mut TokenPolicy<TRASH>,
@@ -192,28 +204,49 @@ module robobo::game {
         // 1. 先进行所有必要的检查和支付，确保在随机性生成前完成
         let robot_id = robot::get_robot_id(robot);
         let sender = tx_context::sender(ctx);
-        assert!(table::contains(&game_state.passports, sender), E_NO_PASSPORT);
-        
+        assert!(
+            table::contains(&game_state.passports, sender),
+            E_NO_PASSPORT
+        );
+
         // 消耗战斗费用（提前支付）
-        trash::spend(payment, token_policy, config::get_trash_amount_battle(game_config), ctx);
-        
+        trash::spend(
+            payment,
+            token_policy,
+            config::get_trash_amount_battle(game_config),
+            ctx
+        );
+
         // 2. 生成随机对手
-        let opponent_id = battle::select_random_opponent(&game_state.robots, robot_id, random, ctx);
-        
+        let opponent_id = battle::select_random_opponent(
+            &game_state.robots,
+            robot_id,
+            random,
+            ctx
+        );
+
         // 3. 进行战斗
         let battle_result = battle::start_battle(robot, opponent_id, clock, robot_pool);
-        
+
         // 4. 更新游戏状态（无论胜负都要执行，保证gas消耗一致）
         game_state.total_battles = game_state.total_battles + 1;
-        
+
         // 5. 更新排行榜（无论胜负都要执行）
         if (!table::contains(&game_state.rankings, robot_id)) {
-            table::add(&mut game_state.rankings, robot_id, 0);
+            table::add(
+                &mut game_state.rankings,
+                robot_id,
+                0
+            );
         };
         if (!table::contains(&game_state.rankings, opponent_id)) {
-            table::add(&mut game_state.rankings, opponent_id, 0);
+            table::add(
+                &mut game_state.rankings,
+                opponent_id,
+                0
+            );
         };
-        
+
         // 6. 更新胜负记录
         if (battle::is_winner(&battle_result)) {
             robot::increment_win_count(robot);
@@ -221,7 +254,10 @@ module robobo::game {
             *wins = *wins + 1;
         } else {
             robot::increment_lose_count(robot);
-            let wins = table::borrow_mut(&mut game_state.rankings, opponent_id);
+            let wins = table::borrow_mut(
+                &mut game_state.rankings,
+                opponent_id
+            );
             *wins = *wins + 1;
         };
 
@@ -258,23 +294,41 @@ module robobo::game {
         let robot_id = robot::get_robot_id(robot);
         let element_id = element::get_element_id(&element);
         let equip_cost = config::get_trash_amount_equip_element(game_config);
-        
+
         // 处理支付
         let payment_value = token::value(&payment);
         if (payment_value > equip_cost) {
-            let remaining = token::split(&mut payment, payment_value - equip_cost, ctx);
+            let remaining = token::split(
+                &mut payment,
+                payment_value - equip_cost,
+                ctx
+            );
             token::keep(remaining, ctx);
         };
-        
+
         // 支付 TRASH token
-        trash::spend(payment, token_policy, equip_cost, ctx);
-        
+        trash::spend(
+            payment,
+            token_policy,
+            equip_cost,
+            ctx
+        );
+
         // 装备零件
-        robot::equip_element(robot, element, robot_pool, game_config);
-        
+        robot::equip_element(
+            robot,
+            element,
+            robot_pool,
+            game_config
+        );
+
         // 更新机器人的零件列表
         if (!table::contains(&game_state.elements, robot_id)) {
-            table::add(&mut game_state.elements, robot_id, vector::empty());
+            table::add(
+                &mut game_state.elements,
+                robot_id,
+                vector::empty()
+            );
         };
         let elements = table::borrow_mut(&mut game_state.elements, robot_id);
         vector::push_back(elements, element_id);
@@ -293,17 +347,17 @@ module robobo::game {
         element_id: ID,
     ) {
         let robot_id = robot::get_robot_id(robot);
-        
+
         // 卸下零件
         let element = robot::unequip_element_by_id(robot, element_id, robot_pool);
-        
+
         // 更新机器人的零件列表
         let elements = table::borrow_mut(&mut game_state.elements, robot_id);
         let (exists, index) = vector::index_of(elements, &element_id);
         if (exists) {
             vector::remove(elements, index);
         };
-        
+
         // 销毁零件
         element::delete_element(element);
     }
@@ -331,35 +385,53 @@ module robobo::game {
 
         // 卸下旧零件
         let old_element = robot::unequip_element_by_id(robot, old_element_id, robot_pool);
-        
+
         // 更新机器人的零件列表
         let elements = table::borrow_mut(&mut game_state.elements, robot_id);
         let (exists, index) = vector::index_of(elements, &old_element_id);
         if (exists) {
             vector::remove(elements, index);
         };
-        
+
         // 销毁旧零件
         element::delete_element(old_element);
 
         // 处理支付
         let payment_value = token::value(&payment);
-        if (payment_value > TRASH_AMOUNT_EQUIP_ELEMENT) {
-            let remaining = token::split(&mut payment, payment_value - TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+        if (payment_value > config::get_trash_amount_equip_element(game_config)) {
+            let remaining = token::split(
+                &mut payment,
+                payment_value - config::get_trash_amount_equip_element(game_config),
+                ctx
+            );
             token::keep(remaining, ctx);
         };
-        
+
         // 支付 TRASH token
-        trash::spend(payment, token_policy, TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
-        
+        trash::spend(
+            payment,
+            token_policy,
+            TRASH_AMOUNT_EQUIP_ELEMENT,
+            ctx
+        );
+
         let element_id = element::get_element_id(&new_element);
-        
+
         // 装备新零件
-        robot::equip_element(robot, new_element, robot_pool, game_config);
-        
+        robot::equip_element(
+            robot,
+            new_element,
+            robot_pool,
+            game_config
+        );
+
         // 更新机器人的零件列表
         if (!table::contains(&game_state.elements, robot_id)) {
-            table::add(&mut game_state.elements, robot_id, vector::empty());
+            table::add(
+                &mut game_state.elements,
+                robot_id,
+                vector::empty()
+            );
         };
         let elements = table::borrow_mut(&mut game_state.elements, robot_id);
         vector::push_back(elements, element_id);
@@ -436,12 +508,7 @@ module robobo::game {
         recipient: address,
         ctx: &mut TxContext
     ) {
-        let element = element::create_element(
-            name,
-            description,
-            abilities,
-            ctx
-        );
+        let element = element::create_element(name, description, abilities, ctx);
         // 将创建的零件转移给指定用户
         transfer::public_transfer(element, recipient);
     }
@@ -478,9 +545,7 @@ module robobo::game {
     public fun get_robot_wins(game_state: &GameState, robot_id: ID): u64 {
         if (table::contains(&game_state.rankings, robot_id)) {
             *table::borrow(&game_state.rankings, robot_id)
-        } else {
-            0
-        }
+        } else { 0 }
     }
 
     public fun get_total_battles(game_state: &GameState): u64 {
