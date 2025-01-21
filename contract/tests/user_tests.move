@@ -4,8 +4,8 @@ module robobo::user_tests {
     use sui::test_utils;
     use sui::object;
     use sui::transfer;
+    use sui::tx_context;
     use std::string;
-    use std::vector;
     use robobo::user::{Self, Passport};
 
     const USER1: address = @0xA1;
@@ -31,52 +31,7 @@ module robobo::user_tests {
         {
             let passport = ts::take_from_sender<Passport>(test);
             assert!(user::get_name(&passport) == string::utf8(b"Test User"), 0);
-            let robots = user::get_robots(&passport);
-            let elements = user::get_elements(&passport);
-            assert!(vector::is_empty(robots), 1);
-            assert!(vector::is_empty(elements), 2);
-            ts::return_to_sender(test, passport);
-        };
-
-        ts::end(scenario);
-    }
-    
-    #[test]
-    fun test_robot_management() {
-        let mut scenario = test_scenario();
-        let test = &mut scenario;
-
-        // 创建用户
-        ts::next_tx(test, USER1);
-        {
-            let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), ctx);
-            user::transfer_passport(passport, USER1);
-        };
-
-        // 测试添加机器人
-        ts::next_tx(test, USER1);
-        {
-            let mut passport = ts::take_from_sender<Passport>(test);
-            let robot_id = object::id_from_address(@0x1);
-            
-            user::add_robot(&mut passport, robot_id);
-            assert!(vector::length(user::get_robots(&passport)) == 1, 5);
-            assert!(vector::contains(user::get_robots(&passport), &robot_id), 6);
-            
-            ts::return_to_sender(test, passport);
-        };
-
-        // 测试删除机器人
-        ts::next_tx(test, USER1);
-        {
-            let mut passport = ts::take_from_sender<Passport>(test);
-            let robot_id = object::id_from_address(@0x1);
-            
-            user::remove_robot(&mut passport, robot_id);
-            assert!(vector::length(user::get_robots(&passport)) == 0, 7);
-            assert!(!vector::contains(user::get_robots(&passport), &robot_id), 8);
-            
+            assert!(user::get_last_mint_token_time(&passport) > 0, 1);
             ts::return_to_sender(test, passport);
         };
 
@@ -101,49 +56,7 @@ module robobo::user_tests {
         {
             let mut passport = ts::take_from_sender<Passport>(test);
             user::edit_name(&mut passport, string::utf8(b"New Name"));
-            assert!(user::get_name(&passport) == string::utf8(b"New Name"), 7);
-            ts::return_to_sender(test, passport);
-        };
-
-        ts::end(scenario);
-    }
-
-    #[test]
-    fun test_element_management() {
-        let mut scenario = test_scenario();
-        let test = &mut scenario;
-        
-        // 创建用户
-        ts::next_tx(test, USER1);
-        {
-            let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), ctx);
-            user::transfer_passport(passport, USER1);
-        };
-
-        // 测试添加元素
-        ts::next_tx(test, USER1);
-        {
-            let mut passport = ts::take_from_sender<Passport>(test);
-            let element_id = object::id_from_address(@0x2);
-            
-            user::add_element(&mut passport, element_id);
-            assert!(vector::length(user::get_elements(&passport)) == 1, 8);
-            assert!(vector::contains(user::get_elements(&passport), &element_id), 9);
-            
-            ts::return_to_sender(test, passport);
-        };
-
-        // 测试移除元素
-        ts::next_tx(test, USER1);
-        {
-            let mut passport = ts::take_from_sender<Passport>(test);
-            let element_id = object::id_from_address(@0x2);
-            
-            user::remove_element(&mut passport, element_id);
-            assert!(vector::length(user::get_elements(&passport)) == 0, 10);
-            assert!(!vector::contains(user::get_elements(&passport), &element_id), 11);
-            
+            assert!(user::get_name(&passport) == string::utf8(b"New Name"), 2);
             ts::return_to_sender(test, passport);
         };
 
@@ -172,72 +85,18 @@ module robobo::user_tests {
             ts::return_to_sender(test, passport);
         };
 
-        // 设置新的时间戳（增加时间）
+        // 设置新的时间戳（增加时间）并更新最后领取时间
         ts::next_tx(test, USER1);
         {
-            let passport = ts::take_from_sender<Passport>(test);
+            let mut passport = ts::take_from_sender<Passport>(test);
             let ctx = ts::ctx(test);
             
             tx_context::increment_epoch_timestamp(ctx, 1000 * 60 * 60 * 24);
             assert!(user::can_claim_daily_token(&passport, ctx), 4);
-            ts::return_to_sender(test, passport);
-        };
-
-        ts::end(scenario);
-    }
-
-    #[test]
-    #[expected_failure(abort_code = user::E_ROBOT_EXISTS)]
-    fun test_add_duplicate_robot() {
-        let mut scenario = test_scenario();
-        let test = &mut scenario;
-        
-        // 创建用户
-        ts::next_tx(test, USER1);
-        {
-            let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), ctx);
-            user::transfer_passport(passport, USER1);
-        };
-
-        // 测试添加重复机器人
-        ts::next_tx(test, USER1);
-        {
-            let mut passport = ts::take_from_sender<Passport>(test);
-            let robot_id = object::id_from_address(@0x1);
             
-            user::add_robot(&mut passport, robot_id);
-            // 这里应该会失败
-            user::add_robot(&mut passport, robot_id);
-            
-            ts::return_to_sender(test, passport);
-        };
-
-        ts::end(scenario);
-    }
-
-    #[test]
-    #[expected_failure(abort_code = user::E_ROBOT_NOT_EXISTS)]
-    fun test_remove_nonexistent_robot() {
-        let mut scenario = test_scenario();
-        let test = &mut scenario;
-
-        // 创建用户
-        ts::next_tx(test, USER1);
-        {
-            let ctx = ts::ctx(test);
-            let passport = user::mint(string::utf8(b"Test User"), ctx);
-            user::transfer_passport(passport, USER1);
-        };
-
-        // 测试移除不存在的机器人
-        ts::next_tx(test, USER1);
-        {
-            let mut passport = ts::take_from_sender<Passport>(test);
-            let robot_id = object::id_from_address(@0x1);
-            
-            // 这里应该会失败
-            user::remove_robot(&mut passport, robot_id);
+            // 更新最后领取时间
+            user::update_last_mint_token_time(&mut passport, ctx);
+            assert!(!user::can_claim_daily_token(&passport, ctx), 5);
             
             ts::return_to_sender(test, passport);
         };

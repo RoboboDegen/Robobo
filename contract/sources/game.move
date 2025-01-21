@@ -2,6 +2,10 @@ module robobo::game {
     use sui::{
         table::{Self, Table},
         token::{Self, Token, TokenPolicy},
+        clock::{Self, Clock},
+        event,
+        object::{Self, ID, UID},
+        random::{Self, Random}
     };
     use std::string::String;
     use robobo::user::{Self, Passport};
@@ -9,6 +13,7 @@ module robobo::game {
     use robobo::robot::{Self, Robot, Robot_Pool};
     use robobo::element::{Self, Element};
     use robobo::config::{Self, GameConfig};
+    use robobo::battle::{Self, BattleResult};
 
     // Error codes
     const E_ALREADY_HAS_PASSPORT: u64 = 0;
@@ -23,6 +28,7 @@ module robobo::game {
 
     /// 添加新的常量
     const TRASH_AMOUNT_EQUIP_ELEMENT: u64 = 5;
+    const TRASH_AMOUNT_BATTLE: u64 = 10;
 
     /// 游戏管理员权限凭证
     public struct AdminCap has key, store {
@@ -38,10 +44,23 @@ module robobo::game {
         robots: vector<ID>,
         // 记录所有的零件
         elements: Table<ID, vector<ID>>,
+        // 记录总对局数
+        total_battles: u64,
+        // 记录机器人胜场数（排行榜）
+        rankings: Table<ID, u64>
     }
 
     /// One-Time-Witness for the module
     public struct GAME has drop {}
+
+    /// 战斗奖励事件
+    public struct BattleRewardEvent has copy, drop {
+        winner_id: ID,
+        loser_id: ID,
+        token_reward: u64,
+        has_element_drop: bool,
+        timestamp: u64
+    }
 
     // ======== 初始化函数 ========
 
@@ -56,6 +75,8 @@ module robobo::game {
             passports: table::new(ctx),
             robots: vector::empty(),
             elements: table::new(ctx),
+            total_battles: 0,
+            rankings: table::new(ctx)
         };
 
         let robot_pool = robot::create_robot_pool(ctx);
@@ -82,6 +103,7 @@ module robobo::game {
     public entry fun create_passport(
         name: String,
         game_state: &mut GameState,
+        game_config: &GameConfig,
         token_cap: &mut TrashTokenCap,
         ctx: &mut TxContext
     ) {
@@ -97,42 +119,42 @@ module robobo::game {
         table::add(&mut game_state.passports, sender, passport_id);
         
         // 铸造 TRASH token 给用户
-        trash::mint(token_cap, TRASH_AMOUNT_DAILY_CLAIM, ctx);
+        trash::mint(token_cap, config::get_trash_amount_daily_claim(game_config), ctx);
 
         // 转移 passport 给用户
         user::transfer_passport(passport, sender);
     }
 
-    /// 用户创建初始机器人,需要收取TRASH
+    /// 用户创建机器人,需要收取TRASH
     public entry fun mint_robot(
         game_state: &mut GameState,
+        game_config: &GameConfig,
         robot_pool: &mut Robot_Pool,
-        passport: &mut Passport,
         robot_name: String,
         mut payment: Token<TRASH>,
         token_policy: &mut TokenPolicy<TRASH>,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
+        assert!(table::contains(&game_state.passports, sender), E_NO_PASSPORT);
+        
+        let mint_cost = config::get_trash_amount_mint_robot(game_config);
         // 分割出正确数量的token作为支付，剩余的返还给用户
         let payment_value = token::value(&payment);
-        if (payment_value > TRASH_AMOUNT_MINT_ROBOT) {
-            let remaining = token::split(&mut payment, payment_value - TRASH_AMOUNT_MINT_ROBOT, ctx);
+        if (payment_value > mint_cost) {
+            let remaining = token::split(&mut payment, payment_value - mint_cost, ctx);
             token::keep(remaining, ctx);
         };
         
         // 支付 TRASH token
-        trash::spend(payment, token_policy, TRASH_AMOUNT_MINT_ROBOT, ctx);
+        trash::spend(payment, token_policy, mint_cost, ctx);
         
         // 创建初始机器人并获取其 ID
         let robot = robot::create_robot(robot_name, robot_pool, ctx);
         let robot_id = robot::get_robot_id(&robot);
         
-        // 记录机器人所有者
+        // 记录机器人
         vector::push_back(&mut game_state.robots, robot_id);
-        
-        // 添加机器人到 passport
-        user::add_robot(passport, robot_id);
         
         // 转移机器人给用户
         transfer::public_transfer(robot, sender);
@@ -141,18 +163,78 @@ module robobo::game {
     /// 每日领取 TRASH token
     public entry fun claim_daily_token(
         game_state: &GameState,
+        game_config: &GameConfig,
         passport: &mut Passport,
         token_cap: &mut TrashTokenCap,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
-        // 验证 passport 确实属于该用户
-        assert!(table::contains(&game_state.passports, sender), E_NO_PASSPORT);
         assert!(user::can_claim_daily_token(passport,ctx), E_ALREADY_CLAIMED_TODAY);
         // 更新最后领取时间
         user::update_last_mint_token_time(passport, ctx);
         // 铸造 TRASH token 给用户
-        trash::mint(token_cap, TRASH_AMOUNT_DAILY_CLAIM, ctx);
+        trash::mint(token_cap, config::get_trash_amount_daily_claim(game_config), ctx);
+    }
+
+    /// 随机战斗入口函数
+    public entry fun random_battle(
+        game_state: &mut GameState,
+        game_config: &GameConfig,
+        robot_pool: &mut Robot_Pool,
+        robot: &mut Robot,
+        payment: Token<TRASH>,
+        token_policy: &mut TokenPolicy<TRASH>,
+        token_cap: &mut TrashTokenCap,
+        random: &Random,
+        clock: &Clock,
+        ctx: &mut TxContext
+    ) {
+        // 1. 先进行所有必要的检查和支付，确保在随机性生成前完成
+        let robot_id = robot::get_robot_id(robot);
+        let sender = tx_context::sender(ctx);
+        assert!(table::contains(&game_state.passports, sender), E_NO_PASSPORT);
+        
+        // 消耗战斗费用（提前支付）
+        trash::spend(payment, token_policy, config::get_trash_amount_battle(game_config), ctx);
+        
+        // 2. 生成随机对手
+        let opponent_id = battle::select_random_opponent(&game_state.robots, robot_id, random, ctx);
+        
+        // 3. 进行战斗
+        let battle_result = battle::start_battle(robot, opponent_id, clock, robot_pool);
+        
+        // 4. 更新游戏状态（无论胜负都要执行，保证gas消耗一致）
+        game_state.total_battles = game_state.total_battles + 1;
+        
+        // 5. 更新排行榜（无论胜负都要执行）
+        if (!table::contains(&game_state.rankings, robot_id)) {
+            table::add(&mut game_state.rankings, robot_id, 0);
+        };
+        if (!table::contains(&game_state.rankings, opponent_id)) {
+            table::add(&mut game_state.rankings, opponent_id, 0);
+        };
+        
+        // 6. 更新胜负记录
+        if (battle::is_winner(&battle_result)) {
+            robot::increment_win_count(robot);
+            let wins = table::borrow_mut(&mut game_state.rankings, robot_id);
+            *wins = *wins + 1;
+        } else {
+            robot::increment_lose_count(robot);
+            let wins = table::borrow_mut(&mut game_state.rankings, opponent_id);
+            *wins = *wins + 1;
+        };
+
+        // 7. 处理奖励（胜利和失败的计算量应该相近）
+        battle::process_battle_rewards(
+            robot,
+            battle_result,
+            token_cap,
+            random,
+            clock,
+            game_config,
+            ctx
+        );
     }
 
     // ======== 零件管理功能 ========
@@ -175,16 +257,17 @@ module robobo::game {
     ) {
         let robot_id = robot::get_robot_id(robot);
         let element_id = element::get_element_id(&element);
+        let equip_cost = config::get_trash_amount_equip_element(game_config);
         
         // 处理支付
         let payment_value = token::value(&payment);
-        if (payment_value > TRASH_AMOUNT_EQUIP_ELEMENT) {
-            let remaining = token::split(&mut payment, payment_value - TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+        if (payment_value > equip_cost) {
+            let remaining = token::split(&mut payment, payment_value - equip_cost, ctx);
             token::keep(remaining, ctx);
         };
         
         // 支付 TRASH token
-        trash::spend(payment, token_policy, TRASH_AMOUNT_EQUIP_ELEMENT, ctx);
+        trash::spend(payment, token_policy, equip_cost, ctx);
         
         // 装备零件
         robot::equip_element(robot, element, robot_pool, game_config);
@@ -293,6 +376,51 @@ module robobo::game {
         config::set_max_elements(game_config, new_max);
     }
 
+    /// 设置创建机器人所需的 TRASH token 数量
+    public entry fun set_trash_amount_mint_robot(
+        _: &AdminCap,
+        game_config: &mut GameConfig,
+        amount: u64,
+    ) {
+        config::set_trash_amount_mint_robot(game_config, amount);
+    }
+
+    /// 设置每日可领取的 TRASH token 数量
+    public entry fun set_trash_amount_daily_claim(
+        _: &AdminCap,
+        game_config: &mut GameConfig,
+        amount: u64,
+    ) {
+        config::set_trash_amount_daily_claim(game_config, amount);
+    }
+
+    /// 设置装备零件所需的 TRASH token 数量
+    public entry fun set_trash_amount_equip_element(
+        _: &AdminCap,
+        game_config: &mut GameConfig,
+        amount: u64,
+    ) {
+        config::set_trash_amount_equip_element(game_config, amount);
+    }
+
+    /// 设置战斗所需的 TRASH token 数量
+    public entry fun set_trash_amount_battle(
+        _: &AdminCap,
+        game_config: &mut GameConfig,
+        amount: u64,
+    ) {
+        config::set_trash_amount_battle(game_config, amount);
+    }
+
+    /// 设置战斗胜利奖励的 TRASH token 数量
+    public entry fun set_trash_amount_battle_reward(
+        _: &AdminCap,
+        game_config: &mut GameConfig,
+        amount: u64,
+    ) {
+        config::set_trash_amount_battle_reward(game_config, amount);
+    }
+
     /// 创建零件
     /// * `admin_cap` - 管理员权限凭证
     /// * `name` - 零件名称
@@ -344,5 +472,18 @@ module robobo::game {
     /// 获取用户的 passport ID
     public fun get_passport_id(game_state: &GameState, user: address): ID {
         *table::borrow(&game_state.passports, user)
+    }
+
+    // 添加排行榜查询函数
+    public fun get_robot_wins(game_state: &GameState, robot_id: ID): u64 {
+        if (table::contains(&game_state.rankings, robot_id)) {
+            *table::borrow(&game_state.rankings, robot_id)
+        } else {
+            0
+        }
+    }
+
+    public fun get_total_battles(game_state: &GameState): u64 {
+        game_state.total_battles
     }
 }

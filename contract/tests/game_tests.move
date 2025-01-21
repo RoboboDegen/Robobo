@@ -50,6 +50,7 @@ module robobo::game_tests {
             assert!(ts::has_most_recent_shared<Robot_Pool>(), 1);
             assert!(ts::has_most_recent_shared<TokenPolicy<TRASH>>(), 1);
             assert!(ts::has_most_recent_shared<TrashTokenCap>(), 1);
+            assert!(ts::has_most_recent_shared<GameConfig>(), 1);
         };
 
         ts::end(scenario);
@@ -67,16 +68,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 验证护照创建成功
@@ -102,11 +106,13 @@ module robobo::game_tests {
         ts::next_tx(&mut scenario, USER1);
         {
             let passport = ts::take_from_sender<Passport>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             // 验证用户的token数量
             let token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            assert!(token::value(&token) == 100, 0);
+            assert!(token::value(&token) == config::get_trash_amount_daily_claim(&game_config), 0);
             ts::return_to_sender(&scenario, token);
             ts::return_to_sender(&scenario, passport);
+            ts::return_shared(game_config);
         };
 
         ts::end(scenario);
@@ -124,16 +130,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 尝试重复创建护照（应该失败）
@@ -141,16 +150,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One Again"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         ts::end(scenario);
@@ -167,27 +179,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
-        };
-
-        // 验证用户创建护照后,账户的token数量
-        ts::next_tx(&mut scenario, USER1);
-        {
-            let passport = ts::take_from_sender<Passport>(&scenario);
-            // 验证用户的token数量
-            let token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            assert!(token::value(&token) == 100, 0);
-            ts::return_to_sender(&scenario, token);
-            ts::return_to_sender(&scenario, passport);
+            ts::return_shared(game_config);
         };
 
         // 创建初始机器人
@@ -198,18 +202,19 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             let token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
 
             // 先获取一些 TRASH token
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
             // 分割出正确数量的token作为支付
-            let payment = token::split(&mut token, 10, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_mint_robot(&game_config), ts::ctx(&mut scenario));
             // 把剩余的token还给用户
             ts::return_to_sender(&scenario, token);
 
             game::mint_robot(
                 &mut game_state,
+                &game_config,
                 &mut robot_pool,
-                &mut passport,
                 string::utf8(b"First Robot"),
                 payment,
                 &mut token_policy,
@@ -221,15 +226,12 @@ module robobo::game_tests {
             ts::return_shared(robot_pool);
             ts::return_shared(token_policy);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 验证机器人创建成功
         ts::next_tx(&mut scenario, USER1);
         {
-            let passport = ts::take_from_sender<Passport>(&scenario);
-            assert!(user::get_total_robots(&passport) == 1, 0);
-            ts::return_to_sender(&scenario, passport);
-
             // 验证用户确实拥有机器人对象
             assert!(ts::has_most_recent_for_address<Robot>(USER1), 1);
         };
@@ -248,26 +250,31 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 验证用户创建护照后的初始token数量
         ts::next_tx(&mut scenario, USER1);
         {
             let passport = ts::take_from_sender<Passport>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             let token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            assert!(token::value(&token) == TRASH_AMOUNT_DAILY_CLAIM, 0);
+            assert!(token::value(&token) == config::get_trash_amount_daily_claim(&game_config), 0);
             ts::return_to_sender(&scenario, token);
             ts::return_to_sender(&scenario, passport);
+            ts::return_shared(game_config);
         };
 
         // 等待一天
@@ -282,9 +289,11 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::claim_daily_token(
                 &game_state,
+                &game_config,
                 &mut passport,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
@@ -293,21 +302,24 @@ module robobo::game_tests {
             ts::return_to_sender(&scenario, passport);
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 验证领取后的token数量
         ts::next_tx(&mut scenario, USER1);
         {
             let passport = ts::take_from_sender<Passport>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             let mut token1 = ts::take_from_sender<Token<TRASH>>(&scenario);
             let token2 = ts::take_from_sender<Token<TRASH>>(&scenario);
             
             // 合并两个token
             token::join(&mut token1, token2);
-            assert!(token::value(&token1) == TRASH_AMOUNT_DAILY_CLAIM * 2, 0);
+            assert!(token::value(&token1) == config::get_trash_amount_daily_claim(&game_config) * 2, 0);
             
             ts::return_to_sender(&scenario, token1);
             ts::return_to_sender(&scenario, passport);
+            ts::return_shared(game_config);
         };
 
         ts::end(scenario);
@@ -325,16 +337,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 等待一天
@@ -349,9 +364,11 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::claim_daily_token(
                 &game_state,
+                &game_config,
                 &mut passport,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
@@ -360,6 +377,7 @@ module robobo::game_tests {
             ts::return_to_sender(&scenario, passport);
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 尝试第二次领取（应该失败）
@@ -368,9 +386,11 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::claim_daily_token(
                 &game_state,
+                &game_config,
                 &mut passport,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
@@ -379,6 +399,7 @@ module robobo::game_tests {
             ts::return_to_sender(&scenario, passport);
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         ts::end(scenario);
@@ -419,16 +440,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 创建初始机器人
@@ -439,16 +463,17 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             let token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
 
             // 获取token并支付
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 10, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_mint_robot(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
 
             game::mint_robot(
                 &mut game_state,
+                &game_config,
                 &mut robot_pool,
-                &mut passport,
                 string::utf8(b"Test Robot"),
                 payment,
                 &mut token_policy,
@@ -460,6 +485,7 @@ module robobo::game_tests {
             ts::return_shared(robot_pool);
             ts::return_shared(token_policy);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 装备零件
@@ -485,7 +511,7 @@ module robobo::game_tests {
 
             // 获取token用于支付装备费用
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_equip_element(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
             
             // 装备零件
@@ -530,16 +556,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 创建初始机器人
@@ -550,16 +579,17 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             let token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
 
             // 获取token并支付
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 10, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_mint_robot(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
 
             game::mint_robot(
                 &mut game_state,
+                &game_config,
                 &mut robot_pool,
-                &mut passport,
                 string::utf8(b"Test Robot"),
                 payment,
                 &mut token_policy,
@@ -571,6 +601,7 @@ module robobo::game_tests {
             ts::return_shared(robot_pool);
             ts::return_shared(token_policy);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 装备零件
@@ -602,8 +633,8 @@ module robobo::game_tests {
             
             // 获取token用于支付装备费用
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment1 = token::split(&mut token, 5, ts::ctx(&mut scenario));
-            let payment2 = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            let payment1 = token::split(&mut token, config::get_trash_amount_equip_element(&game_config), ts::ctx(&mut scenario));
+            let payment2 = token::split(&mut token, config::get_trash_amount_equip_element(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
             
             // 装备零件
@@ -683,16 +714,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 创建初始机器人
@@ -703,15 +737,16 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             let token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
 
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 10, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_mint_robot(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
 
             game::mint_robot(
                 &mut game_state,
+                &game_config,
                 &mut robot_pool,
-                &mut passport,
                 string::utf8(b"Test Robot"),
                 payment,
                 &mut token_policy,
@@ -723,6 +758,7 @@ module robobo::game_tests {
             ts::return_shared(robot_pool);
             ts::return_shared(token_policy);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 尝试装备超过限制的零件
@@ -747,7 +783,7 @@ module robobo::game_tests {
                     create_attack_abilities(),
                     ts::ctx(&mut scenario)
                 );
-                let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+                let payment = token::split(&mut token, config::get_trash_amount_equip_element(&game_config), ts::ctx(&mut scenario));
                 
                 game::equip_element(
                     &mut game_state,
@@ -838,16 +874,19 @@ module robobo::game_tests {
         {
             let mut game_state = ts::take_shared<GameState>(&scenario);
             let mut token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
             
             game::create_passport(
                 string::utf8(b"User One"),
                 &mut game_state,
+                &game_config,
                 &mut token_cap,
                 ts::ctx(&mut scenario)
             );
 
             ts::return_shared(game_state);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 创建初始机器人
@@ -858,16 +897,17 @@ module robobo::game_tests {
             let mut passport = ts::take_from_sender<Passport>(&scenario);
             let mut token_policy = ts::take_shared<TokenPolicy<TRASH>>(&scenario);
             let token_cap = ts::take_shared<TrashTokenCap>(&scenario);
+            let game_config = ts::take_shared<GameConfig>(&scenario);
 
             // 获取token并支付
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 10, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_mint_robot(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
 
             game::mint_robot(
                 &mut game_state,
+                &game_config,
                 &mut robot_pool,
-                &mut passport,
                 string::utf8(b"Test Robot"),
                 payment,
                 &mut token_policy,
@@ -879,6 +919,7 @@ module robobo::game_tests {
             ts::return_shared(robot_pool);
             ts::return_shared(token_policy);
             ts::return_shared(token_cap);
+            ts::return_shared(game_config);
         };
 
         // 装备第一个零件
@@ -904,7 +945,7 @@ module robobo::game_tests {
 
             // 获取token用于支付装备费用
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_equip_element(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
             
             // 装备零件
@@ -957,7 +998,7 @@ module robobo::game_tests {
 
             // 获取token用于支付装备费用
             let mut token = ts::take_from_sender<Token<TRASH>>(&scenario);
-            let payment = token::split(&mut token, 5, ts::ctx(&mut scenario));
+            let payment = token::split(&mut token, config::get_trash_amount_equip_element(&game_config), ts::ctx(&mut scenario));
             ts::return_to_sender(&scenario, token);
             
             // 替换零件

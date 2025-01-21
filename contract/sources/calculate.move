@@ -38,25 +38,24 @@ module robobo::calculate {
         // Calculate stats using specific bytes from the hash
         // For each stat, we:
         // 1. Take 4 bytes from different positions in the hash
-        // 2. Sum them to get a more distributed random value
-        // 3. Multiply by the stat's range and divide by 255 to get a value within range
+        // 2. Sum them and normalize by dividing by (255 * 4) to get a value between 0-1
+        // 3. Multiply by the stat's range to get a value within range
         // 4. Add zero_point and minimum value to get final stat
         let energy = zero_point + energy_min + 
-            ((bytes[0] + bytes[8] + bytes[16] + bytes[24]) * energy_range) / 255;
+            ((bytes[0] + bytes[8] + bytes[16] + bytes[24]) * energy_range) / (255 * 4);
 
         let attack = zero_point + attack_min + 
-            ((bytes[1] + bytes[9] + bytes[17] + bytes[25]) * attack_range) / 255;
+            ((bytes[1] + bytes[9] + bytes[17] + bytes[25]) * attack_range) / (255 * 4);
 
         let defense = zero_point + defense_min + 
-            ((bytes[2] + bytes[10] + bytes[18] + bytes[26]) * defense_range) / 255;
+            ((bytes[2] + bytes[10] + bytes[18] + bytes[26]) * defense_range) / (255 * 4);
 
         let speed = zero_point + speed_min + 
-            ((bytes[3] + bytes[11] + bytes[19] + bytes[27]) * speed_range) / 255;
+            ((bytes[3] + bytes[11] + bytes[19] + bytes[27]) * speed_range) / (255 * 4);
 
         // Personality uses same pattern but with 0-100 range
-        // Ensure we don't overflow u8 by scaling down the sum first
         let personality = zero_point + 
-            ((bytes[4] + bytes[12] + bytes[20] + bytes[28]) / 4 * 100) / 255;
+            ((bytes[4] + bytes[12] + bytes[20] + bytes[28]) * 100) / (255 * 4);
 
         // Convert final u64 values to u8 (safe as all results are within 0-255 range)
         (attack as u8, defense as u8, speed as u8, energy as u8, personality as u8)

@@ -116,7 +116,7 @@ module robobo::robot {
 
     /// 内部函数：计算单个属性值
     fun calculate_stat(base: u8, delta: u8): u8 {
-        let zero_point = 127;
+        let zero_point = 128;
         if (delta >= zero_point) {
             // 增加属性
             let increase = (delta as u64) - (zero_point as u64);
@@ -246,4 +246,24 @@ module robobo::robot {
     public fun get_robot_mirror_speed(mirror: &Robot_Mirror): u8 {mirror.speed}
     public fun get_robot_mirror_energy(mirror: &Robot_Mirror): u8 {mirror.energy}
     public fun get_robot_mirror_personality(mirror: &Robot_Mirror): u8 {mirror.personality}
+
+    /// 增加胜利场次
+    public(package) fun increment_win_count(robot: &mut Robot) {
+        robot.win_count = robot.win_count + 1;
+    }
+
+    /// 增加失败场次
+    public(package) fun increment_lose_count(robot: &mut Robot) {
+        robot.lose_count = robot.lose_count + 1;
+    }
+
+    /// 获取胜利场次
+    public fun get_win_count(robot: &Robot): u64 {
+        robot.win_count
+    }
+
+    /// 获取失败场次
+    public fun get_lose_count(robot: &Robot): u64 {
+        robot.lose_count
+    }
 }
