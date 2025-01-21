@@ -61,8 +61,8 @@ export default function BattleMockPage() {
     isAttack: boolean
   ): number {
     const personalityModifier = isAttack
-      ? Math.floor(personality / 100) + 1
-      : Math.floor((100 - personality) / 100) + 1;
+      ? Math.floor((personality - 128) / 100) + 1
+      : Math.floor((228 - personality) / 100) + 1;
 
     const safeStat = Math.min(153, baseStat);
     const safeMultiplier = Math.min(25, multiplier);
@@ -89,30 +89,29 @@ export default function BattleMockPage() {
     let log = "";
     let newActorEnergy = actor.energy;
     let newTargetEnergy = target.energy;
+    const zeroPoint = 128;
+    const maxEnergy = 188;
 
     if (moveValue <= 3) {
-      const damage = calculateDamage(actor.attack, 10, actor.personality, true) - 128;
-      newTargetEnergy = target.energy - damage;
-      newActorEnergy = actor.energy - 2;
+      const damage = calculateDamage(actor.attack, 10, actor.personality, true) - zeroPoint;
+      newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
       log = `${actorName} used Light Attack: -${damage} damage`;
     } else if (moveValue <= 6) {
-      const damage = calculateDamage(actor.attack, 20, actor.personality, true) - 128;
-      newTargetEnergy = target.energy - damage;
-      newActorEnergy = actor.energy - 4;
+      const damage = calculateDamage(actor.attack, 20, actor.personality, true) - zeroPoint;
+      newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
       log = `${actorName} used Heavy Attack: -${damage} damage`;
     } else if (moveValue <= 8) {
       const recovery = calculateDamage(actor.defense, 15, actor.personality, false);
-      newActorEnergy = actor.energy + recovery;
+      newActorEnergy = Math.min(maxEnergy, actor.energy + recovery);
       log = `${actorName} used Defense: +${recovery} energy`;
     } else {
-      if (actor.personality >= 50) {
-        const damage = calculateDamage(actor.attack, 25, actor.personality, true) - 128;
-        newTargetEnergy = target.energy - damage;
-        newActorEnergy = actor.energy - 5;
+      if (actor.personality >= 178) {
+        const damage = calculateDamage(actor.attack, 25, actor.personality, true) - zeroPoint;
+        newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
         log = `${actorName} used Special Attack: -${damage} damage`;
       } else {
         const recovery = calculateDamage(actor.defense, 20, actor.personality, false);
-        newActorEnergy = actor.energy + recovery;
+        newActorEnergy = Math.min(maxEnergy, actor.energy + recovery);
         log = `${actorName} used Special Defense: +${recovery} energy`;
       }
     }
@@ -131,9 +130,10 @@ export default function BattleMockPage() {
     const logs: string[] = [];
     const ZERO_POINT = 128;
 
-    for (let round = 0; round < 16; round++) {
-      if (currentAttackerEnergy <= ZERO_POINT || currentDefenderEnergy <= ZERO_POINT) {
-        break;
+    let round = 0;
+    while (true) {
+      if (round === 16) {
+        round = 0;
       }
 
       const attackerMove = battleHash[round] % 10;
@@ -156,19 +156,22 @@ export default function BattleMockPage() {
         currentDefenderEnergy = attackerAction.targetEnergy;
         logs.push(attackerAction.log);
 
-        if (currentDefenderEnergy > ZERO_POINT) {
-          const defenderAction = processAction(
-            { ...defender, energy: currentDefenderEnergy },
-            { ...attacker, energy: currentAttackerEnergy },
-            defenderMove,
-            false
-          );
-          currentDefenderEnergy = defenderAction.actorEnergy;
-          currentAttackerEnergy = defenderAction.targetEnergy;
-          logs.push(defenderAction.log);
+        // 基础能量消耗
+        if (currentAttackerEnergy > ZERO_POINT + 1) {
+          currentAttackerEnergy--;
+          logs.push(`Attacker base energy cost: -1`);
+        } else {
+          currentAttackerEnergy = ZERO_POINT;
         }
-      } else {
-        // Defender goes first
+
+        // 检查防守方能量
+        if (currentDefenderEnergy <= ZERO_POINT + 1) {
+          currentDefenderEnergy = ZERO_POINT;
+          logs.push(`Defender energy depleted!`);
+          break;
+        }
+
+        // Defender counterattack
         const defenderAction = processAction(
           { ...defender, energy: currentDefenderEnergy },
           { ...attacker, energy: currentAttackerEnergy },
@@ -179,24 +182,73 @@ export default function BattleMockPage() {
         currentAttackerEnergy = defenderAction.targetEnergy;
         logs.push(defenderAction.log);
 
-        if (currentAttackerEnergy > ZERO_POINT) {
-          const attackerAction = processAction(
-            { ...attacker, energy: currentAttackerEnergy },
-            { ...defender, energy: currentDefenderEnergy },
-            attackerMove,
-            true
-          );
-          currentAttackerEnergy = attackerAction.actorEnergy;
-          currentDefenderEnergy = attackerAction.targetEnergy;
-          logs.push(attackerAction.log);
+        // 基础能量消耗
+        if (currentDefenderEnergy > ZERO_POINT + 1) {
+          currentDefenderEnergy--;
+          logs.push(`Defender base energy cost: -1`);
+        } else {
+          currentDefenderEnergy = ZERO_POINT;
+        }
+
+        // 检查攻击方能量
+        if (currentAttackerEnergy <= ZERO_POINT + 1) {
+          currentAttackerEnergy = ZERO_POINT;
+          logs.push(`Attacker energy depleted!`);
+          break;
+        }
+      } else {
+        // Defender goes first
+        const defenderAction = processAction(
+          { ...defender, energy: currentDefenderEnergy },
+          { ...attacker, energy: currentAttackerEnergy },
+          defenderMove,
+          false
+        );
+        currentAttackerEnergy = defenderAction.targetEnergy;
+        logs.push(defenderAction.log);
+
+        // 检查攻击方能量
+        if (currentAttackerEnergy <= ZERO_POINT + 1) {
+          currentAttackerEnergy = ZERO_POINT;
+          logs.push(`Attacker energy depleted!`);
+          break;
+        }
+
+        // 确认战斗继续后，才应用防守者的能量消耗
+        currentDefenderEnergy = defenderAction.actorEnergy;
+
+        // Attacker counterattack
+        const attackerAction = processAction(
+          { ...attacker, energy: currentAttackerEnergy },
+          { ...defender, energy: currentDefenderEnergy },
+          attackerMove,
+          true
+        );
+        currentAttackerEnergy = attackerAction.actorEnergy;
+        currentDefenderEnergy = attackerAction.targetEnergy;
+        logs.push(attackerAction.log);
+
+        // 检查防守方能量
+        if (currentDefenderEnergy <= ZERO_POINT + 1) {
+          currentDefenderEnergy = ZERO_POINT;
+          logs.push(`Defender energy depleted!`);
+          break;
+        }
+
+        // 基础能量消耗
+        if (currentAttackerEnergy > ZERO_POINT + 1) {
+          currentAttackerEnergy--;
+          logs.push(`Attacker base energy cost: -1`);
+        }
+        if (currentDefenderEnergy > ZERO_POINT + 1) {
+          currentDefenderEnergy--;
+          logs.push(`Defender base energy cost: -1`);
         }
       }
 
-      currentAttackerEnergy--;
-      currentDefenderEnergy--;
-      logs.push(`Base energy cost: -1`);
       logs.push(`Energy levels - Attacker: ${currentAttackerEnergy}, Defender: ${currentDefenderEnergy}`);
       logs.push("---");
+      round++;
     }
 
     const winner = currentAttackerEnergy > currentDefenderEnergy ? "Attacker" : "Defender";
@@ -215,7 +267,6 @@ export default function BattleMockPage() {
   function calculateRobotStatsFromHash(nameHash: number[]): RobotStats {
     const zeroPoint = 128;
     
-    // Define minimum values and ranges
     const energyMin = 40;
     const energyRange = 20;
     const attackMin = 15;
@@ -225,28 +276,27 @@ export default function BattleMockPage() {
     const speedMin = 5;
     const speedRange = 5;
 
-    // Calculate stats using specific bytes from the hash
     const energy = zeroPoint + energyMin + 
-      Math.floor(((nameHash[0] + nameHash[8] + nameHash[16] + nameHash[24]) * energyRange) / 255);
+      Math.floor(((nameHash[0] + nameHash[8] + nameHash[16] + nameHash[24]) * energyRange) / (255 * 4));
 
     const attack = zeroPoint + attackMin + 
-      Math.floor(((nameHash[1] + nameHash[9] + nameHash[17] + nameHash[25]) * attackRange) / 255);
+      Math.floor(((nameHash[1] + nameHash[9] + nameHash[17] + nameHash[25]) * attackRange) / (255 * 4));
 
     const defense = zeroPoint + defenseMin + 
-      Math.floor(((nameHash[2] + nameHash[10] + nameHash[18] + nameHash[26]) * defenseRange) / 255);
+      Math.floor(((nameHash[2] + nameHash[10] + nameHash[18] + nameHash[26]) * defenseRange) / (255 * 4));
 
     const speed = zeroPoint + speedMin + 
-      Math.floor(((nameHash[3] + nameHash[11] + nameHash[19] + nameHash[27]) * speedRange) / 255);
+      Math.floor(((nameHash[3] + nameHash[11] + nameHash[19] + nameHash[27]) * speedRange) / (255 * 4));
 
     const personality = zeroPoint + 
-      Math.floor(((nameHash[4] + nameHash[12] + nameHash[20] + nameHash[28]) / 4 * 100) / 255);
+      Math.floor(((nameHash[4] + nameHash[12] + nameHash[20] + nameHash[28]) * 100) / (255 * 4));
 
     return {
-      energy,
-      attack,
-      defense,
-      speed,
-      personality,
+      energy: Math.min(188, Math.max(168, energy)),
+      attack: Math.min(153, Math.max(143, attack)),
+      defense: Math.min(153, Math.max(143, defense)),
+      speed: Math.min(138, Math.max(133, speed)),
+      personality: Math.min(228, Math.max(128, personality)),
     };
   }
 
