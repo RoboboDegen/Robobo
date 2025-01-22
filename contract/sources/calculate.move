@@ -61,62 +61,99 @@ module robobo::calculate {
         // Convert final u64 values to u8 (safe as all results are within 0-255 range)
         (attack as u8, defense as u8, speed as u8, energy as u8, personality as u8)
     }
-
+    /// 处理行动
+    /// 
+    /// # Arguments
+    /// * `actor_energy` - 行动者的能量
+    /// * `target_energy` - 目标的能量
+    /// * `move_value` - 行动值
+    /// * `attack` - 攻击力
+    /// * `defense` - 防御力
+    /// * `personality` - 个性
+    /// move_value: 0-3: 轻攻击
+    /// move_value: 4-6: 重攻击
+    /// move_value: 7-8: 防御
+    /// move_value: 9: 特殊技能
+    /// 
     fun process_action(
-    actor_energy: &mut u8,
-    target_energy: &mut u8,
-    move_value: u8,
-    attack: u8,
-    defense: u8,
-    personality: u8
+        actor_energy: &mut u8,
+        target_energy: &mut u8,
+        move_value: u8,
+        attack: u8,
+        defense: u8,
+        personality: u8
     ) {
         let zero_point = 128;
         let max_energy = 188;
 
-        if (move_value <= 3) {
-            // 轻攻击：只造成伤害，不消耗能量
-            let damage = calculate_damage(attack as u64, 10, personality, true);
-            // 伤害值已经包含了 zero_point，需要减去
-            let actual_damage = damage - zero_point;
-            *target_energy = if (*target_energy > zero_point + actual_damage) { 
-                *target_energy - actual_damage 
-            } else { 
-                zero_point 
-            };
-        } else if (move_value <= 6) {
-            // 重攻击：只造成伤害，不消耗能量
-            let damage = calculate_damage(attack as u64, 20, personality, true);
-            let actual_damage = damage - zero_point;
-            *target_energy = if (*target_energy > zero_point + actual_damage) { 
-                *target_energy - actual_damage 
-            } else { 
-                zero_point 
-            };
-        } else if (move_value <= 8) {
-            // 防御：回复生命值
-            let recovery = calculate_damage(defense as u64, 15, personality, false);
-            *actor_energy = if (*actor_energy + recovery <= max_energy) { 
-                *actor_energy + recovery 
-            } else { 
-                max_energy 
-            };
-        } else {
+        // If attacker energy is less than or equal to 129, trigger special attack
+        if (*actor_energy <= 129) {
             if (personality >= 178) {
-                // 攻击型特殊技能：只造成伤害，不消耗能量
+                // Attack-type special skill: only deals damage, no energy cost
                 let damage = calculate_damage(attack as u64, 25, personality, true);
                 let actual_damage = damage - zero_point;
-                *target_energy = if (*target_energy > zero_point + actual_damage) { 
-                    *target_energy - actual_damage 
-                } else { 
-                    zero_point 
+                *target_energy = if (*target_energy > zero_point + actual_damage) {
+                    *target_energy - actual_damage
+                } else {
+                    zero_point
                 };
             } else {
-                // 防御型特殊技能：回复生命值
+                // Defense-type special skill: recovers health
                 let recovery = calculate_damage(defense as u64, 20, personality, false);
-                *actor_energy = if (*actor_energy + recovery <= max_energy) { 
-                    *actor_energy + recovery 
-                } else { 
-                    max_energy 
+                *actor_energy = if (*actor_energy + recovery <= max_energy) {
+                    *actor_energy + recovery
+                } else {
+                    max_energy
+                };
+            };
+        } else {
+            //行动的时候先扣除能量
+            *actor_energy = *actor_energy - 1;
+            if (move_value <= 3) {
+                // Light attack: only deals damage, no energy cost
+                let damage = calculate_damage(attack as u64, 10, personality, true);
+                // Damage value already includes zero_point, need to subtract
+                let actual_damage = damage - zero_point;
+                *target_energy = if (*target_energy > zero_point + actual_damage) {
+                    *target_energy - actual_damage
+                } else {
+                    zero_point
+                };
+            } else if (move_value <= 6) {
+                // Heavy attack: only deals damage, no energy cost
+                let damage = calculate_damage(attack as u64, 20, personality, true);
+                let actual_damage = damage - zero_point;
+                *target_energy = if (*target_energy > zero_point + actual_damage) {
+                    *target_energy - actual_damage
+                } else {
+                    zero_point
+                };
+            } else if (move_value <= 8) {
+                // Defense: recovers health
+                let recovery = calculate_damage(defense as u64, 15, personality, false);
+                *actor_energy = if (*actor_energy + recovery <= max_energy) {
+                    *actor_energy + recovery
+                } else {
+                    max_energy
+                };
+            } else {
+                if (personality >= 178) {
+                    // Attack-type special skill: only deals damage, no energy cost
+                    let damage = calculate_damage(attack as u64, 25, personality, true);
+                    let actual_damage = damage - zero_point;
+                    *target_energy = if (*target_energy > zero_point + actual_damage) {
+                        *target_energy - actual_damage
+                    } else {
+                        zero_point
+                    };
+                } else {
+                    // Defense-type special skill: recovers health
+                    let recovery = calculate_damage(defense as u64, 20, personality, false);
+                    *actor_energy = if (*actor_energy + recovery <= max_energy) {
+                        *actor_energy + recovery
+                    } else {
+                        max_energy
+                    };
                 };
             };
         };
@@ -175,15 +212,36 @@ module robobo::calculate {
         let mut attacker_moves = vector::empty<u8>();
         let mut defender_moves = vector::empty<u8>();
         
+        // 分别计数攻击者和防守者的防御次数
+        let mut attacker_defense_count = 0;
+        let mut defender_defense_count = 0;
+        
+        // 处理攻击者的行动 (0-15)
         let mut i = 0;
-        while (i < len) {
-            let num = hash[i] % 10; // 转换为0-9的数字
-            if (i < 16) {
-                vector::push_back(&mut attacker_moves, num);
-            } else {
-                vector::push_back(&mut defender_moves, num);
+        while (i < 16) {
+            let mut num = hash[i] % 10;
+            if (num >= 7 && num <= 8) {
+                attacker_defense_count = attacker_defense_count + 1;
+                if (attacker_defense_count > 3) {
+                    num = num % 4; // 转换为轻攻击(0-3)
+                };
             };
+            vector::push_back(&mut attacker_moves, num);
             i = i + 1;
+        };
+        
+        // 处理防守者的行动 (16-31)
+        let mut j = 16;
+        while (j < 32) {
+            let mut num = hash[j] % 10;
+            if (num >= 7 && num <= 8) {
+                defender_defense_count = defender_defense_count + 1;
+                if (defender_defense_count > 3) {
+                    num = num % 4; // 转换为轻攻击(0-3)
+                };
+            };
+            vector::push_back(&mut defender_moves, num);
+            j = j + 1;
         };
         
         (attacker_moves, defender_moves)
@@ -201,6 +259,9 @@ module robobo::calculate {
         let zero_point = 128;
         let mut round = 0;
         while (true) {
+            if(*attacker_energy <= 128 || *defender_energy <= 128) {
+                break;
+            };
             if (round == 16) {
                 round = 0;
             };
@@ -218,21 +279,12 @@ module robobo::calculate {
                     attacker_attack,
                     attacker_defense,
                     attacker_personality
-                );
-                
-                // 攻击者基础能量消耗
-                if (*attacker_energy > zero_point + 1) {
-                    *attacker_energy = *attacker_energy - 1;
-                } else {
-                    *attacker_energy = zero_point;
-                };
-                
+                );                 
                 // 立即检查防守方能量
-                if (*defender_energy <= zero_point + 1) {
+                if (*defender_energy <= zero_point) {
                     *defender_energy = zero_point;
                     break;
-                };
-                
+                };                
                 // 防守方反击
                 process_action(
                     defender_energy,
@@ -241,17 +293,9 @@ module robobo::calculate {
                     defender_attack,
                     defender_defense,
                     defender_personality
-                );
-                
-                // 防守方基础能量消耗
-                if (*defender_energy > zero_point + 1) {
-                    *defender_energy = *defender_energy - 1;
-                } else {
-                    *defender_energy = zero_point;
-                };
-                
+                ); 
                 // 检查攻击方能量
-                if (*attacker_energy <= zero_point + 1) {
+                if (*attacker_energy <= zero_point) {
                     *attacker_energy = zero_point;
                     break;
                 };
@@ -264,21 +308,12 @@ module robobo::calculate {
                     defender_attack,
                     defender_defense,
                     defender_personality
-                );
-                
-                // 防守方基础能量消耗
-                if (*defender_energy > zero_point + 1) {
-                    *defender_energy = *defender_energy - 1;
-                } else {
-                    *defender_energy = zero_point;
-                };
-                
+                );                
                 // 检查攻击方能量
-                if (*attacker_energy <= zero_point + 1) {
+                if (*attacker_energy <= zero_point) {
                     *attacker_energy = zero_point;
                     break;
-                };
-                
+                };                
                 // 攻击方反击
                 process_action(
                     attacker_energy,
@@ -287,25 +322,16 @@ module robobo::calculate {
                     attacker_attack,
                     attacker_defense,
                     attacker_personality
-                );
-                
-                // 攻击方基础能量消耗
-                if (*attacker_energy > zero_point + 1) {
-                    *attacker_energy = *attacker_energy - 1;
-                } else {
-                    *attacker_energy = zero_point;
-                };
-                
+                );                
                 // 检查攻击方能量
-                if (*attacker_energy <= zero_point + 1) {
+                if (*attacker_energy <= zero_point) {
                     *attacker_energy = zero_point;
                     break;
                 };
-            };
+            };           
             
             round = round + 1;
-        };
-
+        };        
         let winner = *attacker_energy > *defender_energy;
         (winner, *attacker_energy, *defender_energy)
     }
