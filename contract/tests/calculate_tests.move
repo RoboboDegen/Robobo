@@ -362,8 +362,8 @@ module robobo::calculate_tests {
         //143
         // debug::print(&final_defender_energy);
 
-        // assert!(final_attacker_energy == 128, 0);
-        // assert!(final_defender_energy == 144, 1);
+        assert!(final_attacker_energy == 128, 0);
+        assert!(final_defender_energy == 144, 1);
         // 战斗应该在能量耗尽或达到回合限制时结束
         assert!(winner == (final_attacker_energy > final_defender_energy), 2);
     }
@@ -439,7 +439,7 @@ module robobo::calculate_tests {
         // debug::print(&final_attacker_energy);
         //128
         // debug::print(&final_defender_energy);
-    // assert!(final_attacker_energy == 138, 0);
+        // assert!(final_attacker_energy == 138, 0);
         // assert!(final_defender_energy == 128, 1);
 
     }
@@ -702,8 +702,8 @@ module robobo::calculate_tests {
         debug::print(&final_defender_energy);
         // 验证战斗结果
         // 战斗应该很快结束
-        // assert!(final_attacker_energy == 128, 0); 
-        // assert!(final_defender_energy == 130, 1); 
+        assert!(final_attacker_energy == 128, 0); 
+        assert!(final_defender_energy == 129, 1); 
        
     }
 

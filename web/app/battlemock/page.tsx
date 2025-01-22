@@ -204,8 +204,17 @@ export default function BattleMockPage() {
           defenderMove,
           false
         );
+        currentDefenderEnergy = defenderAction.actorEnergy;  // Apply defender's energy change immediately
         currentAttackerEnergy = defenderAction.targetEnergy;
         logs.push(defenderAction.log);
+
+        // 基础能量消耗
+        if (currentDefenderEnergy > ZERO_POINT + 1) {
+          currentDefenderEnergy--;
+          logs.push(`Defender base energy cost: -1`);
+        } else {
+          currentDefenderEnergy = ZERO_POINT;
+        }
 
         // 检查攻击方能量
         if (currentAttackerEnergy <= ZERO_POINT + 1) {
@@ -213,9 +222,6 @@ export default function BattleMockPage() {
           logs.push(`Attacker energy depleted!`);
           break;
         }
-
-        // 确认战斗继续后，才应用防守者的能量消耗
-        currentDefenderEnergy = defenderAction.actorEnergy;
 
         // Attacker counterattack
         const attackerAction = processAction(
@@ -228,21 +234,17 @@ export default function BattleMockPage() {
         currentDefenderEnergy = attackerAction.targetEnergy;
         logs.push(attackerAction.log);
 
-        // 检查防守方能量
-        if (currentDefenderEnergy <= ZERO_POINT + 1) {
-          currentDefenderEnergy = ZERO_POINT;
-          logs.push(`Defender energy depleted!`);
-          break;
-        }
-
         // 基础能量消耗
         if (currentAttackerEnergy > ZERO_POINT + 1) {
           currentAttackerEnergy--;
           logs.push(`Attacker base energy cost: -1`);
         }
-        if (currentDefenderEnergy > ZERO_POINT + 1) {
-          currentDefenderEnergy--;
-          logs.push(`Defender base energy cost: -1`);
+
+        // 检查防守方能量
+        if (currentDefenderEnergy <= ZERO_POINT + 1) {
+          currentDefenderEnergy = ZERO_POINT;
+          logs.push(`Defender energy depleted!`);
+          break;
         }
       }
 
