@@ -70,11 +70,13 @@ module robobo::calculate {
     /// * `attack` - 攻击力
     /// * `defense` - 防御力
     /// * `personality` - 个性
-    /// move_value: 0-3: 轻攻击
-    /// move_value: 4-6: 重攻击
-    /// move_value: 7-8: 防御
-    /// move_value: 9: 特殊技能
-    /// 
+    /// 具体逻辑是：
+    /// 1. 如果行动者的能量小于等于129，则触发特殊攻击
+    /// 2. 如果行动者的能量大于129，则扣除1点能量
+    /// 3. 根据行动值和攻击力计算伤害
+    /// 4. 根据防御力和个性计算恢复量
+    /// 5. 根据行动值和防御力计算防御量
+    /// 6. 根据行动值和个性计算特殊技能量
     fun process_action(
         actor_energy: &mut u8,
         target_energy: &mut u8,
@@ -107,7 +109,7 @@ module robobo::calculate {
                 };
             };
         } else {
-            //行动的时候先扣除能量
+            //cost 1 energy when start action
             *actor_energy = *actor_energy - 1;
             if (move_value <= 3) {
                 // Light attack: only deals damage, no energy cost
@@ -159,6 +161,17 @@ module robobo::calculate {
         };
     }
 
+    /// 计算伤害
+    /// 
+    /// # Arguments
+    /// * `base_stat` - 基础属性
+    /// * `multiplier` - 乘数
+    /// * `personality` - 个性
+    /// * `is_attack` - 是否是攻击
+    /// 具体逻辑是：
+    /// 1. 根据个性计算加成
+    /// 2. 根据基础属性和乘数计算伤害
+    /// 3. 根据个性计算加成
     fun calculate_damage(base_stat: u64, multiplier: u64, personality: u8, is_attack: bool): u8 {
         let personality_modifier = if (is_attack) {
             // 攻击型动作：高personality加成，但限制在1-2之间
@@ -206,7 +219,14 @@ module robobo::calculate {
             (heal as u8)
         }
     }
-
+    /// 分割hash并转换为行动值
+    /// 
+    /// # Arguments
+    /// * `hash` - 战斗hash
+    /// 具体逻辑是：
+    /// 1. 分割hash为攻击者和防守者的行动值
+    /// 2. 根据行动值计算防御次数
+    /// 3. 根据防御次数转换行动值   
     fun split_and_convert_hash(hash: vector<u8>): (vector<u8>, vector<u8>) {
         let len = vector::length(&hash);
         let mut attacker_moves = vector::empty<u8>();
@@ -216,7 +236,7 @@ module robobo::calculate {
         let mut attacker_defense_count = 0;
         let mut defender_defense_count = 0;
         
-        // 处理攻击者的行动 (0-15)
+        // 处理攻击者的行动 (0-15) 防止防御次数超过3次
         let mut i = 0;
         while (i < 16) {
             let mut num = hash[i] % 10;
@@ -230,7 +250,7 @@ module robobo::calculate {
             i = i + 1;
         };
         
-        // 处理防守者的行动 (16-31)
+        // 处理防守者的行动 (16-31) 防止防御次数超过3次
         let mut j = 16;
         while (j < 32) {
             let mut num = hash[j] % 10;
@@ -246,13 +266,40 @@ module robobo::calculate {
         
         (attacker_moves, defender_moves)
     }
-
+    /// 计算先攻值
+    /// 
+    /// # Arguments
+    /// * `speed` - 速度
+    /// * `move_value` - 行动值
+    /// 具体逻辑是：
+    /// 1. 将行动值转换为加成值
+    /// 2. 速度+行动值决定最终先攻值
     fun calculate_initiative(speed: u64, move_value: u8): u64 {
         // 将move_value(0-9)转换为加成值
         let move_bonus = (move_value as u64) * 10; // 将0-9转换为0-90的加成
         speed + move_bonus // 速度+行动值决定最终先攻值
     }
-
+    /// 计算战斗结果
+    /// 
+    /// # Arguments
+    /// * `battle_hash` - 战斗hash
+    /// * `attacker_energy` - 攻击者能量
+    /// * `defender_energy` - 防守者能量
+    /// * `attacker_attack` - 攻击者攻击力
+    /// * `attacker_defense` - 攻击者防御力
+    /// * `attacker_speed` - 攻击者速度
+    /// * `attacker_personality` - 攻击者个性
+    /// * `defender_attack` - 防守者攻击力
+    /// * `defender_defense` - 防守者防御力
+    /// * `defender_speed` - 防守者速度
+    /// * `defender_personality` - 防守者个性
+    /// 具体逻辑是：
+    /// 1. 分割hash并转换为行动值
+    /// 2. 根据行动值计算防御次数
+    /// 3. 根据防御次数转换行动值
+    /// 4. 根据先攻值计算行动顺序
+    /// 5. 根据行动顺序处理行动
+    /// 6. 根据行动结果计算战斗结果
     public fun calculate_battle_result(battle_hash: vector<u8>, attacker_energy: &mut u8, defender_energy: &mut u8, attacker_attack: u8, attacker_defense: u8, attacker_speed: u8, attacker_personality: u8, defender_attack: u8, defender_defense: u8, defender_speed: u8, defender_personality: u8): (bool, u8, u8) {
         let (attacker_moves, defender_moves) = split_and_convert_hash(battle_hash);
 
