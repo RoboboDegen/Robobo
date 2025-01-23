@@ -7,7 +7,7 @@ export default function Home() {
           <div
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
           >
-            <Link href="https://github.com/RoboboDegen/Robobo/commit/server">
+            <Link href="https://github.com/RoboboDegen/Robobo/tree/backend">
             Source Code
           </Link>
           </div>
