@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Robot {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  ownerId   String   @unique
+  winCount  Int
+  loseCount Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([address])
+  @@index([ownerId]) 
+}
+
