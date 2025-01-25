@@ -8,16 +8,26 @@ datasource db {
 }
 
 model Robot {
-  id        String   @id @default(cuid())
-  address   String   @unique
-  ownerId   String   @unique
-  winCount  Int
-  loseCount Int
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String      @id @default(cuid())
+  address     String      @unique
+  ownerId     String      @unique
+  winCount    Int         @default(0)
+  loseCount   Int         @default(0)
+  name        String
+  personality Personality @relation(fields: [personalityId], references: [id])
+  personalityId String    @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([address])
-  @@index([ownerId]) 
+  @@index([ownerId])
+}
+
+model Personality {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 

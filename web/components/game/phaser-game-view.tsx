@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
 import { useGameStore } from '@/context/use-game-store';
 
+
 function PhaserGameContent() {
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const { setGameInstance } = useGameStore();
@@ -17,13 +18,17 @@ function PhaserGameContent() {
         import('@/game/config'),
       ]);
 
+      const container = gameContainerRef.current;
       const config = {
         ...gameConfig,
-        parent: gameContainerRef.current,
+        parent: container,
+        width: container?.clientWidth,
+        height: container?.clientHeight,
         scale: {
-          ...gameConfig.scale,
           mode: Phaser.Scale.FIT,
           autoCenter: Phaser.Scale.CENTER_BOTH,
+          width: gameConfig.width,
+          height: gameConfig.height,
         },
       };
 
@@ -35,20 +40,27 @@ function PhaserGameContent() {
       };
     };
 
-    initGame();
+    const cleanup = initGame();
+    return () => {
+      cleanup.then(cleanupFn => cleanupFn?.());
+    };
   }, [setGameInstance]);
 
   return (
     <div 
       ref={gameContainerRef} 
-      className="absolute inset-0"
+      className="absolute inset-0 w-full h-full"
     />
   );
 }
 
 const PhaserGameView = dynamic(() => Promise.resolve(PhaserGameContent), {
   ssr: false,
-  loading: () => <div className="absolute inset-0 flex items-center justify-center">Loading game...</div>
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-background">
+      Loading game...
+    </div>
+  ),
 });
 
 export function GameView() {

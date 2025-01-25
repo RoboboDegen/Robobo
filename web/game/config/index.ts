@@ -1,11 +1,12 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { GameTestScene } from '@/game/scenes';
+import { PreloadScene } from '../scenes/preload-scene';
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: 340,
   height: 640,
-  scene: [GameTestScene],
+  scene: [PreloadScene, GameTestScene],
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { inter } from "./fonts";
+import { inter, tiny5 } from "./fonts";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${tiny5.variable} ${inter.className} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
