@@ -39,6 +39,9 @@ export class GameEventManager {
     this.listeners = new Map();
   }
 
+  eventManager.on('SCENE_READY', (data) => {
+       console.log(`Scene ${data.sceneName} is ready`);
+     });
   /**
    * 获取事件管理器实例
    * @returns GameEventManager 单例实例
