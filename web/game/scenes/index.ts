@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { GameManager } from '../core/game-manager';
 import { AssetManager } from '../core/asset-manager';
 import { Background } from '../gameObject/background';
+import { SpriteObject } from '../gameObject/sprite';
 
 
 export class GameTestScene extends Phaser.Scene {
@@ -10,6 +11,8 @@ export class GameTestScene extends Phaser.Scene {
   private cameraSpeed: number = 10;
   private gameManager?: GameManager;
   private assetManager?: AssetManager;
+  private player_robot?: SpriteObject;
+  private enemy_robot?: SpriteObject;
 
   constructor() {
     super({ key: 'GameTestScene' });
@@ -29,6 +32,12 @@ export class GameTestScene extends Phaser.Scene {
 
   private createGameObjects() {
     this.background = new Background(this, 'testBackground');
+    this.player_robot = new SpriteObject({
+      texture: 'player',
+      x: 100,
+      y: 100,
+      scene: this
+    });
   }
 
   private setupInput() {
