@@ -63,6 +63,12 @@ export class GameTestScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown) {
       cam.scrollY = Math.max(bounds.y, cam.scrollY - this.cameraSpeed);
+      
+      console.log("上箭头键被按下");
+      // 播放动画：跳跃
+    if (this.player_robot) {
+      this.player_robot.playAnimation('player-jump');
+      }
     }
     if (this.cursors.down.isDown) {
       cam.scrollY = Math.min(bounds.y + bounds.height - cam.height, cam.scrollY + this.cameraSpeed);

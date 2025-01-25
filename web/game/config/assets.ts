@@ -55,6 +55,14 @@ export const GAME_ASSETS_DATA: GameAssetsData = {
         //     frameHeight: 48 
         //   } 
         // }
+        { 
+          key: 'player', 
+          path: '/robobo/baseRobot.png', 
+          frameConfig: { 
+            frameWidth: 90, 
+            frameHeight: 128 
+          } 
+        }
     ],
 
     audio: [
@@ -76,6 +84,13 @@ export const GAME_ASSETS_DATA: GameAssetsData = {
         //   frameRate: 10,
         //   repeat: -1
         // }
+        { 
+          key: 'player-jump',
+          spritesheet: 'player',
+          frames: ['0', '1', '2', '3','4','5'],
+          frameRate: 10,
+          repeat: -1
+        }
     ],
 
     effects: [
