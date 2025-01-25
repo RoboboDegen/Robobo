@@ -1,7 +1,7 @@
 import { AnimationManager } from './animation-manager';
 import { AudioManager } from './audio-manager';
 import { EffectManager } from './effect-manager';
-import { CoroutineManager } from './coroutine-manager';
+import { CoroutinesManager } from './coroutine-manager';
 import { GAME_ASSETS_DATA } from '../config/assets';
 
 export class GameManager {
@@ -10,13 +10,13 @@ export class GameManager {
   public readonly animation: AnimationManager;
   public readonly audio: AudioManager;
   public readonly effect: EffectManager;
-  public readonly coroutine: CoroutineManager;
+  public readonly coroutine: CoroutinesManager;
 
   private constructor(scene: Phaser.Scene) {
     this.animation = new AnimationManager(scene);
     this.audio = new AudioManager(scene);
     this.effect = new EffectManager(scene);
-    this.coroutine = new CoroutineManager();
+    this.coroutine = new CoroutinesManager(scene.game);
 
     // Load all assets from config
     this.animation.loadAnimations(GAME_ASSETS_DATA.animations);
