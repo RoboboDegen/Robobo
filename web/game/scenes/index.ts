@@ -2,9 +2,13 @@ import * as Phaser from 'phaser';
 import { GameManager } from '../core/game-manager';
 import { AssetManager } from '../core/asset-manager';
 import { Background } from '../gameObject/background';
-
+import { WaitForSeconds, WaitForEndOfFrame } from '../core/coroutine';
+import { CoroutineExecutionAt } from '../core/coroutine-manager';
 
 export class GameTestScene extends Phaser.Scene {
+
+
+  
   private background?: Background;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private cameraSpeed: number = 10;
@@ -19,7 +23,9 @@ export class GameTestScene extends Phaser.Scene {
     this.initializeManagers();
     this.createGameObjects();
     this.setupInput();
+    this.doTest();
   }
+
 
   private initializeManagers() {
     this.gameManager = GameManager.getInstance(this);
@@ -31,6 +37,19 @@ export class GameTestScene extends Phaser.Scene {
     this.background = new Background(this, 'testBackground');
   }
 
+  private doTest(): void {
+    this.gameManager?.coroutine.start(this.test());
+}
+
+  public *test() {
+    const loop = this.game.loop;
+    console.log(`Hello! at time ${loop.time} / frame ${loop.frame}`);
+    yield new WaitForSeconds(1);
+    console.log(`Tolking! at time ${loop.time} / frame ${loop.frame}`);
+    yield new WaitForEndOfFrame();
+    console.log(`Goodbye! at time ${loop.time} / frame ${loop.frame}`);
+  }
+  
   private setupInput() {
     this.cursors = this.input.keyboard?.createCursorKeys();
     
@@ -40,7 +59,12 @@ export class GameTestScene extends Phaser.Scene {
     });
   }
 
-  update() {
+  public override update(time: number, delta: number) {
+
+    
+    this.gameManager?.coroutine.tick(delta / 1000, CoroutineExecutionAt.Update);
+    this.gameManager?.coroutine.tick(delta / 1000, CoroutineExecutionAt.PostUpdate);
+
     if (!this.cursors) return;
 
     const cam = this.cameras.main;
@@ -60,6 +84,7 @@ export class GameTestScene extends Phaser.Scene {
     }
   }
 
+ 
   shutdown() {
     this.background?.destroy();
     this.cursors = undefined;
