@@ -1,9 +1,16 @@
 import { create } from 'zustand';
 
 interface GameState {
-  score: number;
-  isPaused: boolean;
-  isGameOver: boolean;
+  uiState: GameUIState;
+}
+
+
+export enum GameUIState {
+  CONNECTING,
+  MAIN_MENU,
+  INVENTORY,
+  FIGHTING,
+  CHART
 }
 
 interface GameStore {
@@ -13,18 +20,14 @@ interface GameStore {
   
   // 游戏状态
   gameState: GameState;
-  setScore: (score: number) => void;
-  setPaused: (isPaused: boolean) => void;
-  setGameOver: (isGameOver: boolean) => void;
+  setUIState: (uiState: GameUIState) => void;
   
   // 重置游戏状态
   resetGameState: () => void;
 }
 
 const initialGameState: GameState = {
-  score: 0,
-  isPaused: false,
-  isGameOver: false,
+  uiState: GameUIState.MAIN_MENU,
 };
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -32,16 +35,9 @@ export const useGameStore = create<GameStore>((set) => ({
   setGameInstance: (game) => set({ gameInstance: game }),
   
   gameState: initialGameState,
-  setScore: (score) => set((state) => ({
-    gameState: { ...state.gameState, score }
-  })),
-  setPaused: (isPaused) => set((state) => ({
-    gameState: { ...state.gameState, isPaused }
-  })),
-  setGameOver: (isGameOver) => set((state) => ({
-    gameState: { ...state.gameState, isGameOver }
-  })),
-  
+  setUIState: (uiState) => set((state) => ({
+    gameState: { ...state.gameState, uiState }
+  })),  
   resetGameState: () => set(() => ({
     gameState: initialGameState
   })),

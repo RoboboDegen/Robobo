@@ -49,7 +49,9 @@ export class AssetManager {
       return undefined;
     }
 
-    return this.scene.add.sprite(0, 0, key);
+    const sprite = this.scene.add.sprite(0, 0, key);
+    sprite.setAlpha(0.5);
+    return sprite;
   }
 
   public playAnimation(sprite: Phaser.GameObjects.Sprite, key: AnimationKeys) {

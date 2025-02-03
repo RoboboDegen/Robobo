@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef } from 'react';
-import { useGameStore } from '@/context/use-game-store';
+import { useGameStore } from '@/hooks/use-game-store';
 
 
 function PhaserGameContent() {
@@ -34,7 +34,6 @@ function PhaserGameContent() {
 
       const game = new Phaser.Game(config);
       setGameInstance(game);
-
       return () => {
         game.destroy(true);
       };
