@@ -42,7 +42,7 @@ export interface GameAssetsData {
 // 导出实际数据（可以逐步添加）
 export const GAME_ASSETS_DATA: GameAssetsData = {
     images: [
-        { key: 'testBackground', path: '/images/testBackground.webp' },
+        // { key: 'testBackground', path: '/images/testBackground.webp' },
     ],
 
     spritesheets: [

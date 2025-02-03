@@ -51,6 +51,9 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+		fontFamily: {
+			tiny5: ['var(--font-tiny5)', 'sans-serif'],
+		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

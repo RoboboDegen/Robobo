@@ -27,9 +27,9 @@ export class GameTestScene extends Phaser.Scene {
     this.assetManager.playBGM('bgm');
   }
 
-  private createGameObjects() {
-    this.background = new Background(this, 'testBackground');
-  }
+  // private createGameObjects() {
+  //   this.background = new Background(this, 'testBackground');
+  // }
 
   private setupInput() {
     this.cursors = this.input.keyboard?.createCursorKeys();
