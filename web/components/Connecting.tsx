@@ -1,8 +1,28 @@
 "use client";
-import { RoButton } from "./ro_button";
+import { SuiConnectButton } from "./SuiConnectButton";
 import Image from "next/image";
+import { useGameStore, GameUIState } from "@/hooks/use-game-store";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 export function Connecting() {
+  const { setUIState } = useGameStore();
+  const account = useCurrentAccount();
+  
+  const connectWallet = async () => {
+    try {
+      console.log("Current Account:", account);  // 打印 account
+      if (account) {
+        setUIState(GameUIState.MAIN_MENU);
+        console.log("UI State set to MAIN_MENU");
+      } else {
+        console.log("No account found.");
+      }
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+    }
+  }
+  
+
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden flex items-center justify-center">
       {/* 背景图片 */}
@@ -38,11 +58,10 @@ export function Connecting() {
       </div>
 
       {/* 按钮区域 - 固定在底部 */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6">
-        <RoButton variant="connect" className="w-full max-w-[366px]">
-          Connect Wallet
-        </RoButton>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 font-tiny5 text-[20px]">
+        <SuiConnectButton/>
       </div>
+      
     </div>
   );
 }

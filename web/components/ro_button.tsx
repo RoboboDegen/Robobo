@@ -1,54 +1,60 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
-import { ConnectButton } from "@mysten/dapp-kit"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[url('/robobo/button-normal.png')] bg-no-repeat bg-contain w-[366px] h-[84px] transition-none pb-[5%] group select-none hover:cursor-pointer [&:hover]:text-6xl",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-no-repeat bg-contain transition-none",
   {
     variants: {
       variant: {
-        connect: "font-tiny5",
-        inventory: "font-tiny5",
-        mint: "font-tiny5",
+        chat_send: "bg-[url('/gameui/chat/chatbox_sent_btn.png')] w-[60px] h-[60px]",
+        chat_back: "bg-[url('/gameui/chat/top_back_btn.png')] w-[60px] h-[60px]",
+        home_bottom:
+          "bg-[url('/gameui/home/bottom_btn.png')] hover:bg-[url('/gameui/home/bottom_btn_pre.png')] active:bg-[url('/gameui/home/bottom_btn_pre.png')] w-[100px] h-[60px]",
+        left_arrow_btn: "bg-[url('/gameui/home/left_arrow_btn.png')] w-[40px] h-[40px]",
+        right_arrow_btn: "bg-[url('/gameui/home/right_arrow_btn.png')] w-[40px] h-[40px]",
+        inventory_back: "bg-[url('/gameui/inventory/top_back_btn.png')] w-[60px] h-[60px]",
+        mint_bottom:
+          "bg-[url('/gameui/mint/bottom_bar_default.png')] hover:bg-[url('/gameui/mint/bottom_bar_pre.png')] active:bg-[url('/gameui/mint/bottom_bar_pre.png')] w-[260px] h-[60px] text-[30px]",
       },
     },
     defaultVariants: {
-      variant: "connect",
+      variant: "home_bottom",
     },
-  },
-)
+  }
+);
 
 export interface RoButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+  asChild?: boolean;
 }
 
 const RoButton = React.forwardRef<HTMLButtonElement, RoButtonProps>(
-  ({ className, asChild = false, children, variant, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  ({ className, asChild = false, variant = "chat_send", children, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
 
-    const buttonContent = (
+    return (
       <Comp
-        className={cn(buttonVariants({ variant, className }), "[&:active]:!bg-[url('/robobo/button-onclick.png')]")}
+        className={cn(
+          buttonVariants({ variant, className }),
+          "group select-none hover:cursor-pointer",
+          "[&:active]:brightness-90",
+          "[&:hover]:scale-105",
+          "font-tiny5",
+          "transition-transform duration-200",
+          "flex justify-center items-center text-center" // 保证按钮文字居中
+        )}
         ref={ref}
         {...props}
       >
-        {children || "Connect Wallet"}
+        {children || null}
       </Comp>
-    )
+    );
+  }
+);
 
-    if (variant === "connect") {
-      return <ConnectButton>{buttonContent}</ConnectButton>
-    }
+RoButton.displayName = "RoButton";
 
-    return buttonContent
-  },
-)
-
-RoButton.displayName = "RoButton"
-
-export { RoButton, buttonVariants }
-
+export { RoButton, buttonVariants };

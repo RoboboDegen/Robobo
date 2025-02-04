@@ -27,9 +27,9 @@ export class GameTestScene extends Phaser.Scene {
     this.assetManager.playBGM('bgm');
   }
 
-  // private createGameObjects() {
-  //   this.background = new Background(this, 'testBackground');
-  // }
+  private createGameObjects() {
+    this.background = new Background(this, 'testBackground');
+  }
 
   private setupInput() {
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -54,12 +54,6 @@ export class GameTestScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown) {
       cam.scrollY = Math.max(bounds.y, cam.scrollY - this.cameraSpeed);
-      
-      console.log("上箭头键被按下");
-      // 播放动画：跳跃
-    if (this.player_robot) {
-      this.player_robot.playAnimation('player-jump');
-      }
     }
     if (this.cursors.down.isDown) {
       cam.scrollY = Math.min(bounds.y + bounds.height - cam.height, cam.scrollY + this.cameraSpeed);

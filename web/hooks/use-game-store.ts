@@ -7,6 +7,7 @@ interface GameState {
 
 export enum GameUIState {
   CONNECTING,
+  MINT,
   MAIN_MENU,
   INVENTORY,
   FIGHTING,
@@ -35,9 +36,12 @@ export const useGameStore = create<GameStore>((set) => ({
   setGameInstance: (game) => set({ gameInstance: game }),
   
   gameState: initialGameState,
-  setUIState: (uiState) => set((state) => ({
+  setUIState: (uiState) => {
+    console.log("set: ",uiState);
+    set((state) => ({
     gameState: { ...state.gameState, uiState }
-  })),  
+  }));
+},
   resetGameState: () => set(() => ({
     gameState: initialGameState
   })),
