@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Connecting } from "../Connecting";
-import { Mint } from "../mint";
+import { Mint } from "../Mint";
 import { Home } from "../Main";
 import { Chatting } from "../Chatting";
 import { Inventory } from "../Inventory";

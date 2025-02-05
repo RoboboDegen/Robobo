@@ -8,20 +8,14 @@ export function Connecting() {
   const { setUIState } = useGameStore();
   const account = useCurrentAccount();
   
-  const connectWallet = async () => {
-    try {
-      console.log("Current Account:", account);  // 打印 account
-      if (account) {
-        setUIState(GameUIState.MAIN_MENU);
-        console.log("UI State set to MAIN_MENU");
-      } else {
-        console.log("No account found.");
-      }
-    } catch (error) {
-      console.error("Error connecting wallet:", error);
+  const connectWallet = () => {
+    if (account) {
+      setUIState(GameUIState.MAIN_MENU);
+      console.log("UI State set to MAIN_MENU");
+    } else {
+      console.log("No account connected");
     }
   }
-  
 
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden flex items-center justify-center">
@@ -59,7 +53,7 @@ export function Connecting() {
 
       {/* 按钮区域 - 固定在底部 */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 font-tiny5 text-[20px]">
-        <SuiConnectButton/>
+        <SuiConnectButton onClick = {connectWallet} />
       </div>
       
     </div>
