@@ -2,6 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { Connecting } from "../Connecting";
+import { Mint } from "../mint";
+import { Home } from "../Main";
 import { Chatting } from "../Chatting";
 import { Inventory } from "../Inventory";
 import { Fighting } from "../Fighting";
@@ -13,7 +15,7 @@ export function GameUI() {
     const { gameState,setUIState } = useGameStore();
 
     useEffect(() => {
-        setUIState(GameUIState.MAIN_MENU);
+        setUIState(GameUIState.CONNECTING);
     }, [setUIState]);
 
     return (
@@ -23,7 +25,9 @@ export function GameUI() {
             "max-w-[720px] mx-auto", // 与游戏最大宽度匹配
         )}>
             <div className="flex h-full flex-col justify-end">
-                {gameState.uiState === GameUIState.MAIN_MENU && <Connecting />}
+                {gameState.uiState === GameUIState.CONNECTING && <Connecting />}
+                {gameState.uiState === GameUIState.MINT && <Mint />} 
+                {gameState.uiState === GameUIState.MAIN_MENU && <Home />}
                 {gameState.uiState === GameUIState.INVENTORY && <Inventory />}
                 {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
                 {gameState.uiState === GameUIState.CHART && <Chatting />}
