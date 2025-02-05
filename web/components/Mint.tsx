@@ -1,7 +1,27 @@
 import { RoButton } from "./ro_button";
 import Image from 'next/image';
+import { useGameStore, GameUIState } from "@/hooks/use-game-store";
 
 export function Mint() {
+  const { setUIState } = useGameStore();
+
+  const handleMint = async () => {
+    try {
+      // 这里添加mint NFT的逻辑
+      const mintSuccess = true; // 测试时默认为true，之后替换为实际的mint结果
+      
+      if (mintSuccess) {
+        console.log("Mint successful, redirecting to Main Menu");
+        setUIState(GameUIState.MAIN_MENU);
+      } else {
+        console.log("Mint failed");
+        // 可以添加失败提示
+      }
+    } catch (error) {
+      console.error("Error minting NFT:", error);
+    }
+  };
+
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden flex items-center justify-center">
       {/* Background Scene */}
@@ -100,7 +120,9 @@ export function Mint() {
 
         {/* Bottom Action Bar */}
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 px-6 font-tiny5">
-         <RoButton variant="mint_bottom"> mint </RoButton>
+          <RoButton variant="mint_bottom" onClick={handleMint}>
+            mint
+          </RoButton>
         </div>
       </div>
     </div>
