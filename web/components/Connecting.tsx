@@ -3,19 +3,31 @@ import { SuiConnectButton } from "./SuiConnectButton";
 import Image from "next/image";
 import { useGameStore, GameUIState } from "@/hooks/use-game-store";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useEffect } from "react";
 
 export function Connecting() {
   const { setUIState } = useGameStore();
   const account = useCurrentAccount();
   
+  // 使用 useEffect 来监听 account 的变化
+  useEffect(() => {
+    if (account) {
+      connectWallet();
+    }
+  }, [account]); // 当 account 变化时触发
+
   const connectWallet = async () => {
     try {
-      console.log("Current Account:", account);  // 打印 account
-      if (account) {
+      console.log("Current Account:", account);
+      // 这里添加检测NFT的逻辑
+      const hasNFT = false; // 测试时默认为false，之后替换为实际的NFT检测逻辑
+      
+      if (hasNFT) {
         setUIState(GameUIState.MAIN_MENU);
-        console.log("UI State set to MAIN_MENU");
+        console.log("Has NFT, redirecting to Main Menu");
       } else {
-        console.log("No account found.");
+        setUIState(GameUIState.MINT);
+        console.log("No NFT found, redirecting to Mint page");
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);

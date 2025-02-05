@@ -3,8 +3,11 @@
 import Image from "next/image"
 import { RoButton } from "./ro_button"
 import { useState } from "react"
+import { useGameStore, GameUIState } from "@/hooks/use-game-store";
+
 
 export function Home() {
+  const { setUIState } = useGameStore();
   const [currentPage, setCurrentPage] = useState(0)
   const totalPages = 3
 
@@ -132,8 +135,25 @@ export function Home() {
         {/* Bottom Action Buttons */}
         <div className="absolute bottom-16 left-[204px] -translate-x-1/2 flex gap-4">
         {["Inventory", "Chat", "Fight"].map((action) => (
-            <RoButton key={action} variant="home_bottom" className="flex justify-center items-center text-center text-lg">
-            {action}
+            <RoButton 
+                key={action} 
+                variant="home_bottom" 
+                className="flex justify-center items-center text-center text-lg"
+                onClick={() => {
+                    switch(action) {
+                        case "Inventory":
+                            setUIState(GameUIState.INVENTORY);
+                            break;
+                        case "Chat":
+                            setUIState(GameUIState.CHART);
+                            break;
+                        case "Fight":
+                            setUIState(GameUIState.FIGHTING);
+                            break;
+                    }
+                }}
+            >
+                {action}
             </RoButton>
         ))}
         </div>
