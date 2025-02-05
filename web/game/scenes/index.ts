@@ -28,7 +28,7 @@ export class GameTestScene extends Phaser.Scene {
   }
 
   private createGameObjects() {
-    this.background = new Background(this, 'testBackground');
+    
   }
 
   private setupInput() {
@@ -41,23 +41,7 @@ export class GameTestScene extends Phaser.Scene {
   }
 
   update() {
-    if (!this.cursors) return;
-
-    const cam = this.cameras.main;
-    const bounds = cam.getBounds();
     
-    if (this.cursors.left.isDown) {
-      cam.scrollX = Math.max(bounds.x, cam.scrollX - this.cameraSpeed);
-    }
-    if (this.cursors.right.isDown) {
-      cam.scrollX = Math.min(bounds.x + bounds.width - cam.width, cam.scrollX + this.cameraSpeed);
-    }
-    if (this.cursors.up.isDown) {
-      cam.scrollY = Math.max(bounds.y, cam.scrollY - this.cameraSpeed);
-    }
-    if (this.cursors.down.isDown) {
-      cam.scrollY = Math.min(bounds.y + bounds.height - cam.height, cam.scrollY + this.cameraSpeed);
-    }
   }
 
   shutdown() {

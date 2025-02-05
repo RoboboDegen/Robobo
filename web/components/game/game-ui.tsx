@@ -9,14 +9,32 @@ import { Inventory } from "../Inventory";
 import { Fighting } from "../Fighting";
 import { GameUIState, useGameStore } from "@/hooks/use-game-store";
 import { useEffect } from "react";
+import { useGameData } from "@/context/GameDataProvider";
+
+
 
 
 export function GameUI() {
-    const { gameState,setUIState } = useGameStore();
+    const { gameState, setUIState } = useGameStore();
+    const { getRobot } = useGameData();
+    
+
+    const handleMint = () => {
+        //setUIState(GameUIState.MAIN_MENU);
+    }
 
     useEffect(() => {
-        setUIState(GameUIState.CONNECTING);
-    }, [setUIState]);
+        const fetchRobot = async () => {
+            await getRobot();
+            setUIState(GameUIState.CONNECTING);
+        }
+        fetchRobot();
+    }, [setUIState, getRobot]);
+
+
+
+
+
 
     return (
         <div className={cn(
@@ -24,14 +42,12 @@ export function GameUI() {
             "flex flex-col items-center justify-between p-4",
             "max-w-[720px] mx-auto", // 与游戏最大宽度匹配
         )}>
-            <div className="flex h-full flex-col justify-end">
-                {gameState.uiState === GameUIState.CONNECTING && <Connecting />}
-                {gameState.uiState === GameUIState.MINT && <Mint />} 
-                {gameState.uiState === GameUIState.MAIN_MENU && <Home />}
-                {gameState.uiState === GameUIState.INVENTORY && <Inventory />}
-                {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
-                {gameState.uiState === GameUIState.CHART && <Chatting />}
-            </div>
+            {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
+            {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}    
+            {gameState.uiState === GameUIState.MAIN_MENU && <Home />}
+            {gameState.uiState === GameUIState.INVENTORY && <Inventory />}
+            {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
+            {gameState.uiState === GameUIState.CHART && <Chatting />}
         </div>
     );
 } 
