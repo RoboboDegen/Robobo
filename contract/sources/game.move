@@ -560,7 +560,7 @@ module robobo::game {
     }
 
     //链下加密函数
-    public fun admin_set_robot_energy(
+    public fun offchain_set_robot_energy(
         robot: &mut Robot,
         sig:vector<u8>,
         energy: u8
@@ -579,7 +579,7 @@ module robobo::game {
         set_robot_energy(robot, current_energy);
     }
 
-    public fun admin_set_robot_personality(
+    public fun offchain_set_robot_personality(
         robot: &mut Robot,
         sig:vector<u8>,
         personality: u8
