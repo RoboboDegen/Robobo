@@ -3,14 +3,19 @@
 import { useEffect, useState } from 'react';
 import { GameEventManager } from '@/game/core/event-manager';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GameUIState } from '@/hooks/use-game-store';
+import { useGameStore } from '@/hooks/use-game-store';
 
 export function LoadingScreen() {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const { setUIState } = useGameStore();
+
 
   useEffect(() => {
     const eventManager = GameEventManager.getInstance();
 
+    setUIState(GameUIState.LOADING);
     // 监听加载进度
     const unsubscribeProgress = eventManager.on('ASSET_LOAD_PROGRESS', (data) => {
       setProgress(Math.round(data.progress * 100));
@@ -23,6 +28,7 @@ export function LoadingScreen() {
       // 加载完成后延迟消失
       setTimeout(() => {
         setIsVisible(false);
+        setUIState(GameUIState.CONNECTING);
       }, 500);
     });
 
@@ -30,12 +36,12 @@ export function LoadingScreen() {
       unsubscribeProgress();
       unsubscribeComplete();
     };
-  }, []);
+  }, [setUIState]);
 
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div 
+        <motion.div
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

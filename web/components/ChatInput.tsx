@@ -26,7 +26,7 @@ export function ChatInput({ onSubmit, className }: ChatInputProps) {
         className="flex-1 bg-[#2a2a3a] text-white rounded-lg px-3 py-2 font-pixel text-sm translate-y-[-15px]"
         placeholder="Type your message..."
       />
-      <RoButton type="submit" variant="chat_send">
+      <RoButton type="submit" variant="chat_send" onClick={handleSubmit}>
       <span className="translate-y-[-10px] text-lg">Send</span>
       </RoButton>
     </div>

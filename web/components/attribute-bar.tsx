@@ -10,16 +10,16 @@ interface AttributeBarProps {
   height?: number; // 添加 height 属性
 }
 
-const colorMap: Record<string, string> = {
-  'bg-[#ff4444]': '#ff4444',
-  'bg-[#00ffcc]': '#00ffcc',
-  'bg-[#ffcc00]': '#ffcc00',
-  'bg-[#ff9933]': '#ff9933',
-  'bg-red-500': '#ef4444',
-  'bg-cyan-400': '#22d3ee',
-  'bg-yellow-400': '#facc15',
-  'bg-orange-400': '#fb923c',
-};
+// const colorMap: Record<string, string> = {
+//   'bg-[#ff4444]': '#ff4444',
+//   'bg-[#00ffcc]': '#00ffcc',
+//   'bg-[#ffcc00]': '#ffcc00',
+//   'bg-[#ff9933]': '#ff9933',
+//   'bg-red-500': '#ef4444',
+//   'bg-cyan-400': '#22d3ee',
+//   'bg-yellow-400': '#facc15',
+//   'bg-orange-400': '#fb923c',
+// };
 
 export function AttributeBar({
   name,
@@ -28,7 +28,6 @@ export function AttributeBar({
   width = 280,
   height = 24,
 }: AttributeBarProps) {
-  const hexColor = colorMap[color] || color.match(/#[0-9a-fA-F]{6}/)?.[0] || '#000000';
   // 计算图标尺寸，设置为高度的0.9倍
   const iconSize = Math.round(height * 0.9);
   // 增加偏移系数从0.8到1.2，使图标位置更靠上
