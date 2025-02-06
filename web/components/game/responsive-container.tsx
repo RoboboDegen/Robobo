@@ -4,12 +4,14 @@ interface ResponsiveContainerProps {
 
 export function ResponsiveContainer({ children }: ResponsiveContainerProps) {
   return (
-    <div className="relative w-full h-dvh flex items-center justify-center bg-black">
-      <div className="relative w-full h-full max-w-[720px] max-h-[calc(100dvh-2rem)] mx-auto">
+    <div className="relative w-full h-dvh  flex items-center justify-center bg-white">
+      <div className="relative w-full h-full  max-w-[720px] max-h-[calc(100dvh-2rem)]">
         <div 
           className="absolute inset-0"
+
+
           style={{ 
-            maxHeight: 'min(calc(100vw * 1.88235294118), calc(100dvh - 2rem))',
+            maxHeight: 'min(calc(100vw * 1.88235294118), calc(100dvh))',
             margin: 'auto'
           }}
         >

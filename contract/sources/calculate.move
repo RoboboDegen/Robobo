@@ -1,5 +1,4 @@
 module robobo::calculate {
-    use std::debug;
     /// Calculates balanced robot stats for turn-based combat based on a name hash
     /// 
     /// # Arguments
@@ -228,7 +227,6 @@ module robobo::calculate {
     /// 2. 根据行动值计算防御次数
     /// 3. 根据防御次数转换行动值   
     fun split_and_convert_hash(hash: vector<u8>): (vector<u8>, vector<u8>) {
-        let len = vector::length(&hash);
         let mut attacker_moves = vector::empty<u8>();
         let mut defender_moves = vector::empty<u8>();
         
@@ -300,7 +298,9 @@ module robobo::calculate {
     /// 4. 根据先攻值计算行动顺序
     /// 5. 根据行动顺序处理行动
     /// 6. 根据行动结果计算战斗结果
+    #[allow(unused_trailing_semi)]
     public fun calculate_battle_result(battle_hash: vector<u8>, attacker_energy: &mut u8, defender_energy: &mut u8, attacker_attack: u8, attacker_defense: u8, attacker_speed: u8, attacker_personality: u8, defender_attack: u8, defender_defense: u8, defender_speed: u8, defender_personality: u8): (bool, u8, u8) {
+
         let (attacker_moves, defender_moves) = split_and_convert_hash(battle_hash);
 
         let zero_point = 128;

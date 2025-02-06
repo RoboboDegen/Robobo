@@ -234,6 +234,12 @@ module robobo::robot {
         robot.energy = energy;
     }
 
+    /// 设置机器人的个性值
+    public(package) fun set_robot_personality(robot: &mut Robot, personality: u8) {
+        robot.personality = personality;
+    }
+
+
     public fun get_robot_attack(robot: &Robot): u8 {robot.attack}
     public fun get_robot_defense(robot: &Robot): u8 {robot.defense}
     public fun get_robot_speed(robot: &Robot): u8 {robot.speed}

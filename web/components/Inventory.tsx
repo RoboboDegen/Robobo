@@ -1,7 +1,10 @@
+import EquipmentInterface from "@/components/inventory/equipment-interface"
+
 export function Inventory() {
-    return (
-        <div>
-            Inventory...
-        </div>
-    );
+  return (
+    <div>
+      <EquipmentInterface />
+    </div>
+  )
 }
+
