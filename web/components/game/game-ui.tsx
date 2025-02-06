@@ -17,7 +17,7 @@ import { useGameData } from "@/context/GameDataProvider";
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
     const { getRobot } = useGameData();
-    
+
 
     const handleMint = () => {
         //setUIState(GameUIState.MAIN_MENU);
@@ -31,11 +31,6 @@ export function GameUI() {
         fetchRobot();
     }, [setUIState, getRobot]);
 
-
-
-
-
-
     return (
         <div className={cn(
             "absolute inset-0 pointer-events-auto",
@@ -43,7 +38,7 @@ export function GameUI() {
             "max-w-[720px] mx-auto", // 与游戏最大宽度匹配
         )}>
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
-            {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}    
+            {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home />}
             {gameState.uiState === GameUIState.INVENTORY && <Inventory />}
             {gameState.uiState === GameUIState.FIGHTING && <Fighting />}

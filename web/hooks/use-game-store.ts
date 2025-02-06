@@ -6,6 +6,7 @@ interface GameState {
 
 
 export enum GameUIState {
+  LOADING,
   CONNECTING,
   MINT,
   MAIN_MENU,
