@@ -3,12 +3,15 @@ module robobo::game {
         table::{Self, Table},
         token::{Self, Token, TokenPolicy},
         clock::{ Clock },
-        random::{ Random }
+        random::{ Random },
+        bcs,
+        hash,
+        ed25519
     };
     use std::string::String;
     use robobo::user::{Self, Passport};
     use robobo::trash::{Self, TrashTokenCap, TRASH};
-    use robobo::robot::{Self, Robot, Robot_Pool};
+    use robobo::robot::{Self, Robot, Robot_Pool, set_robot_energy, set_robot_personality, get_robot_energy};
     use robobo::element::{Self, Element};
     use robobo::config::{Self, GameConfig};
     use robobo::battle::{Self};
@@ -21,6 +24,10 @@ module robobo::game {
 
     /// 添加新的常量
     const TRASH_AMOUNT_EQUIP_ELEMENT: u64 = 5;
+
+    /// 公钥
+    const PK: vector<u8> = vector[93,51,18,189,20,112,56,203,181,234,192,63,104,62,182,60,129,208,40,0,33,50,233,136,70,68,220,141,131,226,106,38];
+
 
     /// 游戏管理员权限凭证
     public struct AdminCap has key, store {
@@ -551,4 +558,46 @@ module robobo::game {
     public fun get_total_battles(game_state: &GameState): u64 {
         game_state.total_battles
     }
+
+    //链下加密函数
+    public fun admin_set_robot_energy(
+        robot: &mut Robot,
+        sig:vector<u8>,
+        energy: u8
+    ) {
+        let byte_data = bcs::to_bytes(&energy);
+        let hash_data = hash::keccak256(&byte_data);
+        let pk = PK;
+        let verify = ed25519::ed25519_verify(&sig,&pk,&hash_data);
+        assert!(verify == true, 1);
+        let mut current_energy = get_robot_energy(robot);  
+        if (current_energy + energy > 188) {
+            current_energy = 188;
+        } else {
+            current_energy = current_energy + energy;
+        };
+        set_robot_energy(robot, current_energy);
+    }
+
+    public fun admin_set_robot_personality(
+        robot: &mut Robot,
+        sig:vector<u8>,
+        personality: u8
+    ) {
+        let byte_data = bcs::to_bytes(&personality);
+        let hash_data = hash::keccak256(&byte_data);
+        let pk = PK;
+        let verify = ed25519::ed25519_verify(&sig,&pk,&hash_data);
+        assert!(verify == true, 1);
+        //Personality: 128-228 (0-100 range above zero)
+        let mut set_personality = 0;
+        if (personality > 228) {
+            set_personality = 228;
+        } else if (personality < 128) {
+            set_personality = 128;
+        };
+        set_robot_personality(robot, set_personality);
+    }   
 }
+
+
