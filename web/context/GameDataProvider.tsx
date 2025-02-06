@@ -7,10 +7,14 @@ interface GameDataContextType {
   trash: number;
   robot: RobotConfig | undefined;
   messages: Message[];
+  leftHealth: number;
+  rightHealth: number;
+  maxHealth: number;
   updateTrash: (value: number) => void;
   getRobot: () => Promise<void>;
   getMessage: () => Promise<void>;
   addMessage: (message: Message) => void;
+  updateHealth: (left: number, right: number) => void;
 }
 
 const GameDataContext = createContext<GameDataContextType | undefined>(undefined);
@@ -19,6 +23,9 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
   const [trash, setTrash] = useState(0);
   const [robot, setRobot] = useState<RobotConfig | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [leftHealth, setLeftHealth] = useState(40);
+  const [rightHealth, setRightHealth] = useState(60);
+  const maxHealth = 100;
 
   const updateTrash = (value: number) => setTrash(value);
 
@@ -69,15 +76,24 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     setMessages(prevMessages => [...prevMessages, message]);
   }, []);
 
+  const updateHealth = useCallback((left: number, right: number) => {
+    setLeftHealth(left);
+    setRightHealth(right);
+  }, []);
+
   return (
     <GameDataContext.Provider value={{ 
       trash, 
       robot,
       messages,
+      leftHealth,
+      rightHealth,
+      maxHealth,
       updateTrash, 
       getRobot,
       getMessage,
-      addMessage
+      addMessage,
+      updateHealth
     }}>
       {children}
     </GameDataContext.Provider>
