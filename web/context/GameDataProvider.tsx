@@ -6,11 +6,13 @@ import { createContext, useContext, useState, ReactNode, useCallback } from 'rea
 interface GameDataContextType {
   trash: number;
   robot: RobotConfig | undefined;
-  messages: Message[];
+  enemy: RobotConfig | undefined;
+  messages: Message[]
   updateTrash: (value: number) => void;
   getRobot: () => Promise<void>;
   getMessage: () => Promise<void>;
   addMessage: (message: Message) => void;
+  getEnemy: () => Promise<void>;
 }
 
 const GameDataContext = createContext<GameDataContextType | undefined>(undefined);
@@ -18,7 +20,9 @@ const GameDataContext = createContext<GameDataContextType | undefined>(undefined
 export function GameDataProvider({ children }: { children: ReactNode }) {
   const [trash, setTrash] = useState(0);
   const [robot, setRobot] = useState<RobotConfig | undefined>();
+  const [enemy, setEnemy] = useState<RobotConfig | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
+ 
 
   const updateTrash = (value: number) => setTrash(value);
 
@@ -35,6 +39,18 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     setRobot(robot);
   }, []);
 
+  const getEnemy = useCallback(async () => {
+    const enemy: RobotConfig = {
+        id: "2",
+        name: "Robot 2",
+        attack: 20,
+        defense: 11,
+        speed: 45,
+        energy: 60,
+        personality: 70,
+    }
+    setEnemy(enemy);
+  }, []);
   const getMessage = useCallback(async () => {
     const messages: Message[] = [
       {
@@ -74,10 +90,12 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
       trash, 
       robot,
       messages,
+      enemy,
       updateTrash, 
       getRobot,
+      getEnemy,
       getMessage,
-      addMessage
+      addMessage,
     }}>
       {children}
     </GameDataContext.Provider>
