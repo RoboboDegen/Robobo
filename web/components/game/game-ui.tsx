@@ -26,7 +26,6 @@ export function GameUI() {
     useEffect(() => {
         const fetchRobot = async () => {
             await getRobot();
-            setUIState(GameUIState.CONNECTING);
         }
         fetchRobot();
     }, [setUIState, getRobot]);
