@@ -51,6 +51,7 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     }
     setEnemy(enemy);
   }, []);
+
   const getMessage = useCallback(async () => {
     const messages: Message[] = [
       {
@@ -74,7 +75,19 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
       {
         id: 4,
         text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
+        timestamp: new Date(),
+      },
+      {
+        id: 5,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
         sender: "ai",
+        timestamp: new Date(),
+      },
+      {
+        id: 6,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
         timestamp: new Date(),
       },
     ];
