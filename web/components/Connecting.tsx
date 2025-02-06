@@ -37,7 +37,7 @@ export function Connecting({ setUIState }: ConnectingProps) {
       {/* 按钮区域 - 固定在底部 */}
       <div className="">
         {/* <SuiConnectButton/> */}
-        <RoButton variant="home_bottom" onClick={() => setUIState(GameUIState.MINT)}>
+        <RoButton variant="mint_bottom" onClick={() => setUIState(GameUIState.MINT)}>
           Connect Wallet
         </RoButton>
       </div>

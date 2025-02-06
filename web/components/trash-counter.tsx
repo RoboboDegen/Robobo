@@ -15,7 +15,7 @@ export function TrashCounter({ value }: TrashCounterProps) {
         width={210} 
         height={60} 
       />
-      <span className="absolute inset-0 flex items-center justify-center text-white font-tiny5 text-2xl pr-5">
+      <span className="absolute inset-0 items-center justify-center text-white font-tiny5 text-2xl pt-2 pl-12">
         Trash: {value}
       </span>
     </div>

@@ -15,7 +15,7 @@ interface Attribute {
 }
 
 export function Mint({ handleMint }: MintProps) {
-  const { trash, robot,updateTrash } = useGameData();
+  const { trash, robot } = useGameData();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
 
@@ -31,10 +31,6 @@ export function Mint({ handleMint }: MintProps) {
   }, [robot]);
 
 
-  const handleMintClick = () => {
-    updateTrash(trash - 10000);
-    handleMint();
-  }
 
   return (
     <div className="flex flex-col items-center justify-between h-full">
@@ -42,9 +38,12 @@ export function Mint({ handleMint }: MintProps) {
       {/* Main Content Container */}
 
       {/* Top Trash Counter */}
-      <TrashCounter value={trash} />
+      <div className="w-full ">
+        <TrashCounter value={trash} />
+      </div>
 
       {/* Attribute Bars */}
+      <div className="flex flex-col items-center justify-center">
       <div className="flex flex-col gap-2 w-[280px]">
         {attributes?.map((attr) => (
           <AttributeBar
@@ -58,11 +57,11 @@ export function Mint({ handleMint }: MintProps) {
 
       {/* Bottom Action Bar */}
       <div className="font-tiny5">
-        <RoButton variant="mint_bottom" onClick={handleMintClick}>
+        <RoButton variant="mint_bottom" onClick={handleMint}>
           mint
         </RoButton>
       </div>
-
+      </div>
     </div>
   );
 }

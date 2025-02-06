@@ -41,10 +41,9 @@ export function AttributeBar({ name, value, color }: AttributeBarProps) {
         />
         <div className="absolute inset-0 overflow-hidden">
           <div
-            className={`h-full transition-all duration-300 ease-out transform origin-left rounded-full`}
+            className={`h-full transition-all duration-300 ease-out transform origin-left rounded-full ${color}`}
             style={{
               width: `${value}%`,
-              background: `linear-gradient(to bottom, ${hexColor}, ${hexColor}100)`
             }}
           >
             <div className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-2xl font-tiny5 text-white">
