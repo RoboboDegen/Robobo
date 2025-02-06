@@ -6,12 +6,13 @@ interface GameState {
 
 
 export enum GameUIState {
+  LOADING,
   CONNECTING,
   MINT,
   MAIN_MENU,
   INVENTORY,
   FIGHTING,
-  CHART
+  CHAT
 }
 
 interface GameStore {

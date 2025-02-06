@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/hooks/use-game-store';
+import { LoadingScreen } from '../loading-screen';
 
 function PhaserGameContent() {
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -68,13 +69,15 @@ function PhaserGameContent() {
 
 const PhaserGameView = dynamic(() => Promise.resolve(PhaserGameContent), {
   ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center bg-background">
-      Loading game...
-    </div>
-  ),
+  loading: () => <LoadingScreen />
 });
 
 export function GameView() {
-  return <PhaserGameView />;
+  
+  return (
+    <>
+      <PhaserGameView />
+      <LoadingScreen />
+    </>
+  );
 }

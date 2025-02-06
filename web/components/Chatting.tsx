@@ -13,18 +13,25 @@ export interface ChattingProps {
 }
 
 export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
-  const { messages } = useGameData();
+  const { messages, getMessage } = useGameData();
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  useEffect(() => { 
+    console.log(messages);
+    const trygetMessage = async () => {
+      await getMessage();
+    }
+    trygetMessage();
+
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [scrollRef]) //Fixed unnecessary dependency
+  }, [scrollRef, getMessage]) //Fixed unnecessary dependency
+
 
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-[#1a1a2e] relative pt-16">
+    <div className="flex flex-col items-center min-h-screen relative pt-16">
       {/* Back Button */}
       <RoButton 
         variant="chat_back" 

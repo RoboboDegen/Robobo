@@ -8,19 +8,19 @@ interface AttributeBarProps {
   color: string;
 }
 
-const colorMap: Record<string, string> = {
-  'bg-[#ff4444]': '#ff4444',
-  'bg-[#00ffcc]': '#00ffcc',
-  'bg-[#ffcc00]': '#ffcc00',
-  'bg-[#ff9933]': '#ff9933',
-  'bg-red-500': '#ef4444',
-  'bg-cyan-400': '#22d3ee',
-  'bg-yellow-400': '#facc15',
-  'bg-orange-400': '#fb923c',
-};
+// const colorMap: Record<string, string> = {
+//   'bg-[#ff4444]': '#ff4444',
+//   'bg-[#00ffcc]': '#00ffcc',
+//   'bg-[#ffcc00]': '#ffcc00',
+//   'bg-[#ff9933]': '#ff9933',
+//   'bg-red-500': '#ef4444',
+//   'bg-cyan-400': '#22d3ee',
+//   'bg-yellow-400': '#facc15',
+//   'bg-orange-400': '#fb923c',
+// };
 
 export function AttributeBar({ name, value, color }: AttributeBarProps) {
-  const hexColor = colorMap[color] || color.match(/#[0-9a-fA-F]{6}/)?.[0] || '#000000';
+  //const hexColor = colorMap[color] || color.match(/#[0-9a-fA-F]{6}/)?.[0] || '#000000';
 
   return (
     <div className="relative my-4">
