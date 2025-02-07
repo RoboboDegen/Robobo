@@ -36,8 +36,8 @@ export function AttributeBar({
   return (
     <div className="relative my-4" style={{ width }}>
       {/* Attribute Name above the bar */}
-      <div className="absolute top-[-16px] left-8 w-full flex">
-        <span className="text-white font-tiny5 text-xs">
+      <div className="absolute top-[-18px] left-7 w-full flex">
+        <span className="text-white font-tiny5 text-[14px]">
           {name}: {value}
         </span>
       </div>

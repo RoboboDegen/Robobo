@@ -21,7 +21,7 @@ export default function EquipedBar({ equippedItems }: EquipedBarProps) {
     return (
 
         <div className="flex flex-col">
-            <h2 className="text-[#ff3366] text-3xl mb-1">Equipped</h2>
+            <h2 className="text-[#ff3366] text-[26px] mb-1">Equipped</h2>
             <div
                 className="relative h-full"
                 style={{

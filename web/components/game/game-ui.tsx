@@ -15,9 +15,10 @@ import { useGameData } from "@/context/GameDataProvider";
 
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
-    const { getRobot } = useGameData();
+    const { getUserInfo } = useGameData();
 
     
+
     const handleMint = () => {
         setUIState(GameUIState.MAIN_MENU);
     }
@@ -38,15 +39,14 @@ export function GameUI() {
     const handleChatBack = () => {
         setUIState(GameUIState.MAIN_MENU);
     }
-
-
+    const handleInventoryBack = () => {
+        setUIState(GameUIState.MAIN_MENU);
+    }
 
     useEffect(() => {
-        const fetchRobot = async () => {
-            await getRobot();
-        }
-        fetchRobot();
-    }, [setUIState, getRobot]);
+        getUserInfo("0x1234567890123456789012345678901234567890");
+    }, [getUserInfo]);
+
 
     return (
         <div className={cn(
@@ -57,7 +57,7 @@ export function GameUI() {
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
             {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home handleChat={handleChat} handleFight={handleFight} handleInventory={handleInventory} />}
-            {gameState.uiState === GameUIState.INVENTORY && <Inventory />}
+            {gameState.uiState === GameUIState.INVENTORY && <Inventory  handleInventoryBack={handleInventoryBack}/>}
             {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
             {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleChatBack} />}
         </div>

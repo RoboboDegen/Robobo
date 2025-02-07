@@ -15,20 +15,23 @@ interface Attribute {
 }
 
 export function Mint({ handleMint }: MintProps) {
-  const { trash, robot } = useGameData();
+  const { userInfo } = useGameData();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
 
 
+
   useEffect(() => {
-    console.log(robot)
+    console.log(userInfo)
     const attributes: Attribute[] = [] 
-    attributes.push({ name: "Attack", value: robot?.attack || 0, color: "bg-[#ff4444]" })
-    attributes.push({ name: "Energy", value: robot?.energy || 0, color: "bg-[#00ffcc]" })
-    attributes.push({ name: "Speed", value: robot?.speed || 0, color: "bg-[#ffcc00]" })
-    attributes.push({ name: "Personality", value: robot?.personality || 0, color: "bg-[#ff9933]" })
+    attributes.push({ name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-[#ff4444]" })
+    attributes.push({ name: "Energy", value: userInfo?.robot?.energy || 0, color: "bg-[#00ffcc]" })
+
+    attributes.push({ name: "Speed", value: userInfo?.robot?.speed || 0, color: "bg-[#ffcc00]" })
+    attributes.push({ name: "Personality", value: userInfo?.robot?.personality || 0, color: "bg-[#ff9933]" })
     setAttributes(attributes)
-  }, [robot]);
+
+  }, [userInfo]);
 
 
 
@@ -39,7 +42,7 @@ export function Mint({ handleMint }: MintProps) {
 
       {/* Top Trash Counter */}
       <div className="w-full ">
-        <TrashCounter value={trash} />
+        <TrashCounter value={userInfo?.trash || 0} />
       </div>
 
       {/* Attribute Bars */}

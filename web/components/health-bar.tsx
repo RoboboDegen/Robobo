@@ -17,14 +17,13 @@ export function HealthBar({ value, maxValue }: HealthBarProps) {
       />
       <Image
         src="/gameui/pk/pk_health_bar_fill.png"
-
         alt=""
         className="absolute inset-0 h-full transition-all duration-300"
         style={{ width: `${value/maxValue*100}%` }}
         width={100}
         height={20}
       />
-      <span className="absolute inset-0 flex items-center justify-center text-xs text-white font-pixel">{value}</span>
+      <span className="absolute inset-0 flex items-center justify-center text-[18px] text-white font-pixel font-tiny5">{value}</span>
     </div>
 
   )

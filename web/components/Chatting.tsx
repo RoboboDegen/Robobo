@@ -17,12 +17,7 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { 
-    console.log(messages);
-    const trygetMessage = async () => {
-      await getMessage();
-    }
-    trygetMessage();
-
+    getMessage("0x1234567890123456789012345678901234567890");
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
@@ -63,7 +58,8 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
         }}
       >
         <MessageList messages={messages} />
-        <ChatInput onSubmit={handleSubmit} className="mt-[-40px]" />
+        
+        <ChatInput onSubmit={handleSubmit} className="mt-40" />
       </div>
     </div>
   )
