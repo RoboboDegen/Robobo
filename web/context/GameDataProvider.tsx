@@ -1,59 +1,44 @@
 'use client';
 
-import { RobotConfig ,Message} from '@/types';
+import { Message, UserInfo, MirrorConfig} from '@/types';
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import {  mockUserInfo, mockMirrorConfig } from '@/mock';
+
 
 interface GameDataContextType {
-  trash: number;
-  robot: RobotConfig | undefined;
-  enemy: RobotConfig | undefined;
+  userInfo: UserInfo | undefined;
   messages: Message[]
-  updateTrash: (value: number) => void;
-  getRobot: () => Promise<void>;
-  getMessage: () => Promise<void>;
-  addMessage: (message: Message) => void;
-  getEnemy: () => Promise<void>;
+  enemy: MirrorConfig | undefined;
+  getEnemyFromMirrorPool: (id:string) => Promise<void>;
+  getUserInfo: (id:string) => Promise<void>;
+  getMessage: (id:string) => Promise<void>;
 }
+
 
 const GameDataContext = createContext<GameDataContextType | undefined>(undefined);
 
 export function GameDataProvider({ children }: { children: ReactNode }) {
-  const [trash, setTrash] = useState(0);
-  const [robot, setRobot] = useState<RobotConfig | undefined>();
-  const [enemy, setEnemy] = useState<RobotConfig | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
- 
+  const [userInfo, setUserInfo] = useState<UserInfo | undefined>();
+  const [enemy, setEnemy] = useState<MirrorConfig | undefined>();
 
-  const updateTrash = (value: number) => setTrash(value);
 
-  const getRobot = useCallback(async() => {
-    const robot: RobotConfig = {
-        id: "1",
-        name: "Robot 1",
-        attack: 20,
-        defense: 11,
-        speed: 45,
-        energy: 60,
-        personality: 70,
-    }
-    setRobot(robot);
+  const getEnemyFromMirrorPool = useCallback(async (id:string) => {    
+    setEnemy(mockMirrorConfig);
+  }, []);   
+
+
+  const getUserInfo = useCallback(async (id:string) => {
+    setUserInfo(mockUserInfo);
   }, []);
 
-  const getEnemy = useCallback(async () => {
-    const enemy: RobotConfig = {
-        id: "2",
-        name: "Robot 2",
-        attack: 20,
-        defense: 11,
-        speed: 45,
-        energy: 60,
-        personality: 70,
-    }
-    setEnemy(enemy);
+  const getBattleRecords = useCallback(async (id:string) => {
+    
   }, []);
 
-  const getMessage = useCallback(async () => {
+  const getMessage = useCallback(async (id:string) => {
     const messages: Message[] = [
+
       {
         id: 1,
         text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
@@ -94,22 +79,19 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     setMessages(messages);
   }, []);
 
-  const addMessage = useCallback((message: Message) => {
-    setMessages(prevMessages => [...prevMessages, message]);
-  }, []);
 
   return (
     <GameDataContext.Provider value={{ 
-      trash, 
-      robot,
+      userInfo, 
       messages,
       enemy,
-      updateTrash, 
-      getRobot,
-      getEnemy,
+      getEnemyFromMirrorPool,
+      getUserInfo,
       getMessage,
-      addMessage,
     }}>
+
+
+
       {children}
     </GameDataContext.Provider>
   );

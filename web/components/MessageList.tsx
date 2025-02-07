@@ -1,15 +1,10 @@
 import { useRef, useEffect } from "react"
 import Image from "next/image"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Message } from "@/types"
 
-interface Message {
-  id: number
-  text: string
-  sender: "user" | "ai"
-  timestamp: Date
-}
 
-interface MessageListProps {
+interface MessageListProps {  
   messages: Message[]
 }
 

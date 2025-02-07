@@ -18,20 +18,24 @@ export interface MainProps {
 }
 
 export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
-  const { trash, robot } = useGameData();
+  const { userInfo } = useGameData();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
 
 
+
   useEffect(() => {
-    console.log(robot)
+    console.log(userInfo)
     const attributes: Attribute[] = [] 
-    attributes.push({ name: "Attack", value: robot?.attack || 0, color: "bg-red-500" })
-    attributes.push({ name: "Energy", value: robot?.energy || 0, color: "bg-cyan-400" })
-    attributes.push({ name: "Speed", value: robot?.speed || 0, color: "bg-yellow-400" })
-    attributes.push({ name: "Personality", value: robot?.personality || 0, color: "bg-orange-400" })
+    attributes.push({ name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-red-500" })
+    attributes.push({ name: "Energy", value: userInfo?.robot?.energy || 0, color: "bg-cyan-400" })
+
+    attributes.push({ name: "Speed", value: userInfo?.robot?.speed || 0, color: "bg-yellow-400" })
+    attributes.push({ name: "Personality", value: userInfo?.robot?.personality || 0, color: "bg-orange-400" })
     setAttributes(attributes)
-  }, [robot]);
+
+  }, [userInfo]);
+
 
 
 
@@ -40,8 +44,9 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
 
       {/* Top Trash Counter */}
       <div className="w-full ">
-        <TrashCounter value={trash} />
+        <TrashCounter value={userInfo?.trash || 0} />
       </div>
+
 
       {/* Attribute Bars */}
       <div className="flex flex-col items-center justify-center">

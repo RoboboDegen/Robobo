@@ -12,24 +12,28 @@ interface Attribute {
 }
 
 export function Fighting() {
-    const { robot, enemy } = useGameData();
+    const { userInfo, enemy } = useGameData();
+
 
     const leftAttributes = useMemo(() => [
-        { name: "Attack", value: robot?.attack || 0, color: "bg-red-500" },
-        { name: "Energy", value: robot?.energy || 0, color: "bg-cyan-400" },
-        { name: "Speed", value: robot?.speed || 0, color: "bg-yellow-400" },
-        { name: "Personality", value: robot?.personality || 0, color: "bg-orange-400" }
-    ], [robot]);
+        { name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-red-500" },
+        { name: "Energy", value: userInfo?.robot?.energy || 0, color: "bg-cyan-400" },
+
+        { name: "Speed", value: userInfo?.robot?.speed || 0, color: "bg-yellow-400" },
+        { name: "Personality", value: userInfo?.robot?.personality || 0, color: "bg-orange-400" }
+
+    ], [userInfo]);
 
     const rightAttributes = useMemo(() => [
         { name: "Attack", value: enemy?.attack || 0, color: "bg-red-500" },
+
         { name: "Energy", value: enemy?.energy || 0, color: "bg-cyan-400" },
         { name: "Speed", value: enemy?.speed || 0, color: "bg-yellow-400" },
         { name: "Personality", value: enemy?.personality || 0, color: "bg-orange-400" }
     ], [enemy]);
 
     // 派生状态：通过 useMemo 来计算健康值
-    const leftHealth = useMemo(() => robot?.energy || 0, [robot?.energy]);
+    const leftHealth = useMemo(() => userInfo?.robot?.energy || 0, [userInfo?.robot?.energy]);
     const rightHealth = useMemo(() => enemy?.energy || 0, [enemy?.energy]);
 
     return (
@@ -38,7 +42,7 @@ export function Fighting() {
                 {/* Health Bars */}
                 <div className="flex justify-between items-center">
                     <div className="w-20">
-                        <HealthBar value={robot?.energy || 0} maxValue={leftHealth} />
+                        <HealthBar value={userInfo?.robot?.energy || 0} maxValue={leftHealth} />
                     </div>
 
                     <div className="pl-4">

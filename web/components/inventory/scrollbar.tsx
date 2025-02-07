@@ -2,18 +2,17 @@ import * as React from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Element } from "@/types"
 
-interface Item {
-  id: number
-  name: string
-  icon?: string
-}
+
 
 interface InventoryGridProps {
-  inventoryItems: Item[]
-  selectedItem: Item | null
-  setSelectedItem: (item: Item) => void
+  inventoryItems: Element[]
+  selectedItem: Element | null
+  setSelectedItem: (item: Element) => void
 }
+
+
 
 const InventoryGrid: React.FC<InventoryGridProps> = ({
   inventoryItems,
@@ -37,12 +36,14 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
             }}
             onClick={() => setSelectedItem(item)}
           >
-            {item.icon && (
+            {item.image && (
               <Image
-                src={item.icon}
+                src={item.image}
                 alt={item.name}
                 fill
                 className="p-0.5"
+
+
               />
             )}
           </div>

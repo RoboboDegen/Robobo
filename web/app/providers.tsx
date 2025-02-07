@@ -18,7 +18,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
           </GameDataProvider>
         </WalletProvider>
       </SuiClientProvider>
-
     </QueryClientProvider>
   );
 }
