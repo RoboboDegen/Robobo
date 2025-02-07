@@ -1,17 +1,17 @@
 'use client';
 
-import { Message, UserInfo, MirrorConfig} from '@/types';
+import { Message, UserInfo, MirrorConfig } from '@/types';
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import {  mockUserInfo, mockMirrorConfig } from '@/mock';
+import { mockUserInfo, mockMirrorConfig, mockMessages } from '@/mock';
 
 
 interface GameDataContextType {
   userInfo: UserInfo | undefined;
   messages: Message[]
   enemy: MirrorConfig | undefined;
-  getEnemyFromMirrorPool: (id:string) => Promise<void>;
-  getUserInfo: (id:string) => Promise<void>;
-  getMessage: (id:string) => Promise<void>;
+  getEnemyFromMirrorPool: (id: string) => Promise<void>;
+  getUserInfo: (id: string) => Promise<void>;
+  getMessage: (id: string) => Promise<void>;
 }
 
 
@@ -23,75 +23,34 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
   const [enemy, setEnemy] = useState<MirrorConfig | undefined>();
 
 
-  const getEnemyFromMirrorPool = useCallback(async (id:string) => {    
+  const getEnemyFromMirrorPool = useCallback(async (id: string) => {
     setEnemy(mockMirrorConfig);
-  }, []);   
+  }, []);
 
 
-  const getUserInfo = useCallback(async (id:string) => {
+  const getUserInfo = useCallback(async (id: string) => {
     setUserInfo(mockUserInfo);
   }, []);
 
-  const getBattleRecords = useCallback(async (id:string) => {
-    
+  const getBattleRecords = useCallback(async (id: string) => {
+
   }, []);
 
-  const getMessage = useCallback(async (id:string) => {
-    const messages: Message[] = [
-
-      {
-        id: 1,
-        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-        sender: "user",
-        timestamp: new Date(),
-      },
-      {
-        id: 2,
-        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-        sender: "user",
-        timestamp: new Date(),
-      },
-      {
-        id: 3,
-        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-        sender: "ai",
-        timestamp: new Date(),
-      },
-      {
-        id: 4,
-        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-        sender: "user",
-        timestamp: new Date(),
-      },
-      {
-        id: 5,
-        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-        sender: "ai",
-        timestamp: new Date(),
-      },
-      {
-        id: 6,
-        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-        sender: "user",
-        timestamp: new Date(),
-      },
-    ];
-    setMessages(messages);
+  const getMessage = useCallback(async (id: string) => {
+    setMessages(mockMessages);
   }, []);
+
 
 
   return (
-    <GameDataContext.Provider value={{ 
-      userInfo, 
+    <GameDataContext.Provider value={{
+      userInfo,
       messages,
       enemy,
       getEnemyFromMirrorPool,
       getUserInfo,
       getMessage,
     }}>
-
-
-
       {children}
     </GameDataContext.Provider>
   );

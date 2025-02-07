@@ -103,42 +103,42 @@ const mockMirrorConfig: MirrorConfig = {
     personality: 70,
 }
 
-const messages: Message[] = [
+const mockMessages: Message[] = [
 
     {
-      id: 1,
-      text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-      sender: "user",
+        id: 1,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
     },
     {
-      id: 2,
-      text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-      sender: "user",
+        id: 2,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
     },
     {
-      id: 3,
-      text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-      sender: "ai",
+        id: 3,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "ai",
     },
     {
-      id: 4,
-      text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-      sender: "user",
+        id: 4,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
     },
     {
-      id: 5,
-      text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-      sender: "ai",
+        id: 5,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "ai",
     },
     {
-      id: 6,
-      text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
-      sender: "user",
+        id: 6,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
     },
 
-  ];
+];
 
 
 
 
-export { mockUserInfo, mockMirrorConfig };
+export { mockUserInfo, mockMirrorConfig, mockMessages };
