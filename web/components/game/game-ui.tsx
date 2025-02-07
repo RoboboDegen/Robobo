@@ -15,9 +15,10 @@ import { useGameData } from "@/context/GameDataProvider";
 
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
-    const { getRobot } = useGameData();
+    const { getUserInfo } = useGameData();
 
     
+
     const handleMint = () => {
         setUIState(GameUIState.MAIN_MENU);
     }
@@ -43,11 +44,9 @@ export function GameUI() {
     }
 
     useEffect(() => {
-        const fetchRobot = async () => {
-            await getRobot();
-        }
-        fetchRobot();
-    }, [setUIState, getRobot]);
+        getUserInfo("0x1234567890123456789012345678901234567890");
+    }, [getUserInfo]);
+
 
     return (
         <div className={cn(

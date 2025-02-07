@@ -1,64 +1,34 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { RoButton } from "@/components/ro_button"
 import { AttributeBar } from "@/components/attribute-bar"
 import EquipedBar, { type EquipedItemProps } from "./inventory/equipedBar"
 import { InfoBox } from "./inventory/info_box"
 import InventoryGrid from "./inventory/scrollbar"
 import { useGameData } from "@/context/GameDataProvider"
-
-interface Item {
-  id: number
-  name: string
-  damage?: number
-  icon?: string
-  isEquipped?: boolean
-  isRecyclable?: boolean
-  size?: string
-}
-
-interface Attribute {
-  name: string
-  value: number | string
-  color: string
-}
+import { Element } from "@/types"
 
 export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => void }) {
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
-  const [attributes, setAttributes] = useState<Attribute[]>([])
-  const { robot } = useGameData()
+  const [selectedItem, setSelectedItem] = useState<Element | null>(null)
+  const { userInfo } = useGameData()
 
-  useEffect(() => {
-    console.log(robot)
-    const attributes: Attribute[] = []
-    attributes.push({ name: "Attack", value: robot?.attack || 0, color: "bg-red-500" })
-    attributes.push({ name: "Energy", value: robot?.energy || 0, color: "bg-cyan-400" })
-    attributes.push({ name: "Speed", value: robot?.speed || 0, color: "bg-yellow-400" })
-    attributes.push({ name: "Personality", value: robot?.personality || 0, color: "bg-orange-400" })
-    setAttributes(attributes)
-  }, [robot])
+
+
+  const attributes = useMemo(() => [
+    { name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-red-500" },
+    { name: "Energy", value: userInfo?.robot?.energy || 0, color: "bg-cyan-400" },
+
+    { name: "Speed", value: userInfo?.robot?.speed || 0, color: "bg-yellow-400" },
+    { name: "Personality", value: userInfo?.robot?.personality || 0, color: "bg-orange-400" }
+
+], [userInfo]);
 
   const equippedItems: EquipedItemProps[] = [
     { id: "1", name: "Pistol", icon: "/gameui/inventory/test_gun.png" },
     { id: "2", name: "Shield", icon: "/gameui/inventory/test_gun.png" },
     { id: "3", name: "Laser", icon: "/gameui/inventory/test_gun.png" },
   ]
-
-  const inventoryItems: Item[] = Array(51)
-    .fill(null)
-    .map((_, index) => {
-      if (index < 5) {
-        return {
-          id: index + 4,
-          name: index === 0 ? "Plasma Sword" : `Empty`,
-          damage: index === 0 ? 150 : undefined,
-          icon: index === 0 ? "/gameui/inventory/test_gun.png" : undefined,
-          size: index === 0 ? "51 x 53.43" : undefined,
-        }
-      }
-      return { id: index + 4, name: `Empty Slot ${index + 4}` }
-    })
 
   return (
     <div className="">
@@ -85,11 +55,11 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
                 }}
               >
                 <InventoryGrid
-                  inventoryItems={inventoryItems}
+                  inventoryItems={userInfo?.ownedElement || []}
                   selectedItem={selectedItem}
                   setSelectedItem={setSelectedItem}
                 />
-                
+
                 <div className="flex items-center ">
                   <InfoBox selectedItem={selectedItem} />
                 </div>
@@ -107,7 +77,7 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
                   backgroundRepeat: "no-repeat",
                 }}
               />
-              <h2 className="text-sm text-[#ff3366] mb-2">{robot?.name}</h2>
+              <h2 className="text-sm text-[#ff3366] mb-2">{userInfo?.robot?.name}</h2>
             </div>
 
             {/* Attribute Bars */}

@@ -37,7 +37,7 @@ export function Popup({ isOpen, message, onConfirm, onCancel }: PopupProps) {
           height: "200px",
         }}
       >
-        <p className="text-center text-white mb-6">{message}</p>
+        <p className="text-center text-white mb-6 font-tiny5">{message}</p>
         <div className="flex gap-4">
           <button
             onClick={onConfirm}
@@ -48,7 +48,8 @@ export function Popup({ isOpen, message, onConfirm, onCancel }: PopupProps) {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <span className="text-white">Yes</span>
+            <span className="text-black font-tiny5" style={{ marginLeft: "-32px" }}>Yes</span>
+
           </button>
           <button
             onClick={onCancel}
@@ -59,7 +60,7 @@ export function Popup({ isOpen, message, onConfirm, onCancel }: PopupProps) {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <span className="text-white">Cancel</span>
+            <span className="text-black font-tiny5" style={{ marginLeft: "-32px" }}>Cancel</span>
           </button>
         </div>
       </div>

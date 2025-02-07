@@ -12,8 +12,8 @@ const buttonVariants = cva(
         chat_back: "bg-[url('/gameui/chat/top_back_btn.png')] w-[123px] h-[60px]",
         inventory:
           "bg-[url('/gameui/home/bottom_btn.png')] hover:bg-[url('/gameui/home/bottom_btn_pre.png')] active:bg-[url('/gameui/home/bottom_btn_pre.png')] w-[100px] h-[60px] bg-center text-[18px]",
-        fight: "bg-[url('/gameui/home/fight_button.png')] w-[100px] h-[60px] bg-center hover:bg-[url('/gameui/home/fight_button_click.png')] active:bg-[url('/gameui/home/fight_button_click.png.png')] text-[20px] ",
-        chat: "bg-[url('/gameui/home/chat_button.png')] w-[100px] h-[60px] bg-center hover:bg-[url('/gameui/home/chat_button_click.png')] active:bg-[url('/gameui/home/chat_button_click.png.png')] text-[20px]",
+        fight: "bg-[url('/gameui/home/fight_button.png')] w-[100px] h-[60px] bg-center hover:bg-[url('/gameui/home/fight_button_click.png')] active:bg-[url('/gameui/home/fight_button_click.png')] text-[20px] ",
+        chat: "bg-[url('/gameui/home/chat_button.png')] w-[100px] h-[60px] bg-center hover:bg-[url('/gameui/home/chat_button_click.png')] active:bg-[url('/gameui/home/chat_button_click.png')] text-[20px]",
         left_arrow_btn: "bg-[url('/gameui/home/left_arrow_btn.png')] w-[40px] h-[40px]",
         right_arrow_btn: "bg-[url('/gameui/home/right_arrow_btn.png')] w-[40px] h-[40px]",
         inventory_back: "bg-[url('/gameui/inventory/top_back_btn.png')] bg-center w-[100px] h-[40px] text-[24px] text-right pl-2",
