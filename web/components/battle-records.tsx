@@ -1,26 +1,31 @@
+import * as React from "react"
+import Image from "next/image"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+
 export function BattleRecords() {
-  const records = Array(6).fill("battle record 1234567890")
+  const records = Array(20).fill("battle record 1234567890")
 
   return (
-    <div className="relative">
-      <img
-        src="/gameui/pk/info_box_bg.png"
-        alt=""
-        className="w-full"
-      />
-      <div className="absolute inset-0 overflow-auto custom-scrollbar p-2">
+    <ScrollArea className="h-[200px] overflow-auto rounded-md"> {/* Set height for ScrollArea */}
+      <div className="p-2">
         {records.map((record, index) => (
-          <div key={index} className="flex items-center gap-2 text-cyan-400 text-sm mb-2">
-            <img
+          <div key={index} className="flex items-center gap-2 text-cyan-400 text-[16px] mb-2">
+            <Image
               src="/gameui/pk/info_attack_icon.png"
-              alt=""
-              className="w-6 h-6"
+              alt="Attack Icon"
+              width={14}
+              height={14} 
             />
             <span className="font-tiny5">{record}</span>
           </div>
         ))}
       </div>
-    </div>
+
+      <ScrollBar 
+        orientation="vertical" 
+        scrollbarTrackImage="/gameui/pk/info_scrollbar_track.png" 
+        scrollbarThumbImage="/gameui/pk/info_scrollbar_thumb.png" 
+      />
+    </ScrollArea>
   )
 }
-

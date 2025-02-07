@@ -63,7 +63,8 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
         }}
       >
         <MessageList messages={messages} />
-        <ChatInput onSubmit={handleSubmit} className="mt-[-40px]" />
+        
+        <ChatInput onSubmit={handleSubmit} className="mt-40" />
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ export function Connecting({ setUIState }: ConnectingProps) {
   return (
     <div className="flex flex-col items-center justify-between h-full">
       {/* Logo区域 */}
-      <div className="">
+      <div className="flex">
         <Image
           src="/gameui/login/logo_robot_icon.png"
           alt="logo_robot_icon"
@@ -37,7 +37,7 @@ export function Connecting({ setUIState }: ConnectingProps) {
       {/* 按钮区域 - 固定在底部 */}
       <div className="">
         {/* <SuiConnectButton/> */}
-        <RoButton variant="mint_bottom" onClick={() => setUIState(GameUIState.MINT)}>
+        <RoButton variant="mint_bottom" onClick={() => setUIState(GameUIState.MINT)} >
           Connect Wallet
         </RoButton>
       </div>

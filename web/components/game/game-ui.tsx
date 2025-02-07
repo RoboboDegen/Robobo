@@ -38,8 +38,9 @@ export function GameUI() {
     const handleChatBack = () => {
         setUIState(GameUIState.MAIN_MENU);
     }
-
-
+    const handleInventoryBack = () => {
+        setUIState(GameUIState.MAIN_MENU);
+    }
 
     useEffect(() => {
         const fetchRobot = async () => {
@@ -57,7 +58,7 @@ export function GameUI() {
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
             {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home handleChat={handleChat} handleFight={handleFight} handleInventory={handleInventory} />}
-            {gameState.uiState === GameUIState.INVENTORY && <Inventory />}
+            {gameState.uiState === GameUIState.INVENTORY && <Inventory  handleInventoryBack={handleInventoryBack}/>}
             {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
             {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleChatBack} />}
         </div>

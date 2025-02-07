@@ -58,14 +58,14 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
         
         {/* Bottom Buttons */}
         <div className="flex gap-4 mt-4">
-          <RoButton variant="home_bottom" onClick={handleInventory}>
+          <RoButton variant="inventory" onClick={handleInventory}>
             Inventory
           </RoButton>
-          <RoButton variant="home_bottom" onClick={handleChat}>
-            Chat
-          </RoButton>
-          <RoButton variant="home_bottom" onClick={handleFight}>
+          <RoButton variant="fight" onClick={handleFight}>
             Fight
+          </RoButton>
+          <RoButton variant="chat" onClick={handleChat}>
+            Chat
           </RoButton>
         </div>
       </div>
