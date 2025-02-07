@@ -26,14 +26,15 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
 
 
   return (
-    <div className="">
-    <div className="w-full h-full font-tiny5 flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center min-h-screen relative pt-16 w-[430px]">
       {/* Back Button */}
       <div className="flex items-center justify-start w-full mr-4 ">   
       <RoButton 
-        variant="chat_back" onClick={handleBack}
+        variant="chat_back" 
+        className="absolute top-2 left-1 flex items-center justify-center" 
+        onClick={handleBack}
       >
-        Back
+        <span className="translate-y-[-13px] translate-x-[-1px] text-[24px]">Back</span>
       </RoButton>
       </div>
    
@@ -51,13 +52,12 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
       {/* Chat Panel */}
       <div className="flex justify-center w-full">
       <div
-        className="flex-1 w-[350px] relative"
+        className="flex flex-col relative w-[355px]"
         style={{
           backgroundImage: `url(/gameui/chat/chatbox_panel.png)`,
           backgroundSize: "100% 100%",
           padding: "50px 30px 40px 20px",
-          height: "480px",
-        
+          height: "550px",
         }}
       >
         <MessageList messages={messages} />
@@ -73,7 +73,5 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
       </div>
 
     </div>
-    </div>
   )
 }
-

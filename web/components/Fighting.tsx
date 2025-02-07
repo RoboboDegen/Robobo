@@ -51,10 +51,9 @@ export function Fighting() {
         <div className="">
         <div className="flex flex-col items-start justify-between h-full pr-5">
             <div 
-                className="flex flex-col gap-4 pl-2 mt-12" 
+                className="w-[320px] flex flex-col gap-4 pl-2 mt-12" 
                 style={{ transform: 'scale(1.15)' }}
             >
-
                 {/* Health Bars */}
                 <div className="flex justify-between items-center">
                     <div className="w-20">
@@ -75,16 +74,11 @@ export function Fighting() {
                     </div>
                 </div>
 
+
                 {/* Battle Arena */}
                 <div className="relative aspect-video bg-[#2a2a4e] rounded-lg border border-gray-700">
                     {/* Add your robot sprites here */}
                 </div>
-
-                {/* Popup*/}
-                <button onClick={handleAttack} className="px-4 py-2 bg-red-500 text-white rounded font-tiny5">
-                    Attack
-                </button>
-
                 {/* Stats - Made smaller */}
                 <div className="flex justify-between gap-2">
                     <div className="">
@@ -126,6 +120,9 @@ export function Fighting() {
                     }}
                 >
                     <BattleRecords />
+            <button onClick={handleAttack} className="px-4 py-2 bg-red-500 text-white rounded font-tiny5">
+                                     Attack
+            </button>
                 </div>
             </div>
             </div>
