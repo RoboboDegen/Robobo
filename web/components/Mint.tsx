@@ -1,6 +1,6 @@
 import { RoButton } from "./ro_button";
 import { useEffect, useState } from "react";
-import { AttributeBar } from "./attribute-bar";
+import  AttributeBars from "./AttributeBars";
 import { TrashCounter } from "./trash-counter";
 import { useGameData } from "@/context/GameDataProvider";
 
@@ -47,15 +47,7 @@ export function Mint({ handleMint }: MintProps) {
 
       {/* Attribute Bars */}
       <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col gap-2 w-[280px]">
-        {attributes?.map((attr) => (
-          <AttributeBar
-            key={attr.name}
-            name={attr.name}
-            value={attr.value}
-            color={attr.color}
-          />
-        ))}
+      <AttributeBars attributes={attributes} />
       </div>
 
       {/* Bottom Action Bar */}
@@ -65,6 +57,5 @@ export function Mint({ handleMint }: MintProps) {
         </RoButton>
       </div>
       </div>
-    </div>
   );
 }

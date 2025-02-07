@@ -5,12 +5,14 @@ import { useEffect, useState } from "react"
 import { AttributeBar } from "./attribute-bar";
 import { TrashCounter } from "./trash-counter";
 import { useGameData } from "@/context/GameDataProvider";
+import AttributeBars from "./AttributeBars";
 
 interface Attribute {
   name: string;
   value: number | string;
   color: string;
 }
+
 export interface MainProps {
   handleInventory: () => void;
   handleChat: () => void;
@@ -47,16 +49,8 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
 
       {/* Attribute Bars */}
       <div className="flex flex-col items-center justify-center">
-        <div className="flex flex-col gap-2 w-[280px]">
-          {attributes?.map((attr) => (
-            <AttributeBar
-              key={attr.name}
-              name={attr.name}
-              value={attr.value}
-              color={attr.color}
-            />
-          ))}
-        </div>
+        <AttributeBars attributes={attributes} />
+      </div>
         
         {/* Bottom Buttons */}
         <div className="flex gap-4 mt-4">
@@ -71,7 +65,7 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
           </RoButton>
         </div>
       </div>
-    </div>
+    
   )
 }
 

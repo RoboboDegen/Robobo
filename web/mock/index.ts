@@ -78,7 +78,7 @@ const mockRobot: RobotConfig = {
     attack: 20,
     defense: 11,
     speed: 45,
-    energy: 60,
+    energy: 62,
     personality: 70,
     equippedElement: mockEquippedElement,
 }
