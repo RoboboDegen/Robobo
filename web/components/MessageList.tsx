@@ -18,7 +18,7 @@ export function MessageList({ messages }: MessageListProps) {
   }, [scrollRef])
 
   return (
-      <ScrollArea  className="h-[600px] whitespace-nowrap rounded-md"> 
+      <ScrollArea className="h-[600px] rounded-md"> 
       <div className="flex flex-col">
       {messages.map((message) => (
         <div key={message.id} className="flex items-start gap-1.5">
@@ -34,8 +34,8 @@ export function MessageList({ messages }: MessageListProps) {
             className="mt-1"
           />
 
-          <div className="flex- px-1 py-1 ">
-            <p className={`font-tiny5 ${
+          <div className="flex-1 px-1 py-1">
+            <p className={`font-tiny5 break-words whitespace-pre-wrap ${
               message.sender === "user" ? "text-white" : "text-[#00ffcc]"
             }`}>
               {message.text}

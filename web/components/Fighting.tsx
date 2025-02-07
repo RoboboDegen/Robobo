@@ -115,7 +115,7 @@ export function Fighting() {
                     backgroundImage: `url(/gameui/pk/info_box_bg.png)`,
                     backgroundSize: "100% 100%",
                     backgroundRepeat: "no-repeat",
-                    height: "250px",
+                    height: "225px",
                     width: "100%",
                     }}
                 >

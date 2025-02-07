@@ -57,18 +57,15 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
           backgroundImage: `url(/gameui/chat/chatbox_panel.png)`,
           backgroundSize: "100% 100%",
           padding: "50px 30px 40px 20px",
-          height: "550px",
+          height: "525px",
         }}
       >
         <MessageList messages={messages} />
-
         
-        <div className="w-full h-[10px] bg-[#00FFCC] my-2"/>
-
-        <div className="absolute bottom-6 left-4 right-4">
-        <ChatInput onSubmit={handleSubmit} className="w-full" />
-      </div>
-
+        <div className="absolute bottom-[40px] left-4 right-4">
+          <div className="w-full h-[5px] bg-[#00FFCC] translate-y-[-20px]"/>
+          <ChatInput onSubmit={handleSubmit} className="w-full" />
+        </div>
       </div>
       </div>
 
