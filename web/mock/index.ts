@@ -75,11 +75,11 @@ const mockOwnedElement: Element[] = [
 const mockRobot: RobotConfig = {
     id: "0x1234567890123456789012345678901234567890",
     name: "Bobo",
-    attack: 20,
-    defense: 11,
-    speed: 45,
-    energy: 62,
-    personality: 70,
+    attack: 148,  // Example value for attack
+    defense: 150,  // Example value for defense
+    speed: 135,    // Example value for speed
+    energy: 175,   // Example value for energy
+    personality: 180,  // Example value for personality
     equippedElement: mockEquippedElement,
 }
 
@@ -96,11 +96,11 @@ const mockUserInfo: UserInfo = {
 const mockMirrorConfig: MirrorConfig = {
     id: "0x1234567890123456789012345678901234567890",
     name: "Robot 1",
-    attack: 20,
-    defense: 11,
-    speed: 45,
-    energy: 60,
-    personality: 70,
+    attack: 146,  // Example value for attack
+    defense: 148,  // Example value for defense
+    speed: 134,    // Example value for speed
+    energy: 180,   // Example value for energy
+    personality: 200,  // Example value for personality
 }
 
 const mockMessages: Message[] = [

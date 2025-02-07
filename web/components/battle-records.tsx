@@ -7,9 +7,9 @@ export function BattleRecords() {
   const { battleRecords} = useGameData();
 
   return (
-    <ScrollArea className="h-[200px] overflow-auto rounded-md">
+    <ScrollArea className="h-[120px] rounded-md">
       {/* Set height for ScrollArea */}
-      <div className="p-2">
+      <div className="p-2 w-[300px] ">
         {Array.isArray(battleRecords) && battleRecords.length > 0 ? (
           battleRecords.map((record, index) => (
             <div
@@ -26,7 +26,7 @@ export function BattleRecords() {
             </div>
           ))
         ) : (
-          <div>null</div> 
+          <div></div> 
         )}
 
       </div>

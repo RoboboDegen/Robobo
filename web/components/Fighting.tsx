@@ -10,13 +10,17 @@ export function Fighting() {
   const { userInfo, enemy, getEnemyFromMirrorPool } = useGameData();
   const { showPopup } = usePopup();
 
-  //popup
-  const handleAttack = () => {
-    console.log("Attacking...");
-    showPopup("Oh no! You lost the battle!", () => {
-      console.log("Battle lost!");
-    });
-  };
+  useEffect(() => {
+    
+    if (userInfo?.robot?.energy !== undefined && userInfo.robot.energy === 128) {
+      showPopup("Oh no! You lost the battle!", () => {
+        
+      });
+    } else if (enemy?.energy !== undefined && enemy.energy === 128) {
+      showPopup("恭喜! You won the battle!", () => {
+      });
+    }
+  }, [userInfo, enemy, showPopup]);
 
   useEffect(() => {
     // 调用获取敌人数据的方法
@@ -70,6 +74,7 @@ export function Fighting() {
     () => userInfo?.robot?.energy || 0,
     [userInfo?.robot?.energy]
   );
+
   const rightHealth = useMemo(() => enemy?.energy || 0, [enemy?.energy]);
 
   return (
@@ -107,7 +112,7 @@ export function Fighting() {
             {/* Add your robot sprites here */}
           </div>
           {/* Stats - Made smaller */}
-          <div className="flex justify-between gap-2">
+          <div className="flex justify-between gap-8">
             <div className="">
               {leftAttributes.map((attr) => (
                 <AttributeBar
@@ -146,19 +151,15 @@ export function Fighting() {
                 width: "100%",
               }}
             >
+              <BattleRecords />
+
               {userInfo?.robot && enemy ? (
                 <Battle attacker={userInfo.robot} defender={enemy} />
               ) : (
                 <div>Loading...</div>
               )}
 
-              <BattleRecords />
-              <button
-                onClick={handleAttack}
-                className="px-4 py-2 bg-red-500 text-white rounded font-tiny5"
-              >
-                Attack
-              </button>
+            
             </div>
           </div>
         </div>

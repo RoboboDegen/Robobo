@@ -12,8 +12,6 @@ interface InventoryGridProps {
   setSelectedItem: (item: Element) => void
 }
 
-
-
 const InventoryGrid: React.FC<InventoryGridProps> = ({
   inventoryItems,
   selectedItem,

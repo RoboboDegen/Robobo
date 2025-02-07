@@ -28,10 +28,6 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
   const [currentBattleHash, setCurrentBattleHash] = useState<number[]>([]);
   const { battleRecords, setBattleRecords } = useGameData();
 
-  useEffect(() => {
-    console.log(battleRecords); // 这会打印最新的 battleRecords
-  }, [battleRecords]); // 当 battleRecords 发生变化时，useEffect 会执行
-
   function generateRandomHash(): number[] {
     const newHash = Array.from({ length: 32 }, () =>
       Math.floor(Math.random() * 256)
@@ -39,17 +35,6 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
     setCurrentBattleHash(newHash);
     setBattleHashInput(newHash.join(","));
     return newHash;
-  }
-
-  function handleHashInput(input: string) {
-    setBattleHashInput(input);
-    const hashArray = input.split(",").map((num) => parseInt(num.trim()));
-    if (
-      hashArray.length === 32 &&
-      hashArray.every((num) => !isNaN(num) && num >= 0 && num <= 255)
-    ) {
-      setCurrentBattleHash(hashArray);
-    }
   }
 
   function calculateDamage(
@@ -216,6 +201,7 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
 
     let action_count = 0;
     let round = 0;
+
     while (true) {
       if (
         currentAttackerEnergy <= ZERO_POINT ||
@@ -310,7 +296,6 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
       logs.push(
         `Energy levels - Attacker: ${currentAttackerEnergy}, Defender: ${currentDefenderEnergy}`
       );
-      logs.push("---");
       action_count++;
       round++;
     }
@@ -327,81 +312,11 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
     console.log("Battle records after setting:", battleRecords);
   }
 
-  function stringToBytes(str: string): number[] {
-    const hash = keccak256(Buffer.from(str));
-    const bytes = Array.from(Buffer.from(hash.slice(2), "hex"));
-    return bytes;
-  }
-
-  function calculateRobotStatsFromHash(nameHash: number[]): RobotStats {
-    const zeroPoint = 128;
-
-    const energyMin = 40;
-    const energyRange = 20;
-    const attackMin = 15;
-    const attackRange = 10;
-    const defenseMin = 15;
-    const defenseRange = 10;
-    const speedMin = 5;
-    const speedRange = 5;
-
-    const attack =
-      zeroPoint +
-      attackMin +
-      Math.floor(
-        ((nameHash[1] + nameHash[9] + nameHash[17] + nameHash[25]) *
-          attackRange) /
-          (255 * 4)
-      );
-
-    const defense =
-      zeroPoint +
-      defenseMin +
-      Math.floor(
-        ((nameHash[2] + nameHash[10] + nameHash[18] + nameHash[26]) *
-          defenseRange) /
-          (255 * 4)
-      );
-
-    const speed =
-      zeroPoint +
-      speedMin +
-      Math.floor(
-        ((nameHash[3] + nameHash[11] + nameHash[19] + nameHash[27]) *
-          speedRange) /
-          (255 * 4)
-      );
-
-    const energy =
-      zeroPoint +
-      energyMin +
-      Math.floor(
-        ((nameHash[0] + nameHash[8] + nameHash[16] + nameHash[24]) *
-          energyRange) /
-          (255 * 4)
-      );
-
-    const personality =
-      zeroPoint +
-      Math.floor(
-        ((nameHash[4] + nameHash[12] + nameHash[20] + nameHash[28]) * 100) /
-          (255 * 4)
-      );
-
-    return {
-      attack: Math.min(153, Math.max(143, attack)),
-      defense: Math.min(153, Math.max(143, defense)),
-      speed: Math.min(138, Math.max(133, speed)),
-      energy: Math.min(188, Math.max(168, energy)),
-      personality: Math.min(228, Math.max(128, personality)),
-    };
-  }
-
   return (
-    <div className="container mx-auto p-4 space-y-6 font-tiny5">
+    <div className="container mx-auto p-4 space-y-6 font-tiny5 ">
       {/* 其他 UI 结构和元素保持不变 */}
       <Button onClick={simulateBattle} className="w-full">
-        Simulate Battle
+        Fitghting
       </Button>
     </div>
   );

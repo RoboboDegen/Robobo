@@ -24,7 +24,6 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
   }, [scrollRef, getMessage]) //Fixed unnecessary dependency
 
 
-
   return (
     <div className="flex flex-col items-center min-h-screen relative pt-16 w-[430px]">
       {/* Back Button */}
