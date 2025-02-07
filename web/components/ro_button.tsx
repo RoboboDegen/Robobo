@@ -8,15 +8,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        chat_send: "bg-[url('/gameui/chat/chatbox_sent_btn.png')] w-[60px] h-[60px]",
-        chat_back: "bg-[url('/gameui/chat/top_back_btn.png')] w-[123px] h-[60px]",
+        chat_send: "bg-[url('/gameui/chat/chatbox_sent_btn.png')] w-[60px] h-[60px] text-lg ",
+        chat_back: "bg-[url('/gameui/chat/top_back_btn.png')] w-[140px] h-[40px] text-[30px] bg-center text-right pl-4",
         inventory:
           "bg-[url('/gameui/home/bottom_btn.png')] hover:bg-[url('/gameui/home/bottom_btn_pre.png')] active:bg-[url('/gameui/home/bottom_btn_pre.png')] w-[100px] h-[60px] bg-center text-[18px]",
         fight: "bg-[url('/gameui/home/fight_button.png')] w-[100px] h-[60px] bg-center hover:bg-[url('/gameui/home/fight_button_click.png')] active:bg-[url('/gameui/home/fight_button_click.png')] text-[20px] ",
         chat: "bg-[url('/gameui/home/chat_button.png')] w-[100px] h-[60px] bg-center hover:bg-[url('/gameui/home/chat_button_click.png')] active:bg-[url('/gameui/home/chat_button_click.png')] text-[20px]",
         left_arrow_btn: "bg-[url('/gameui/home/left_arrow_btn.png')] w-[40px] h-[40px]",
         right_arrow_btn: "bg-[url('/gameui/home/right_arrow_btn.png')] w-[40px] h-[40px]",
-        inventory_back: "bg-[url('/gameui/inventory/top_back_btn.png')] bg-center w-[100px] h-[40px] text-[24px] text-right pl-2",
+        inventory_back: "bg-[url('/gameui/inventory/top_back_btn.png')] bg-center w-[140px] h-[40px] text-[30px] text-right pl-2",
         mint_bottom:
           "bg-[url('/gameui/mint/bottom_bar_default.png')] w-[300px] hover:w-[300px] hover:bg-[url('/gameui/mint/bottom_bar_pre.png')] active:w-[300px] active:bg-[url('/gameui/mint/bottom_bar_pre.png')] h-[60px] text-[30px] bg-[length:300px_60px] bg-center text-black",
       },

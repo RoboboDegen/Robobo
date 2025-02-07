@@ -26,16 +26,17 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
 
 
   return (
-    <div className="flex flex-col items-center min-h-screen relative pt-16">
+    <div className="">
+    <div className="w-full h-full font-tiny5 flex flex-col items-center justify-center">
       {/* Back Button */}
+      <div className="flex items-center justify-start w-full mr-4 ">   
       <RoButton 
-        variant="chat_back" 
-        className="absolute top-2 left-4 flex items-center justify-center" 
-        onClick={handleBack}
+        variant="chat_back" onClick={handleBack}
       >
-        <span className="translate-y-[-10px] text-lg">Back</span>
+        Back
       </RoButton>
-
+      </div>
+   
       {/* Character Frame with Robot */}
       <div className="flex justify-center mb-4">
         <Image
@@ -48,19 +49,30 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
       </div>
 
       {/* Chat Panel */}
+      <div className="flex justify-center w-full">
       <div
-        className="flex flex-col relative w-[340px]"
+        className="flex-1 w-[350px] relative"
         style={{
           backgroundImage: `url(/gameui/chat/chatbox_panel.png)`,
           backgroundSize: "100% 100%",
-          padding: "50px 20px 20px 20px",
-          height: "500px",
+          padding: "50px 30px 40px 20px",
+          height: "480px",
+        
         }}
       >
         <MessageList messages={messages} />
+
         
-        <ChatInput onSubmit={handleSubmit} className="mt-40" />
+        <div className="w-full h-[10px] bg-[#00FFCC] my-2"/>
+
+        <div className="absolute bottom-6 left-4 right-4">
+        <ChatInput onSubmit={handleSubmit} className="w-full" />
       </div>
+
+      </div>
+      </div>
+
+    </div>
     </div>
   )
 }

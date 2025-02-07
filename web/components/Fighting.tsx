@@ -6,17 +6,24 @@ import { useGameData } from "@/context/GameDataProvider";
 import Image from "next/image";
 import { usePopup } from "@/context/PopupProvider";
 
+
 export function Fighting() {
-    const { userInfo, enemy } = useGameData();
+    const { userInfo, enemy, getEnemyFromMirrorPool } = useGameData();
     const { showPopup } = usePopup();
 
-   //popup
-    const handleAttack = () => {
+      //popup
+      const handleAttack = () => {
         console.log("Attacking...");
         showPopup("Oh no! You lost the battle!", () => {
             console.log("Battle lost!");
         });
     };
+
+    useEffect(() => {
+        // 调用获取敌人数据的方法
+        getEnemyFromMirrorPool("0x1234567890123456789012345678901234567890");
+    }, [getEnemyFromMirrorPool]);
+
 
     
     const leftAttributes = useMemo(() => [
@@ -41,8 +48,13 @@ export function Fighting() {
     const rightHealth = useMemo(() => enemy?.energy || 0, [enemy?.energy]);
 
     return (
+        <div className="">
         <div className="flex flex-col items-start justify-between h-full pr-5">
-            <div className="w-[280px] flex flex-col gap-4 pl-2">
+            <div 
+                className="flex flex-col gap-4 pl-2 mt-12" 
+                style={{ transform: 'scale(1.15)' }}
+            >
+
                 {/* Health Bars */}
                 <div className="flex justify-between items-center">
                     <div className="w-20">
@@ -109,7 +121,7 @@ export function Fighting() {
                     backgroundImage: `url(/gameui/pk/info_box_bg.png)`,
                     backgroundSize: "100% 100%",
                     backgroundRepeat: "no-repeat",
-                    height: "260px",
+                    height: "250px",
                     width: "100%",
                     }}
                 >
@@ -117,6 +129,7 @@ export function Fighting() {
                 </div>
             </div>
             </div>
+        </div>
         </div>
     );
 }

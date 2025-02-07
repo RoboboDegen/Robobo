@@ -27,7 +27,7 @@ export function ChatInput({ onSubmit, className }: ChatInputProps) {
         placeholder="Type your message..."
       />
       <RoButton type="submit" variant="chat_send" onClick={handleSubmit}>
-      <span className="translate-y-[-10px] text-lg">Send</span>
+      <span className="translate-y-[-10px]">Send</span>
       </RoButton>
     </div>
   )

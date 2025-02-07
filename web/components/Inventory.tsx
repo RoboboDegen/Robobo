@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import {  useMemo, useState } from "react"
 import { RoButton } from "@/components/ro_button"
 import { AttributeBar } from "@/components/attribute-bar"
 import EquipedBar, { type EquipedItemProps } from "./inventory/equipedBar"
@@ -34,9 +34,10 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
     <div className="">
       <div className="w-full h-full font-tiny5 flex flex-col items-center justify-between pl-5">
         {/* Header */}
-        <div className="flex items-center justify-start w-full">
+        <div className="flex items-center justify-start w-full mr-4">
           <RoButton variant="inventory_back" onClick={handleInventoryBack}>Back</RoButton>
         </div>
+
         {/* Body */}
         {/* Main Container with 3:2 ratio */}
         <div className="flex items-start justify-between w-full">
@@ -54,15 +55,18 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
                   height: "390px",
                 }}
               >
+                
                 <InventoryGrid
                   inventoryItems={userInfo?.ownedElement || []}
                   selectedItem={selectedItem}
                   setSelectedItem={setSelectedItem}
                 />
 
+                
                 <div className="flex items-center ">
                   <InfoBox selectedItem={selectedItem} />
                 </div>
+
               </div>
             </div>
           </div>

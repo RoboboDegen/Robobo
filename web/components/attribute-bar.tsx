@@ -29,9 +29,10 @@ export function AttributeBar({
   height = 24,
 }: AttributeBarProps) {
   // 计算图标尺寸，设置为高度的0.9倍
-  const iconSize = Math.round(height * 0.8);
+  const iconSize = Math.round(height * 0.9);
   // 增加偏移系数从0.8到1.2，使图标位置更靠上
-  const iconOffset = Math.round(height * 1);
+  const iconOffset = Math.round(height * 1.2);
+
 
   return (
     <div className="relative my-4" style={{ width }}>
