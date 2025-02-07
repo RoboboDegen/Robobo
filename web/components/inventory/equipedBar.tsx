@@ -28,7 +28,7 @@ export default function EquipedBar({ equippedItems }: EquipedBarProps) {
                     backgroundImage: `url(/gameui/inventory/equipped_section.png)`,
                     backgroundSize: "100% 100%",
                     backgroundRepeat: "no-repeat",
-                    height: "135px",
+                    height: "145px",
                 }}
             >
                 <div className="flex justify-center items-center mt-16 gap-2">

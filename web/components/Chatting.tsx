@@ -26,14 +26,14 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
 
 
   return (
-    <div className="flex flex-col items-center min-h-screen relative pt-16">
+    <div className="flex flex-col items-center min-h-screen relative pt-16 w-[400px]">
       {/* Back Button */}
       <RoButton 
         variant="chat_back" 
-        className="absolute top-2 left-4 flex items-center justify-center" 
+        className="absolute top-2 left-1 flex items-center justify-center" 
         onClick={handleBack}
       >
-        <span className="translate-y-[-10px] text-lg">Back</span>
+        <span className="translate-y-[-4.5px] translate-x-[-10px] text-[24px]">Back</span>
       </RoButton>
 
       {/* Character Frame with Robot */}
@@ -49,17 +49,17 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
 
       {/* Chat Panel */}
       <div
-        className="flex flex-col relative w-[340px]"
+        className="flex flex-col relative w-[355px]"
         style={{
           backgroundImage: `url(/gameui/chat/chatbox_panel.png)`,
           backgroundSize: "100% 100%",
-          padding: "50px 20px 20px 20px",
-          height: "500px",
+          padding: "50px 30px 40px 20px",
+          height: "550px",
         }}
       >
         <MessageList messages={messages} />
         
-        <ChatInput onSubmit={handleSubmit} className="mt-40" />
+        <ChatInput onSubmit={handleSubmit} className="" />
       </div>
     </div>
   )

@@ -21,9 +21,6 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
   const { userInfo } = useGameData();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
 
-
-
-
   useEffect(() => {
     console.log(userInfo)
     const attributes: Attribute[] = [] 

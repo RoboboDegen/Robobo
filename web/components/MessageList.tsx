@@ -33,7 +33,7 @@ export function MessageList({ messages }: MessageListProps) {
             className="w-6 h-6 mt-1"
           />
           <div className="flex-1 px-3 py-2 rounded-lg bg-transparent">
-            <p className={`text-sm font-tiny5 ${
+            <p className={`text-base  font-tiny5 ${
               message.sender === "user" ? "text-white" : "text-[#00ffcc]"
             }`}>
               {message.text}

@@ -12,8 +12,12 @@ interface Attribute {
 }
 
 export function Fighting() {
-    const { userInfo, enemy } = useGameData();
+    const { userInfo, enemy, getEnemyFromMirrorPool } = useGameData();
 
+    useEffect(() => {
+        // 调用获取敌人数据的方法
+        getEnemyFromMirrorPool("0x1234567890123456789012345678901234567890");
+    }, [getEnemyFromMirrorPool]);
 
     const leftAttributes = useMemo(() => [
         { name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-red-500" },
@@ -38,7 +42,10 @@ export function Fighting() {
 
     return (
         <div className="flex flex-col items-start justify-between h-full pr-5">
-            <div className="w-[280px] flex flex-col gap-4 pl-2">
+            <div 
+                className="w-[320px] flex flex-col gap-4 pl-2 mt-12" 
+                style={{ transform: 'scale(1.15)' }}
+            >
                 {/* Health Bars */}
                 <div className="flex justify-between items-center">
                     <div className="w-20">
@@ -99,7 +106,7 @@ export function Fighting() {
                     backgroundImage: `url(/gameui/pk/info_box_bg.png)`,
                     backgroundSize: "100% 100%",
                     backgroundRepeat: "no-repeat",
-                    height: "260px",
+                    height: "250px",
                     width: "100%",
                     }}
                 >
