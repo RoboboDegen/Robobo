@@ -7,7 +7,7 @@ export interface RobotConfig {
     energy: number;
     personality: number;
     image?: string;
-    equippedElement: Element[];
+    equippedElement?: Element[];
 }
 
 export interface MirrorConfig {
@@ -20,7 +20,9 @@ export interface MirrorConfig {
     personality: number;
 }
 
-
+export interface BattleRecord {
+    
+}
 
 export interface Element {
     id:string,

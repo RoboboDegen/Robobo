@@ -1,6 +1,6 @@
 import { RoButton } from "./ro_button";
 import { useEffect, useState } from "react";
-import { AttributeBar } from "./attribute-bar";
+import  AttributeBars from "./AttributeBars";
 import { TrashCounter } from "./trash-counter";
 import { useGameData } from "@/context/GameDataProvider";
 
@@ -36,34 +36,23 @@ export function Mint({ handleMint }: MintProps) {
 
 
   return (
-    <div className="flex flex-col items-center justify-between h-full">
-
-      {/* Main Content Container */}
-
+    <div className="flex flex-col items-center justify-between h-full w-[340px]">
       {/* Top Trash Counter */}
-      <div className="w-full ">
+      <div className="w-full">
         <TrashCounter value={userInfo?.trash || 0} />
       </div>
 
-      {/* Attribute Bars */}
-      <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col gap-2 w-[280px]">
-        {attributes?.map((attr) => (
-          <AttributeBar
-            key={attr.name}
-            name={attr.name}
-            value={attr.value}
-            color={attr.color}
-          />
-        ))}
-      </div>
+      {/* Middle and Bottom Content - Grouped Together */}
+      <div className="flex flex-col items-center gap-4">
+        {/* Attribute Bars */}
+        <AttributeBars attributes={attributes} />
 
-      {/* Bottom Action Bar */}
-      <div className="font-tiny5">
-        <RoButton variant="mint_bottom" onClick={handleMint}>
-          mint
-        </RoButton>
-      </div>
+        {/* Bottom Action Bar */}
+        <div className="font-tiny5">
+          <RoButton variant="mint_bottom" onClick={handleMint}>
+            mint
+          </RoButton>
+        </div>
       </div>
     </div>
   );

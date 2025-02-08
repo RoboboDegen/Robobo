@@ -54,7 +54,7 @@ const ScrollBar = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.S
             backgroundImage: `url(${scrollbarThumbImage})`,  // 使用传入的滑块图片
             backgroundSize: "100% 100%", // 确保滑块图片完全填充区域
             width: "100%",
-            minHeight: "40px", // 调整滑块高度
+            minHeight: "60px", // 调整滑块高度
             cursor: "pointer",
           }}
         />

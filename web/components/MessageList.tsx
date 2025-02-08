@@ -18,9 +18,10 @@ export function MessageList({ messages }: MessageListProps) {
   }, [scrollRef])
 
   return (
-      <ScrollArea  className="h-400 rounded-md"> 
+      <ScrollArea className="h-[600px] rounded-md"> 
+      <div className="flex flex-col">
       {messages.map((message) => (
-        <div key={message.id} className="flex items-start gap-2 mb-4">
+        <div key={message.id} className="flex items-start gap-1.5">
           <Image
             src={
               message.sender === "user"
@@ -30,10 +31,11 @@ export function MessageList({ messages }: MessageListProps) {
             alt={message.sender}
             width={24}
             height={24}
-            className="w-6 h-6 mt-1"
+            className="mt-1"
           />
-          <div className="flex-1 px-3 py-2 rounded-lg bg-transparent">
-            <p className={`text-sm font-tiny5 ${
+
+          <div className="flex-1 px-1 py-1">
+            <p className={`font-tiny5 break-words whitespace-pre-wrap ${
               message.sender === "user" ? "text-white" : "text-[#00ffcc]"
             }`}>
               {message.text}
@@ -41,6 +43,8 @@ export function MessageList({ messages }: MessageListProps) {
           </div>
         </div>
       ))}
+      </div>
+
 
       <ScrollBar 
         orientation="vertical" 

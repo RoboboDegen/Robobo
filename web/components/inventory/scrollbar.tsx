@@ -12,8 +12,6 @@ interface InventoryGridProps {
   setSelectedItem: (item: Element) => void
 }
 
-
-
 const InventoryGrid: React.FC<InventoryGridProps> = ({
   inventoryItems,
   selectedItem,
@@ -42,8 +40,6 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
                 alt={item.name}
                 fill
                 className="p-0.5"
-
-
               />
             )}
           </div>

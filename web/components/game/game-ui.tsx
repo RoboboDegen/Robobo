@@ -12,9 +12,12 @@ import { useEffect } from "react";
 import { useGameData } from "@/context/GameDataProvider";
 
 
+
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
     const { getUserInfo } = useGameData();
+
+    
 
     const handleMint = () => {
         setUIState(GameUIState.MAIN_MENU);
@@ -29,14 +32,11 @@ export function GameUI() {
     const handleInventory = () => {
         setUIState(GameUIState.INVENTORY);
     }
-
+    
     const handleChatSubmit = (message: string) => {
         console.log(message);
     }
-    const handleChatBack = () => {
-        setUIState(GameUIState.MAIN_MENU);
-    }
-    const handleInventoryBack = () => {
+    const handleBackMain = () => {
         setUIState(GameUIState.MAIN_MENU);
     }
 
@@ -45,20 +45,18 @@ export function GameUI() {
     }, [getUserInfo]);
 
 
-
     return (
         <div className={cn(
             "absolute inset-0 pointer-events-auto",
             "flex flex-col items-center justify-between p-4",
-            "max-w-[720px] mx-auto", gameState.uiState === GameUIState.LOADING ? "pointer-events-none" : "pointer-events-auto" // 与游戏最大宽度匹配
+            "max-w-[720px] mx-auto", // 与游戏最大宽度匹配
         )}>
-
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
             {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home handleChat={handleChat} handleFight={handleFight} handleInventory={handleInventory} />}
-            {gameState.uiState === GameUIState.INVENTORY && <Inventory handleInventoryBack={handleInventoryBack} />}
-            {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
-            {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleChatBack} />}
+            {gameState.uiState === GameUIState.INVENTORY && <Inventory  handleInventoryBack={handleBackMain}/>}
+            {gameState.uiState === GameUIState.FIGHTING && <Fighting handleBackMain={handleBackMain}/>}
+            {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleBackMain} />}
         </div>
     );
 } 

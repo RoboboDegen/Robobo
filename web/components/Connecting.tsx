@@ -4,6 +4,7 @@ import { GameUIState } from "@/hooks/use-game-store";
 import { RoButton } from "./ro_button";
 import { triggerEvent } from "@/lib/utils";
 
+
 export interface ConnectingProps {
   setUIState: (state: GameUIState) => void;
 }
@@ -41,11 +42,13 @@ export function Connecting({ setUIState }: ConnectingProps) {
       </div>
 
       {/* 按钮区域 - 固定在底部 */}
+
       <div className="">
         {/* <SuiConnectButton/> */}
         <RoButton variant="mint_bottom" onClick={handleConnect} >
           Connect Wallet
         </RoButton>
+
       </div>
     </div>
 
