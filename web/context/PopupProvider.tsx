@@ -7,7 +7,7 @@ interface PopupContextType {
   message: string
   onConfirm: () => void
   onCancel: () => void
-  showPopup: (message: string, onConfirm: () => void) => void
+  showPopup: (message: string, onConfirm: () => void, onCancel: () => void) => void
   hidePopup: () => void
 }
 
@@ -25,13 +25,12 @@ export function PopupProvider({ children }: { children: ReactNode }) {
   }
 
   const hidePopup = () => {
+    confirmCallback()
     setIsOpen(false)
     setMessage("")
-    setConfirmCallback(() => {})
   }
 
   const handleConfirm = () => {
-    confirmCallback()
     hidePopup()
   }
 

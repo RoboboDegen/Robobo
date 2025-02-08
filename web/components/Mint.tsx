@@ -1,5 +1,4 @@
 import { RoButton } from "./ro_button";
-import { useEffect, useState } from "react";
 import  AttributeBars from "./AttributeBars";
 import { TrashCounter } from "./trash-counter";
 import { useGameData } from "@/context/GameDataProvider";
@@ -8,32 +7,8 @@ export interface MintProps {
   handleMint: () => void;
 }
 
-interface Attribute {
-  name: string;
-  value: number | string;
-  color: string;
-}
-
 export function Mint({ handleMint }: MintProps) {
   const { userInfo } = useGameData();
-  const [attributes, setAttributes] = useState<Attribute[]>([]);
-
-
-
-
-  useEffect(() => {
-    console.log(userInfo)
-    const attributes: Attribute[] = [] 
-    attributes.push({ name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-[#ff4444]" })
-    attributes.push({ name: "Energy", value: userInfo?.robot?.energy || 0, color: "bg-[#00ffcc]" })
-
-    attributes.push({ name: "Speed", value: userInfo?.robot?.speed || 0, color: "bg-[#ffcc00]" })
-    attributes.push({ name: "Personality", value: userInfo?.robot?.personality || 0, color: "bg-[#ff9933]" })
-    setAttributes(attributes)
-
-  }, [userInfo]);
-
-
 
   return (
     <div className="flex flex-col items-center justify-between h-full w-[340px]">
@@ -45,7 +20,8 @@ export function Mint({ handleMint }: MintProps) {
       {/* Middle and Bottom Content - Grouped Together */}
       <div className="flex flex-col items-center gap-4">
         {/* Attribute Bars */}
-        <AttributeBars attributes={attributes} />
+        <AttributeBars attack={userInfo?.robot?.attack || 0} energy={userInfo?.robot?.energy || 0} speed={userInfo?.robot?.speed || 0} personality={userInfo?.robot?.personality || 0} />
+
 
         {/* Bottom Action Bar */}
         <div className="font-tiny5">

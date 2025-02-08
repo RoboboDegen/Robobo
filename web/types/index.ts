@@ -19,11 +19,6 @@ export interface MirrorConfig {
     energy: number;
     personality: number;
 }
-
-export interface BattleRecord {
-    
-}
-
 export interface Element {
     id:string,
     name:string,
@@ -48,3 +43,24 @@ export interface Message {
     sender: "user" | "ai"
     timestamp?: Date
 }
+
+
+export interface BattleRecord {
+    attacker: RobotConfig;
+    defender: MirrorConfig;
+    result: string;
+    timestamp: Date;
+    rounds: BattleRound[];
+    winner: string;
+    attacker_final_energy: number;
+    defender_final_energy: number;    
+    reward: string;
+}
+
+export interface BattleRound {
+    attacker_id:string,
+    defender_id:string,
+    action:number,
+    result:number,    
+}
+

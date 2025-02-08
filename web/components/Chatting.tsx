@@ -25,10 +25,11 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
 
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen relative py-5">
+    <div className="flex flex-col items-center justify-between h-full relative">
       {/* Back Button */}
       <div className="flex items-center justify-start w-full">
         <RoButton
+
 
           variant="chat_back"
           onClick={handleBack}
@@ -38,9 +39,9 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
       </div>
 
       {/* Chat Panel */}
-      <div className="flex flex-col justify-between w-full pb-10">
+      <div className="flex flex-col justify-between w-full">
         <div
-          className="w-full py-16 px-5 flex flex-col bg-[url('/gameui/chat/chatbox_panel.png')] bg-contain bg-no-repeat items-center justify-center"
+          className="py-16 px-5 flex flex-col bg-[url('/gameui/chat/chatbox_panel.png')] bg-contain bg-no-repeat items-center justify-center"
         >
 
           <div>

@@ -41,7 +41,7 @@ export function AttributeBar({
   const iconOffset = Math.round(height * 1.2);
 
   return (
-    <div className="relative my-5" style={{ width }}>
+    <div className={`relative my-5 w-${width}`}>
       {/* Attribute Name above the bar */}
       <div className="absolute top-[-18px] left-7 w-full flex " >
         <span className="text-white font-tiny5 text-[14px]">

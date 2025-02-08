@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import { createPortal } from "react-dom"
+import { RoButton } from "../ro_button"
 
 interface PopupProps {
   isOpen: boolean
@@ -28,7 +29,7 @@ export function Popup({ isOpen, message, onConfirm, onCancel }: PopupProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
       <div
-        className="relative flex flex-col items-center justify-center p-6"
+        className="relative flex flex-col items-center justify-center p-4 pt-10"
         style={{
           backgroundImage: `url(/gameui/popup/popup_confirmation_default.png)`,
           backgroundSize: "100% 100%",
@@ -38,33 +39,17 @@ export function Popup({ isOpen, message, onConfirm, onCancel }: PopupProps) {
         }}
       >
         <p className="text-center text-white mb-6 font-tiny5">{message}</p>
-        <div className="flex gap-4">
-          <button
+        <RoButton
             onClick={onConfirm}
-            className="w-24 h-10 flex items-center justify-center"
-            style={{
-              backgroundImage: `url(/gameui/popup/popup_confirmation_yes_btn.png)`,
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-            }}
+            variant="chat_send"
           >
-            <span className="text-black font-tiny5" style={{ marginLeft: "-32px" }}>Yes</span>
-
-          </button>
-          <button
-            onClick={onCancel}
-            className="w-24 h-10 flex items-center justify-center"
-            style={{
-              backgroundImage: `url(/gameui/popup/popup_confirmation_cancel_btn.png)`,
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-            }}
-          >
-            <span className="text-black font-tiny5" style={{ marginLeft: "-32px" }}>Cancel</span>
-          </button>
-        </div>
+            <p className="pb-3">Yes</p>
+          </RoButton>
       </div>
+
+
     </div>,
+
     document.body,
   )
 }

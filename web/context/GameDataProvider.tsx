@@ -1,6 +1,6 @@
 "use client";
 
-import { Message, UserInfo, MirrorConfig } from "@/types";
+import { Message, UserInfo, BattleRecord, MirrorConfig, RobotConfig } from "@/types";
 import {
   createContext,
   useContext,
@@ -8,19 +8,19 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { mockUserInfo, mockMirrorConfig, mockMessages } from "@/mock";
+import { mockUserInfo, mockMessages} from "@/mock";
+import CalculateBattleRecords from "@/mock/battleRecords";
+
 
 interface GameDataContextType {
   userInfo: UserInfo | undefined;
   messages: Message[];
-  enemy: MirrorConfig | undefined;
-  battleRecords: string[];
-  getEnemyFromMirrorPool: (id: string) => Promise<void>;
+  battleRecords: BattleRecord | undefined;
   getUserInfo: (id: string) => Promise<void>;
   getMessage: (id: string) => Promise<void>;
-  setBattleRecords: (logs: string[]) => void;
-  updateRobotEnergies: (attackerEnergy: number, defenderEnergy: number) => void;
+  getBattleRecords: (robot: RobotConfig, mirror: MirrorConfig) => Promise<void>;
 }
+
 
 const GameDataContext = createContext<GameDataContextType | undefined>(
   undefined
@@ -29,12 +29,7 @@ const GameDataContext = createContext<GameDataContextType | undefined>(
 export function GameDataProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo | undefined>();
-  const [enemy, setEnemy] = useState<MirrorConfig | undefined>();
-  const [battleRecords, setBattleRecords] = useState<string[]>([]);
-
-  const getEnemyFromMirrorPool = useCallback(async (id: string) => {
-    setEnemy(mockMirrorConfig);
-  }, []);
+  const [battleRecords, setBattleRecords] = useState<BattleRecord>();
 
   const getUserInfo = useCallback(async (id: string) => {
     setUserInfo(mockUserInfo);
@@ -44,40 +39,27 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     setMessages(mockMessages);
   }, []);
 
-  const updateRobotEnergies = useCallback((attackerEnergy: number, defenderEnergy: number) => {
-    setUserInfo(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        robot: {
-          ...prev.robot,
-          energy: attackerEnergy
-        }
-      };
-    });
-
-    setEnemy(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        energy: defenderEnergy
-      };
-    });
+  const getBattleRecords = useCallback(async (robot: RobotConfig, mirror: MirrorConfig) => {
+    setBattleRecords(await CalculateBattleRecords({attacker:robot,defender:mirror}));
   }, []);
+  
+
+
+
+
 
   return (
     <GameDataContext.Provider
       value={{
         userInfo,
         messages,
-        enemy,
         battleRecords,
-        getEnemyFromMirrorPool,
         getUserInfo,
         getMessage,
-        setBattleRecords,
-        updateRobotEnergies,
+        getBattleRecords,
       }}
+
+
     >
       {children}
     </GameDataContext.Provider>

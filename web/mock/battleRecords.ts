@@ -1,34 +1,32 @@
-"use client";
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useGameData } from "@/context/GameDataProvider";
-import { RobotConfig } from "@/types";
+import { BattleRecord, BattleRound, MirrorConfig, RobotConfig } from "@/types";
 
 interface BattleMockPageProps {
   attacker: RobotConfig;
-  defender: RobotConfig;
+  defender: MirrorConfig;
 }
 
-interface RobotStats {
-  attack: number;
-  defense: number;
-  speed: number;
-  energy: number;
-  personality: number;
-}
 
-export default function Battle({ attacker, defender }: BattleMockPageProps) {
-  const [battleHashInput, setBattleHashInput] = useState<string>("");
-  const [currentBattleHash, setCurrentBattleHash] = useState<number[]>([]);
-  const { battleRecords, setBattleRecords } = useGameData();
+export default function CalculateBattleRecords({ attacker, defender }: BattleMockPageProps): BattleRecord {
+
+  const result: BattleRecord = {
+    attacker: attacker,
+    defender: defender,
+    result: "win",
+    timestamp: new Date(),
+    rounds: [],
+    winner: "attacker",
+    attacker_final_energy: 100,
+    defender_final_energy: 100,
+    reward: "100",
+  } satisfies BattleRecord;
+
+  const rounds: BattleRound[] = [];
+  
 
   function generateRandomHash(): number[] {
     const newHash = Array.from({ length: 32 }, () =>
       Math.floor(Math.random() * 256)
     );
-    setCurrentBattleHash(newHash);
-    setBattleHashInput(newHash.join(","));
     return newHash;
   }
 
@@ -67,10 +65,12 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
     target: RobotConfig,
     moveValue: number,
     isAttacker: boolean
-  ): { actorEnergy: number; targetEnergy: number; logs: string[] } {
+  ): { actorEnergy: number; targetEnergy: number; logs: string[],action:number,value:number } {
     const actorName = isAttacker ? "Attacker" : "Defender";
     const zeroPoint = 128;
     const maxEnergy = 188;
+    let action = 0;
+    let value = 0;
     let newActorEnergy = actor.energy;
     let newTargetEnergy = target.energy;
     const logs: string[] = [];
@@ -83,18 +83,24 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
           zeroPoint;
         newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
         logs.push(`${actorName} used Special Attack: -${damage} damage`);
+        action = 1;
+        value = damage;
       } else {
         const recovery = calculateDamage(
           actor.defense,
           20,
           actor.personality,
           false
+
         );
         newActorEnergy = Math.min(maxEnergy, newActorEnergy + recovery);
         logs.push(
           `${actorName} used Special Defense: +${recovery} energy, total energy: ${newActorEnergy}`
         );
+        action = 2;
+        value = recovery;
       }
+
     } else {
       newActorEnergy = newActorEnergy - 1;
       logs.push(`${actorName} base energy cost: -1`);
@@ -110,44 +116,59 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
           zeroPoint;
         newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
         logs.push(`${actorName} used Heavy Attack: -${damage} damage`);
+        action = 3;
+        value = damage;
       } else if (moveValue <= 8) {
         const recovery = calculateDamage(
           actor.defense,
           15,
           actor.personality,
           false
+
         );
         newActorEnergy = Math.min(maxEnergy, newActorEnergy + recovery);
         logs.push(
           `${actorName} used Defense: +${recovery} energy, total energy: ${newActorEnergy}`
         );
+        action = 4;
+        value = recovery;
       } else {
         if (actor.personality >= 178) {
           const damage =
+
             calculateDamage(actor.attack, 25, actor.personality, true) -
             zeroPoint;
           newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
           logs.push(`${actorName} used Special Attack: -${damage} damage`);
+          action = 5;
+          value = damage;
         } else {
           const recovery = calculateDamage(
             actor.defense,
             20,
             actor.personality,
             false
+
           );
           newActorEnergy = Math.min(maxEnergy, newActorEnergy + recovery);
           logs.push(
             `${actorName} used Special Defense: +${recovery} energy, total energy: ${newActorEnergy}`
           );
+          action = 6;
+          value = recovery;
         }
       }
     }
+
 
     return {
       actorEnergy: newActorEnergy,
       targetEnergy: newTargetEnergy,
       logs: logs,
+      action: action,
+      value: value,
     };
+
   }
 
   function processHash(hash: number[]): [number[], number[]] {
@@ -183,11 +204,8 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
     return [attackerMoves, defenderMoves];
   }
 
-  function simulateBattle() {
-    const battleHash =
-      currentBattleHash.length === 32
-        ? currentBattleHash
-        : generateRandomHash();
+  function simulateBattle(): BattleRecord {
+    const battleHash = generateRandomHash()
     const [attackerMoves, defenderMoves] = processHash(battleHash);
     let currentAttackerEnergy = attacker.energy;
     let currentDefenderEnergy = defender.energy;
@@ -230,6 +248,15 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
         );
         logs.push(...attackerAction.logs);
 
+        rounds.push({
+          attacker_id: attacker.id,
+          defender_id: defender.id,
+          action: attackerAction.action,
+          result: attackerAction.value,
+        });
+
+
+
         currentAttackerEnergy = attackerAction.actorEnergy;
         currentDefenderEnergy = attackerAction.targetEnergy;
 
@@ -247,6 +274,12 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
         );
         logs.push(...defenderAction.logs);
 
+        rounds.push({
+          attacker_id: attacker.id,
+          defender_id: defender.id,
+          action: defenderAction.action,
+          result: defenderAction.value,
+        });
         currentDefenderEnergy = defenderAction.actorEnergy;
         currentAttackerEnergy = defenderAction.targetEnergy;
         if (currentAttackerEnergy <= ZERO_POINT) {
@@ -263,8 +296,15 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
         );
         logs.push(...defenderAction.logs);
 
+        rounds.push({
+          attacker_id: attacker.id,
+          defender_id: defender.id,
+          action: defenderAction.action,
+          result: defenderAction.value,
+        });
         currentDefenderEnergy = defenderAction.actorEnergy;
         currentAttackerEnergy = defenderAction.targetEnergy;
+
         if (currentAttackerEnergy <= ZERO_POINT) {
           currentAttackerEnergy = ZERO_POINT;
           logs.push(`Attacker energy depleted!`);
@@ -279,6 +319,12 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
         );
         logs.push(...attackerAction.logs);
 
+        rounds.push({
+          attacker_id: attacker.id,
+          defender_id: defender.id,
+          action: attackerAction.action,
+          result: attackerAction.value,
+        });
         currentAttackerEnergy = attackerAction.actorEnergy;
         currentDefenderEnergy = attackerAction.targetEnergy;
         if (currentDefenderEnergy <= ZERO_POINT) {
@@ -295,24 +341,14 @@ export default function Battle({ attacker, defender }: BattleMockPageProps) {
       round++;
     }
 
-    const winner =
-      currentAttackerEnergy > currentDefenderEnergy ? "Attacker" : "Defender";
-    logs.push(`Battle ended! ${winner} wins!`);
-    logs.push(
-      `Final energy - Attacker: ${currentAttackerEnergy}, Defender: ${currentDefenderEnergy}`
-    );
-
-    console.log("Before setting battle records:", logs);
-    setBattleRecords(logs);
-    console.log("Battle records after setting:", battleRecords);
+    result.attacker_final_energy = currentAttackerEnergy;
+    result.defender_final_energy = currentDefenderEnergy;
+    result.winner = 
+    currentAttackerEnergy > currentDefenderEnergy ? attacker.id : defender.id;;
+    result.rounds = rounds;
+    result.result = currentAttackerEnergy > currentDefenderEnergy ? "win" : "lose";
+    console.log("Battle records after setting:", result);
+    return result;
   }
-
-  return (
-    <div className="container mx-auto p-4 space-y-6 font-tiny5 ">
-      {/* 其他 UI 结构和元素保持不变 */}
-      <Button onClick={simulateBattle} className="w-full">
-        Fitghting
-      </Button>
-    </div>
-  );
+  return simulateBattle();
 }

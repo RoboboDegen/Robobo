@@ -1,4 +1,4 @@
-import { RobotConfig, Element, UserInfo, MirrorConfig, Message } from "@/types";
+import { RobotConfig, Element, UserInfo, MirrorConfig, Message, BattleRecord } from "@/types";
 
 
 
@@ -161,4 +161,31 @@ const mockMessages: Message[] = [
 
 
 
-export { mockUserInfo, mockMirrorConfig, mockMessages };
+
+async function mockBattleRecords(): Promise<BattleRecord> {
+    return {
+        attacker: mockRobot,
+        defender: mockMirrorConfig,
+        result: "win",
+        timestamp: new Date(),
+        rounds: [
+            {
+                attacker_id: mockRobot.id,
+                defender_id: mockMirrorConfig.id,
+                action: 1,
+                result: 1,
+            }
+        ],
+        winner: "attacker",
+        attacker_final_energy: 100,
+        defender_final_energy: 100,
+        reward: "100",
+
+    } satisfies BattleRecord;
+}
+
+
+
+
+
+export { mockUserInfo, mockMirrorConfig, mockMessages, mockBattleRecords };
