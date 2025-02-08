@@ -101,9 +101,15 @@ export class GameTestScene extends Phaser.Scene {
               this.robot.playAnimation('defeated');
             }
             break;
+          case RobotEventTypes.chat:
+            if (this.robot) {
+              this.robot.playAnimation('chat');
+            }
+            break;
 
         }
       }
+
 
     });
     this.eventManager?.on('AUDIO', (data) => {
@@ -139,7 +145,7 @@ export class GameTestScene extends Phaser.Scene {
       y: this.cameras.main.height / 2,
     }, {
       id: '1',
-      name: 'Robobo',
+      name: 'Froge',
       attack: 10,
       defense: 10,
       speed: 10,

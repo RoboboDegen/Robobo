@@ -35,6 +35,7 @@ export enum RobotEventTypes{
   win = 'win',
   lose = 'lose',
   hit = 'hit',
+  chat = 'chat',
 }
 
 export enum AudioEventTypes{

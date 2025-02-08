@@ -101,7 +101,7 @@ export const GAME_ASSETS_DATA: GameAssetsData = {
         {
             key: 'chat',
             frames: { key: 'baseRobot' },
-            repeat: 0,
+            repeat: -1,
             frameRate: 10
         },
         {

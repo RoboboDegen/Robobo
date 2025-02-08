@@ -194,6 +194,26 @@ const robotCommands: EventCommand[] = [
             type: RobotEventTypes.hit,
             robotId: params.robotId
         })
+    },
+    {
+        id: 'robot-chat',
+        key: 'ROBOT',
+        name: '聊天动作',
+        category: 'robot',
+        params: [
+            {
+                name: '机器人ID',
+                type: 'string',
+                key: 'robotId',
+                default: '1'
+            }
+        ],  
+        getData: (params) => ({
+            type: RobotEventTypes.chat,
+            robotId: params.robotId
+        })
+
+
     }
 ];
 
