@@ -3,31 +3,71 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
+// Robot模型 - 存储机器人基本信息
 model Robot {
-  id          String      @id @default(cuid())
-  address     String      @unique
-  ownerId     String      @unique
-  winCount    Int         @default(0)
-  loseCount   Int         @default(0)
+  id          String   @id
   name        String
-  personality Personality @relation(fields: [personalityId], references: [id])
-  personalityId String    @unique
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  @@index([address])
-  @@index([ownerId])
-}
-
-model Personality {
-  id          String   @id @default(cuid())
-  name        String
-  description String   @db.Text
+  avatar      String?
+  personality Int      @default(128)  // 性格值 128-228
+  description String?
+  status      String   @default("online")
+  
+  // 关联
+  elements    Element[]
+  chats       Chat[]
+  rewards     Reward[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
+// Element模型 - 存储零件信息
+model Element {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  attackMod       Int      @default(128)
+  defenseMod      Int      @default(128)
+  speedMod        Int      @default(128)
+  energyMod       Int      @default(128)
+  personalityMod  Int      @default(128)
+  
+  // 关联
+  robot           Robot?   @relation(fields: [robotId], references: [id])
+  robotId         String?
+  createdAt       DateTime @default(now())
+}
+
+// Chat模型 - 存储聊天记录
+model Chat {
+  id                String   @id @default(cuid())
+  robotId           String
+  message           String   // 用户消息
+  reply             String   // 机器人回复
+  personalityChange Int?     // 性格变化值
+  
+  // 关联
+  robot             Robot    @relation(fields: [robotId], references: [id])
+  rewards           Reward[]
+  createdAt         DateTime @default(now())
+}
+
+// Reward模型 - 存储奖励信息
+model Reward {
+  id          String   @id @default(cuid())
+  type        String   // token 或 element
+  amount      Int?     // token数量
+  elementId   String?  // 零件ID
+  claimed     Boolean  @default(false)
+  
+  // 关联
+  robot       Robot    @relation(fields: [robotId], references: [id])
+  robotId     String
+  chat        Chat     @relation(fields: [chatId], references: [id])
+  chatId      String
+  createdAt   DateTime @default(now())
+} 
