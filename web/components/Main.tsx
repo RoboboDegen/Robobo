@@ -40,20 +40,18 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
 
   return (
     <div className="flex flex-col items-center justify-between h-full">
-
       {/* Top Trash Counter */}
-      <div className="w-full ">
+      <div className="w-full">
         <TrashCounter value={userInfo?.trash || 0} />
       </div>
 
-
-      {/* Attribute Bars */}
-      <div className="flex flex-col items-center justify-center">
+      {/* Middle and Bottom Content - Grouped Together */}
+      <div className="flex flex-col items-center gap-4">
+        {/* Attribute Bars */}
         <AttributeBars attributes={attributes} />
-      </div>
         
         {/* Bottom Buttons */}
-        <div className="flex gap-4 mt-4">
+        <div className="flex gap-4">
           <RoButton variant="inventory" onClick={handleInventory}>
             Inventory
           </RoButton>
@@ -65,7 +63,7 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
           </RoButton>
         </div>
       </div>
-    
-  )
+    </div>
+  );
 }
 

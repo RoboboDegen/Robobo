@@ -37,25 +37,23 @@ export function Mint({ handleMint }: MintProps) {
 
   return (
     <div className="flex flex-col items-center justify-between h-full w-[340px]">
-
-      {/* Main Content Container */}
-
       {/* Top Trash Counter */}
       <div className="w-full">
         <TrashCounter value={userInfo?.trash || 0} />
       </div>
 
-      {/* Attribute Bars */}
-      <div className="flex flex-col items-center justify-center">
-      <AttributeBars attributes={attributes} />
-      </div>
+      {/* Middle and Bottom Content - Grouped Together */}
+      <div className="flex flex-col items-center gap-4">
+        {/* Attribute Bars */}
+        <AttributeBars attributes={attributes} />
 
-      {/* Bottom Action Bar */}
-      <div className="font-tiny5">
-        <RoButton variant="mint_bottom" onClick={handleMint}>
-          mint
-        </RoButton>
+        {/* Bottom Action Bar */}
+        <div className="font-tiny5">
+          <RoButton variant="mint_bottom" onClick={handleMint}>
+            mint
+          </RoButton>
+        </div>
       </div>
-      </div>
+    </div>
   );
 }
