@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "migrate": "npx prisma db push --force-reset && npx prisma generate",
     "dev": "next dev --turbopack",
+    "build": "prisma generate && next build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -15,7 +17,8 @@
     "next": "15.1.6",
     "prisma": "^6.2.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "swr": "^2.3.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
