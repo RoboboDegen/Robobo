@@ -1,27 +1,27 @@
-import { useRef, useEffect } from "react"
 import Image from "next/image"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Message } from "@/types"
+import { useEffect, useRef } from "react";
 
 
 interface MessageListProps {
-  messages: Message[]
+  displayMessage: Message[];
 }
 
-export function MessageList({ messages }: MessageListProps) {
-  const scrollRef = useRef<HTMLDivElement>(null)
+export function MessageList({ displayMessage }: MessageListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [scrollRef])
+  }, [displayMessage]);
 
   return (
-    <ScrollArea className="h-[280px] rounded-md">
-      <div className="flex flex-col">
-        {messages.map((message) => (
-          <div key={message.id} className="flex items-start gap-1.5">
+    <ScrollArea className="h-[320px] w-full rounded-md">
+      <div className="flex flex-col w-full pl-4">
+        {displayMessage.map((message, index) => (
+          <div key={index} className="flex justify-start items-start gap-1">
             <Image
               src={
                 message.sender === "user"
@@ -34,14 +34,15 @@ export function MessageList({ messages }: MessageListProps) {
               className="mt-1"
             />
 
-            <div className="flex-1 px-1 py-1">
-              <p className={`font-tiny5 break-words whitespace-pre-wrap ${message.sender === "user" ? "text-white" : "text-[#00ffcc]"
+            <div className="px-1 py-3">
+              <p className={`font-tiny5 text-lg break-words max-w-[200px] ${message.sender === "user" ? "text-white" : "text-[#00ffcc]"
                 }`}>
-                {message.text}
+                {message.sender === "user" ? "You" : "AI"}: {message.text}
               </p>
             </div>
           </div>
         ))}
+        <div ref={scrollRef} />
       </div>
       <ScrollBar
         orientation="vertical"
@@ -49,6 +50,5 @@ export function MessageList({ messages }: MessageListProps) {
         scrollbarThumbImage="/gameui/pk/info_scrollbar_thumb.png"
       />
     </ScrollArea>
-
   )
 } 

@@ -43,7 +43,7 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
                 src={item.image}
                 alt={item.name}
                 fill
-                className="p-0.5"
+                className="p-1"
               />
             )}
           </div>

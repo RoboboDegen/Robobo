@@ -39,8 +39,10 @@ const ScrollBar = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.S
       <div
         className="flex-1"
         style={{
-          backgroundImage: `url(${scrollbarTrackImage})` ,  // 使用传入的轨道图片
-          backgroundSize: "100% 100%", // 确保轨道图片完全填充区域
+          ...(scrollbarTrackImage && {
+            backgroundImage: `url(${scrollbarTrackImage})`,
+            backgroundSize: "100% 100%",
+          }),
           width: "100%",
           position: "absolute",
           top: 0,
@@ -51,8 +53,10 @@ const ScrollBar = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.S
         <ScrollAreaPrimitive.ScrollAreaThumb
           className="relative flex-1"
           style={{
-            backgroundImage: `url(${scrollbarThumbImage})`,  // 使用传入的滑块图片
-            backgroundSize: "100% 100%", // 确保滑块图片完全填充区域
+            ...(scrollbarThumbImage && {
+              backgroundImage: `url(${scrollbarThumbImage})`,
+              backgroundSize: "100% 100%",
+            }),
             width: "100%",
             minHeight: "60px", // 调整滑块高度
             cursor: "pointer",

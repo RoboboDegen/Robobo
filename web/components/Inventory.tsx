@@ -8,21 +8,15 @@ import { InfoBox } from "./inventory/info_box"
 import InventoryGrid from "./inventory/scrollbar"
 import { useGameData } from "@/context/GameDataProvider"
 import { Element } from "@/types"
+import AttributeBars from "./AttributeBars"
 
 export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => void }) {
     const [selectedItem, setSelectedItem] = useState<Element | null>(null)
     const { userInfo } = useGameData()
 
-
-
-    const attributes = useMemo(() => [
-        { name: "Attack", value: userInfo?.robot?.attack || 0, color: "bg-red-500" },
-        { name: "Energy", value: userInfo?.robot?.energy || 0, color: "bg-cyan-400" },
-
-        { name: "Speed", value: userInfo?.robot?.speed || 0, color: "bg-yellow-400" },
-        { name: "Personality", value: userInfo?.robot?.personality || 0, color: "bg-orange-400" }
-
-    ], [userInfo]);
+    const handleSelectItem = (item: EquipedItemProps) => {
+        console.log(item)
+    }
 
     const equippedItems: EquipedItemProps[] = [
         { id: "1", name: "Pistol", icon: "/gameui/inventory/test_gun.png" },
@@ -35,7 +29,7 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
             {/* Header */}
             <div className="flex items-center justify-start w-full">
                 <RoButton variant="inventory_back" onClick={handleInventoryBack}>
-                    <span className="translate-y-[-4.5px] text-[24px]">Back</span>
+                    <span className="text-[24px]">Back</span>
                 </RoButton>
             </div>
             <div className="w-full h-full self-end">
@@ -44,23 +38,25 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
                 <div className="flex justify-between h-full space-x-5">
                     {/* Equipment Section */}
                     <div className="flex flex-col justify-between w-8/12 gap-y-3">
-                        <EquipedBar equippedItems={equippedItems} />
+                        <EquipedBar equippedItems={equippedItems} onSelectItem={handleSelectItem} />
 
                         <div className="flex-1 relative self-end">
                             <div
-                                className="h-full"
+                                className="h-full w-full"
                                 style={{
                                     backgroundImage: `url(/gameui/inventory/inventory_section_bg.png)`,
                                     backgroundSize: "100% 100%",
                                     backgroundRepeat: "no-repeat",
                                 }}
+
                             >
-                                <div className="flex flex-col justify-between h-full p-2">
+                                <div className="flex flex-col justify-between h-full p-5">
                                     <InventoryGrid
                                         inventoryItems={userInfo?.ownedElement || []}
                                         selectedItem={selectedItem}
                                         setSelectedItem={setSelectedItem}
                                         className="flex-1"
+
                                     />
                                     <div className="self-end w-full py-2 px-1">
                                         <InfoBox selectedItem={selectedItem} />
@@ -76,32 +72,24 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
                         <div className="flex flex-col justify-start items-center">
                             <div
                                 className="w-32 h-32 mt-12"
-
                                 style={{
                                     backgroundImage: `url(/gameui/inventory/character_frame.png)`,
                                     backgroundSize: "contain",
                                     backgroundRepeat: "no-repeat",
                                     height: "140px",
+                                    zIndex: 1,
                                 }}
                             />
-                            <h2 className="text-lg text-[#ff3366] mb-2">{userInfo?.robot?.name}</h2>
+                            <h2 className="text-2xl font-bold text-[#ff3366] mb-2">{userInfo?.robot?.name}</h2>
                         </div>
 
                         {/* Attribute Bars */}
                         <div className="space-y-7">
-                            {attributes.map((attr, index) => (
-                                <AttributeBar
-                                    key={index}
-                                    name={attr.name}
-                                    value={attr.value}
-                                    color={attr.color}
-                                    width={120}
-                                    height={20}
-                                />
-                            ))}
+                            <AttributeBars attack={userInfo?.robot?.attack || 0} energy={userInfo?.robot?.energy || 0} speed={userInfo?.robot?.speed || 0} personality={userInfo?.robot?.personality || 0} width={120}/>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     )

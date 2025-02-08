@@ -30,10 +30,11 @@ export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
         
 
         {/* Bottom Buttons */}
-        <div className="flex gap-4">
+        <div className="flex">
           <RoButton variant="inventory" onClick={handleInventory}>
             Inventory
           </RoButton>
+
           <RoButton variant="fight" onClick={handleFight}>
             Fight
           </RoButton>

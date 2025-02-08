@@ -38,7 +38,7 @@ export interface UserInfo {
 
 
 export interface Message {
-    id: number
+    id?: number
     text: string
     sender: "user" | "ai"
     timestamp?: Date

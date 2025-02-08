@@ -66,11 +66,13 @@ export function AttributeBar({
              
             }}
           >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full flex items-center justify-center text-sm font-tiny5 text-white">
-              {Math.round(percentage)} {/* 显示百分比 */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 mr-2 w-4 h-4 rounded-full flex items-center justify-center text-lg font-bold font-tiny5 text-white">
+              {Math.round(percentage)+'%'} {/* 显示百分比 */}
             </div>
           </div>
+
         </div>
+
       </div>
 
       <div className="absolute left-0 w-full h-full flex items-center px-1" 

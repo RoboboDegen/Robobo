@@ -1,57 +1,57 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import Image from "next/image"
 import { RoButton } from "./ro_button";
 import { useGameData } from "@/context/GameDataProvider";
 import { ChatInput } from "./ChatInput";
 import { MessageList } from "./MessageList"
+import { Message } from "@/types";
 
 export interface ChattingProps {
-  handleSubmit: (message: string) => void;
   handleBack: () => void;
 }
 
-export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
-  const { messages, getMessage } = useGameData();
-  const scrollRef = useRef<HTMLDivElement>(null)
+
+export function Chatting({ handleBack }: ChattingProps) {
+  const { setMessage, messages, getMessage } = useGameData();
 
   useEffect(() => {
-    getMessage("0x1234567890123456789012345678901234567890");
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
-  }, [scrollRef, getMessage]) //Fixed unnecessary dependency
+    getMessage("1");
+  }, []);
 
+  const handleSubmit = (message: string) => {
+    const newMessage = {
+      id: 0,
+      text: message,
+      sender: "user" as "user" | "ai",
+    };
+    setMessage(newMessage);
+
+  };
 
   return (
-    <div className="flex flex-col items-center justify-between h-full relative">
+    <div className="flex flex-col w-full items-center justify-between h-full relative py-5">
+
       {/* Back Button */}
       <div className="flex items-center justify-start w-full">
-        <RoButton
-
-
-          variant="chat_back"
-          onClick={handleBack}
-        >
-          <span className="translate-y-[-13px] translate-x-[-1px] text-[24px]">Back</span>
+        <RoButton variant="chat_back" onClick={handleBack}>
+          <span className="text-[24px]">Back</span>
         </RoButton>
       </div>
-
       {/* Chat Panel */}
       <div className="flex flex-col justify-between w-full">
         <div
-          className="py-16 px-5 flex flex-col bg-[url('/gameui/chat/chatbox_panel.png')] bg-contain bg-no-repeat items-center justify-center"
+          className="pt-16 px-5 w-full flex flex-col bg-[url('/gameui/chat/chatbox_panel.png')] bg-contain bg-center bg-no-repeat items-center justify-center"
         >
-
-          <div>
-            <MessageList messages={messages} />
+          <div className="flex items-start justify-center w-full">
+            <MessageList displayMessage={messages} />
           </div>
-          <div className="w-full h-1 bg-[#00FFCC]" />
-          <ChatInput onSubmit={handleSubmit} className="w-full self-end" />
+          <div className="mb-10">
+            <ChatInput onSubmit={handleSubmit} />
+          </div>
         </div>
       </div>
-
     </div>
   )
 }

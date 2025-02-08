@@ -11,16 +11,23 @@ export interface EquipedItemProps {
 
 export interface EquipedBarProps {
     equippedItems: EquipedItemProps[]
+    onSelectItem: (item: EquipedItemProps) => void
 }
 
 
 
-export default function EquipedBar({ equippedItems }: EquipedBarProps) {
+
+export default function EquipedBar({ equippedItems, onSelectItem }: EquipedBarProps) {
     const [selectedItem, setSelectedItem] = useState<EquipedItemProps | null>(null)
 
+    const handleSelectItem = (item: EquipedItemProps) => {
+        setSelectedItem(item)
+        onSelectItem(item)
+    }
     return (
 
         <div className="flex flex-col">
+
             <h2 className="text-[#ff3366] text-[26px] mb-1">Equipped</h2>
             <div
                 className="relative h-full"
@@ -44,7 +51,7 @@ export default function EquipedBar({ equippedItems }: EquipedBarProps) {
                                 backgroundSize: "contain",
                                 backgroundRepeat: "no-repeat"
                             }}
-                            onClick={() => setSelectedItem(item)}
+                            onClick={() => handleSelectItem(item)}
                         >
                             {item.icon && (
                                 <Image
@@ -52,6 +59,7 @@ export default function EquipedBar({ equippedItems }: EquipedBarProps) {
                                     alt={item.name}
                                     fill
                                     sizes="100%"
+
                                     className="p-0.5"
                                 />
                             )}

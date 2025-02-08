@@ -18,8 +18,10 @@ interface GameDataContextType {
   battleRecords: BattleRecord | undefined;
   getUserInfo: (id: string) => Promise<void>;
   getMessage: (id: string) => Promise<void>;
+  setMessage: (message: Message) => Promise<void>;
   getBattleRecords: (robot: RobotConfig, mirror: MirrorConfig) => Promise<void>;
 }
+
 
 
 const GameDataContext = createContext<GameDataContextType | undefined>(
@@ -39,6 +41,20 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     setMessages(mockMessages);
   }, []);
 
+  const setMessage = useCallback(async (message: Message) => {
+    setMessages(prevMessages => {
+      const newMessages = [...prevMessages, message];
+      
+      const aiResponse: Message = {
+        text: `This is a response to: ${message.text}`,
+        sender: "ai",
+      };
+      
+      return [...newMessages, aiResponse];
+    });
+  }, []);
+
+
   const getBattleRecords = useCallback(async (robot: RobotConfig, mirror: MirrorConfig) => {
     setBattleRecords(await CalculateBattleRecords({attacker:robot,defender:mirror}));
   }, []);
@@ -56,6 +72,7 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         battleRecords,
         getUserInfo,
         getMessage,
+        setMessage,
         getBattleRecords,
       }}
 

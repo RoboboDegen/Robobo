@@ -48,7 +48,7 @@ export function GameUI() {
     return (
         <div className={cn(
             "absolute inset-0 pointer-events-auto",
-            "flex flex-col items-center justify-between p-4",
+            "flex flex-col items-center justify-between",
             "max-w-[360px] mx-auto", // 与游戏最大宽度匹配
         )}>
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
