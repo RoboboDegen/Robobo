@@ -1,14 +1,9 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { keccak256 } from "ethers";
 import { useGameData } from "@/context/GameDataProvider";
 import { RobotConfig } from "@/types";
-import { BattleRecords } from "./battle-records";
 
 interface BattleMockPageProps {
   attacker: RobotConfig;

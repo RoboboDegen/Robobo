@@ -1,31 +1,121 @@
 import { AttributeBar } from "./attribute-bar";
 import { HealthBar } from "./health-bar";
 import { BattleRecords } from "./battle-records";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useGameData } from "@/context/GameDataProvider";
 import Image from "next/image";
 import { usePopup } from "@/context/PopupProvider";
 import Battle from "./battleRecords";
-export function Fighting() {
-  const { userInfo, enemy, getEnemyFromMirrorPool } = useGameData();
+
+export function Fighting({ handleBackMain }: { handleBackMain: () => void }){
+  const { 
+    userInfo, 
+    enemy, 
+    getEnemyFromMirrorPool, 
+    battleRecords,
+    updateRobotEnergies 
+  } = useGameData();
   const { showPopup } = usePopup();
 
+  
+  // 派生状态：记录初始能量值作为最大生命值
+  const leftHealth = useMemo(
+    () => userInfo?.robot?.energy || 256,  // 使用初始能量或默认值
+    []  // 空依赖数组，只在组件挂载时计算一次
+  );
+
+  const rightHealth = useMemo(
+    () => enemy?.energy || 256,  // 使用敌人的初始能量
+    []  // 当敌人对象首次加载时更新，而不是跟踪 energy 的变化
+  );
+
+  // 监听战斗记录变化并更新能量值
   useEffect(() => {
+    if (battleRecords.length > 0) {
+      const lastRecord = battleRecords[battleRecords.length - 1];
+      if (lastRecord.includes("Final energy")) {
+        const match = lastRecord.match(/Attacker: (\d+), Defender: (\d+)/);
+        if (match) {
+          const attackerEnergy = parseInt(match[1]);
+          const defenderEnergy = parseInt(match[2]);
+          console.log('==== Battle Update ====');
+          console.log('Before update:', {
+            attacker: {
+              currentEnergy: userInfo?.robot?.energy,
+              maxEnergy: leftHealth
+            },
+            defender: {
+              currentEnergy: enemy?.energy,
+              maxEnergy: rightHealth
+            }
+          });
+          console.log('New values:', {
+            attackerEnergy,
+            defenderEnergy
+          });
+          if (userInfo?.robot?.energy !== attackerEnergy || enemy?.energy !== defenderEnergy) {
+            updateRobotEnergies(attackerEnergy, defenderEnergy);
+          }
+        }
+      }
+    }
+  }, [battleRecords]);
+
+  // 在组件挂载时输出初始状态
+  useEffect(() => {
+    console.log('==== Initial Fighting State ====');
+    console.log('User Robot:', {
+      currentEnergy: userInfo?.robot?.energy,
+      maxEnergy: leftHealth
+    });
+    console.log('Enemy Robot:', {
+      currentEnergy: enemy?.energy,
+      maxEnergy: rightHealth
+    });
+  }, []); // 只在组件挂载时运行
+
+  // 监听能量值变化
+  useEffect(() => {
+    console.log('==== Energy Update ====');
+    console.log('Current State:', {
+      userRobot: {
+        currentEnergy: userInfo?.robot?.energy,
+        maxEnergy: leftHealth
+      },
+      enemy: {
+        currentEnergy: enemy?.energy,
+        maxEnergy: rightHealth
+      }
+    });
+  }, [userInfo?.robot?.energy, enemy?.energy]);
+
+  // 检查战斗结果并显示弹窗
+  useEffect(() => {
+    const attackerEnergy = userInfo?.robot?.energy;
+    const defenderEnergy = enemy?.energy;
     
-    if (userInfo?.robot?.energy !== undefined && userInfo.robot.energy === 128) {
+    if (attackerEnergy === 128 && !showPopupCalled.current) {
+      showPopupCalled.current = true;
       showPopup("Oh no! You lost the battle!", () => {
-        
+        showPopupCalled.current = false;
+        handleBackMain();
       });
-    } else if (enemy?.energy !== undefined && enemy.energy === 128) {
+    } else if (defenderEnergy === 128 && !showPopupCalled.current) {
+      showPopupCalled.current = true;
       showPopup("恭喜! You won the battle!", () => {
+        showPopupCalled.current = false;
+        handleBackMain();
       });
     }
-  }, [userInfo, enemy, showPopup]);
+  }, [userInfo?.robot?.energy, enemy?.energy, handleBackMain, showPopup]); // 添加必要的依赖
+
+  // 添加一个 ref 来追踪弹窗是否已经显示
+  const showPopupCalled = useRef(false);
 
   useEffect(() => {
     // 调用获取敌人数据的方法
     getEnemyFromMirrorPool("0x1234567890123456789012345678901234567890");
-  }, [getEnemyFromMirrorPool]);
+  }, []);  // 移除不必要的依赖
 
   const leftAttributes = useMemo(
     () => [
@@ -68,14 +158,6 @@ export function Fighting() {
     ],
     [enemy]
   );
-
-  // 派生状态：通过 useMemo 来计算健康值
-  const leftHealth = useMemo(
-    () => userInfo?.robot?.energy || 0,
-    [userInfo?.robot?.energy]
-  );
-
-  const rightHealth = useMemo(() => enemy?.energy || 0, [enemy?.energy]);
 
   return (
     <div className="">

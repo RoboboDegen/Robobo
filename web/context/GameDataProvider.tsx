@@ -19,6 +19,7 @@ interface GameDataContextType {
   getUserInfo: (id: string) => Promise<void>;
   getMessage: (id: string) => Promise<void>;
   setBattleRecords: (logs: string[]) => void;
+  updateRobotEnergies: (attackerEnergy: number, defenderEnergy: number) => void;
 }
 
 const GameDataContext = createContext<GameDataContextType | undefined>(
@@ -43,6 +44,27 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     setMessages(mockMessages);
   }, []);
 
+  const updateRobotEnergies = useCallback((attackerEnergy: number, defenderEnergy: number) => {
+    setUserInfo(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        robot: {
+          ...prev.robot,
+          energy: attackerEnergy
+        }
+      };
+    });
+
+    setEnemy(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        energy: defenderEnergy
+      };
+    });
+  }, []);
+
   return (
     <GameDataContext.Provider
       value={{
@@ -54,6 +76,7 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         getUserInfo,
         getMessage,
         setBattleRecords,
+        updateRobotEnergies,
       }}
     >
       {children}

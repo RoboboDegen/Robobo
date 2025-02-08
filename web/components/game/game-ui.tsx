@@ -36,10 +36,7 @@ export function GameUI() {
     const handleChatSubmit = (message: string) => {
         console.log(message);
     }
-    const handleChatBack = () => {
-        setUIState(GameUIState.MAIN_MENU);
-    }
-    const handleInventoryBack = () => {
+    const handleBackMain = () => {
         setUIState(GameUIState.MAIN_MENU);
     }
 
@@ -57,9 +54,9 @@ export function GameUI() {
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
             {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home handleChat={handleChat} handleFight={handleFight} handleInventory={handleInventory} />}
-            {gameState.uiState === GameUIState.INVENTORY && <Inventory  handleInventoryBack={handleInventoryBack}/>}
-            {gameState.uiState === GameUIState.FIGHTING && <Fighting />}
-            {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleChatBack} />}
+            {gameState.uiState === GameUIState.INVENTORY && <Inventory  handleInventoryBack={handleBackMain}/>}
+            {gameState.uiState === GameUIState.FIGHTING && <Fighting handleBackMain={handleBackMain}/>}
+            {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleBackMain} />}
         </div>
     );
 } 
