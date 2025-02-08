@@ -2,16 +2,22 @@
 import Image from "next/image";
 import { GameUIState } from "@/hooks/use-game-store";
 import { RoButton } from "./ro_button";
+import { triggerEvent } from "@/lib/utils";
 
 export interface ConnectingProps {
   setUIState: (state: GameUIState) => void;
 }
 
-
 export function Connecting({ setUIState }: ConnectingProps) {
+  const handleConnect = () => {
+    triggerEvent('SCENE_READY', { sceneName: 'GameTestScene' });
+    setUIState(GameUIState.MAIN_MENU);
+  }
+
   return (
     <div className="flex flex-col items-center justify-between h-full">
       {/* Logo区域 */}
+
       <div className="flex">
         <Image
           src="/gameui/login/logo_robot_icon.png"
@@ -37,10 +43,11 @@ export function Connecting({ setUIState }: ConnectingProps) {
       {/* 按钮区域 - 固定在底部 */}
       <div className="">
         {/* <SuiConnectButton/> */}
-        <RoButton variant="mint_bottom" onClick={() => setUIState(GameUIState.MINT)} >
+        <RoButton variant="mint_bottom" onClick={handleConnect} >
           Connect Wallet
         </RoButton>
       </div>
     </div>
+
   );
 }

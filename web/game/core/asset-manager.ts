@@ -2,10 +2,11 @@ import { GAME_ASSETS_DATA } from '../config/assets';
 import { GameManager } from './game-manager';
 
 type ImageKeys = (typeof GAME_ASSETS_DATA.images)[number]['key'];
-type SpriteKeys = (typeof GAME_ASSETS_DATA.spritesheets)[number]['key'];
+type SpriteKeys = (typeof GAME_ASSETS_DATA.aseprites)[number]['key'];
 type AnimationKeys = (typeof GAME_ASSETS_DATA.animations)[number]['key'];
 type AudioKeys = (typeof GAME_ASSETS_DATA.audio)[number]['key'];
 type EffectKeys = (typeof GAME_ASSETS_DATA.effects)[number]['key'];
+
 
 export class AssetManager {
   private scene: Phaser.Scene;
@@ -50,7 +51,7 @@ export class AssetManager {
     }
 
     const sprite = this.scene.add.sprite(0, 0, key);
-    sprite.setAlpha(0.5);
+    sprite.setAlpha(1);
     return sprite;
   }
 
@@ -77,7 +78,15 @@ export class AssetManager {
     GameManager.getInstance(this.scene).audio.playBGM(key);
   }
 
+  public stopSound() {
+    if (!this.scene) return;
+    GameManager.getInstance(this.scene).audio.stopAll();
+  }
+
+
+
   // 检查资源是否已加载
+
   public isAssetLoaded(key: string): boolean {
     return this.scene?.textures.exists(key) || false;
   }

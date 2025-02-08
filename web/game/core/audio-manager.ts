@@ -9,6 +9,7 @@ export class AudioManager {
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.sounds = new Map();
+    
   }
 
   public loadSounds(audioConfigs: AudioConfig[]) {
@@ -19,6 +20,7 @@ export class AudioManager {
           volume: config.volume ?? 1
         });
         this.sounds.set(config.key, sound);
+        (sound as Phaser.Sound.WebAudioSound).setVolume(config.volume ?? 1)
       }
     });
   }
@@ -39,7 +41,7 @@ export class AudioManager {
     if (bgm) {
       this.currentBGM = bgm;
       if (fadeIn) {
-        (bgm as Phaser.Sound.WebAudioSound).volume = 0;
+        (bgm as Phaser.Sound.WebAudioSound).volume = 0.25;
         bgm.play();
         this.scene.tweens.add({
           targets: bgm,

@@ -1,16 +1,16 @@
 import { ImageObject } from "./image";
 
 export class Background extends ImageObject {
-    constructor(scene: Phaser.Scene, texture: string) {
+    constructor(scene: Phaser.Scene,key: string) {
       super({
         scene,
-        texture,
         x: scene.cameras.main.centerX,
-        y: scene.cameras.main.centerY
-      });
+        y: scene.cameras.main.centerY,
+      }, key);
       this.setOrigin(0.5);
       this.setupBounds();
     }
+
   
     private setupBounds(): void {
       if (!this.gameObject) return;
@@ -32,5 +32,15 @@ export class Background extends ImageObject {
         worldWidth,
         worldHeight
       );
+    }
+
+    public setBackground(key: string): void {
+      const oldGameObject = this.gameObject;
+      this.gameObject = this.assetManager.getImage(key);
+      if (oldGameObject) {
+        this.gameObject?.setPosition(oldGameObject.x, oldGameObject.y);
+        this.gameObject?.setDepth(-1); // Set depth for new background
+        oldGameObject.destroy();
+      }
     }
   }

@@ -1,3 +1,5 @@
+import { ImageKey } from "../config/assets";
+
 /**
  * 基础事件数据接口
  * 所有事件数据都会继承这个接口
@@ -19,9 +21,54 @@ export interface CoreEventData {
   SCENE_RESUME: BaseEventData & { sceneName: string };
 }
 
+export enum SceneEventTypes{
+  changeBackground = 'changeBackground',
+  cameraFocusOn = 'cameraFocusOn',
+  cameraReset = 'cameraReset',
+  cameraShake = 'cameraShake',
+}
+
+export enum RobotEventTypes{
+  idle = 'idle',
+  defence = 'defence',
+  underattack = 'underattack',
+  win = 'win',
+  lose = 'lose',
+  hit = 'hit',
+}
+
+export enum AudioEventTypes{
+  play = 'play',
+  playBGM = 'playBGM',
+  stopAll = 'stopAll',
+}
+
+
+
+
+export interface GameLogicEventData {
+  /** 游戏逻辑事件 */
+  SCENE: {type:SceneEventTypes,background?:ImageKey};
+  ROBOT: {type:RobotEventTypes,robotId?:string};
+  AUDIO: {type:AudioEventTypes,audioKey?:string};
+}
+
+
+
+export interface PlayerEventData {
+  /** 玩家移动事件 */
+
+  PLAYER_MOVE: BaseEventData & { x: number; y: number };
+  /** 玩家攻击事件 */
+  PLAYER_ATTACK: BaseEventData;
+}
+
+
+
 /**
  * 资源事件数据
  * 包含资源加载相关的事件
+
  */
 export interface AssetEventData {
   /** 资源加载进度事件 */
@@ -52,9 +99,15 @@ export interface AssetEventData {
  */
 export interface GameEventData extends 
   CoreEventData,
-  AssetEventData {
+  AssetEventData,
+  PlayerEventData,
+  GameLogicEventData {
   // 可以继续添加其他事件类型
 }
+
+
+
+
 
 /**
  * 获取所有事件名称的联合类型

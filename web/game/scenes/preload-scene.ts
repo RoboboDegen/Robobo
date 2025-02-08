@@ -20,11 +20,12 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(img.key, img.path);
     });
 
-    GAME_ASSETS_DATA.spritesheets.forEach(sprite => {
-      if(sprite.key && sprite.path && sprite.frameConfig){
-        this.load.spritesheet(sprite.key, sprite.path, sprite.frameConfig);
+    GAME_ASSETS_DATA.aseprites.forEach(sprite => {
+      if(sprite.key && sprite.imagePath && sprite.spritePath){
+        this.load.aseprite(sprite.key, sprite.imagePath, sprite.spritePath);
       }
     });
+
 
     GAME_ASSETS_DATA.audio.forEach(audio => {
       if (audio.key && audio.path) {

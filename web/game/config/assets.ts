@@ -3,17 +3,17 @@ export interface AssetConfig {
     path: string;
 }
 
-export interface SpritesheetConfig extends AssetConfig {
-    frameConfig: {
-        frameWidth: number;
-        frameHeight: number;
-    };
+export interface AsepriteConfig {
+    key: string;
+    imagePath: string;
+    spritePath: string;
 }
 
 export interface AnimationConfig {
     key: string;
-    spritesheet: string;
-    frames: string[];
+    frames: {
+        key: string;
+    };
     frameRate?: number;
     repeat?: number;
 }
@@ -33,79 +33,90 @@ export interface EffectConfig {
 // 定义资源数据结构
 export interface GameAssetsData {
     images: AssetConfig[];
-    spritesheets: SpritesheetConfig[];
+    aseprites: AsepriteConfig[];
     audio: AudioConfig[];
     animations: AnimationConfig[];
     effects: EffectConfig[];
+
 }
 
 // 导出实际数据（可以逐步添加）
 export const GAME_ASSETS_DATA: GameAssetsData = {
     images: [
-        { key: 'testBackground', path: '/images/testBackground.webp' },
+        { key: 'homeBackground', path: '/gameui/home/background_scene.png' },
+        { key: 'loginBackground', path: '/gameui/login/background_scene.png' },
+        { key: 'mintBackground', path: '/gameui/mint/background_scene.png' },
+        { key: 'pkBackground', path: '/gameui/pk/background_scene.png' },
+        { key: 'inventoryBackground', path: '/gameui/inventory/background_scene.png' },
+        { key: 'chatBackground', path: '/gameui/chat/background_scene.png' },
     ],
-
-    spritesheets: [
-        // 可以为空或添加资源
-        // { 
-        //   key: 'player', 
-        //   path: '/sprites/player.png', 
-        //   frameConfig: { 
-        //     frameWidth: 32, 
-        //     frameHeight: 48 
-        //   } 
-        // }
-        { 
-          key: 'player', 
-          path: '/robobo/baseRobot.png', 
-          frameConfig: { 
-            frameWidth: 90, 
-            frameHeight: 128 
-          } 
-        }
+    aseprites: [
+        { key: 'baseRobot', imagePath: '/robobo/robobo.png', spritePath: '/robobo/robobo.json'},
     ],
-
     audio: [
-        // 可以为空或添加资源
-        // { 
-        //   key: 'bgm', 
-        //   path: '/audio/bgm.mp3', 
-        //   loop: true, 
-        //   volume: 0.7 
-        // }
-    ],
-
-    animations: [
-        // 可以为空或添加资源
-        // { 
-        //   key: 'player-walk',
-        //   spritesheet: 'player',
-        //   frames: ['0', '1', '2', '3'],
-        //   frameRate: 10,
-        //   repeat: -1
-        // }
-        { 
-          key: 'player-jump',
-          spritesheet: 'player',
-          frames: ['0', '1', '2', '3','4','5'],
-          frameRate: 10,
-          repeat: -1
+        {
+            key: 'bgm',
+            path: '/music/bgm.mp3',
+            loop: true,
+            volume: 0.5
+        },
+        {
+            key: 'click',
+            path: '/music/click.mp3',
+            loop: false,
+            volume: 0.5
         }
     ],
-
-    effects: [
-        // 可以为空或添加资源
-        // {
-        //   key: 'explosion',
-        //   spritesheet: 'effects',
-        //   frames: ['0', '1', '2', '3'],
-        // }
-    ]
-}; 
+    animations: [
+        {
+            key: 'idle',
+            frames: { key: 'baseRobot' },
+            repeat: -1,
+            frameRate: 10
+        },
+        {
+            key: 'hit',
+            frames: { key: 'baseRobot' },
+            repeat: 2,
+            frameRate: 10
+        },
+        {
+            key: 'underattack',
+            frames: { key: 'baseRobot' },
+            repeat: 0,
+            frameRate: 10
+        },
+        {
+            key: 'defence',
+            frames: { key: 'baseRobot' },
+            repeat: 0,
+            frameRate: 10
+        },
+        {
+            key: 'win',
+            frames: { key: 'baseRobot' },
+            repeat: 0,
+            frameRate: 10
+        },
+        {
+            key: 'chat',
+            frames: { key: 'baseRobot' },
+            repeat: 0,
+            frameRate: 10
+        },
+        {
+            key: 'defeated',
+            frames: { key: 'baseRobot' },
+            repeat: 0,
+            frameRate: 10
+        }
+    ],
+    effects: []
+};
 
 // 导出资源键名类型
 export type ImageKey = typeof GAME_ASSETS_DATA.images[number]['key'];
-export type SpriteKey = typeof GAME_ASSETS_DATA.spritesheets[number]['key'];
+export type SpriteKey = typeof GAME_ASSETS_DATA.aseprites[number]['key'];
 export type AnimationKey = typeof GAME_ASSETS_DATA.animations[number]['key'];
 export type AudioKey = typeof GAME_ASSETS_DATA.audio[number]['key'];
 export type EffectKey = typeof GAME_ASSETS_DATA.effects[number]['key']; 
