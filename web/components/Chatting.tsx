@@ -16,7 +16,7 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
   const { messages, getMessage } = useGameData();
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => { 
+  useEffect(() => {
     getMessage("0x1234567890123456789012345678901234567890");
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -25,47 +25,30 @@ export function Chatting({ handleSubmit, handleBack }: ChattingProps) {
 
 
   return (
-    <div className="flex flex-col items-center min-h-screen relative pt-16 w-[430px]">
+    <div className="flex flex-col items-center justify-between min-h-screen relative py-5">
       {/* Back Button */}
-      <div className="flex items-center justify-start w-full mr-4 ">   
-      <RoButton 
-        variant="chat_back" 
-        className="absolute top-2 left-1 flex items-center justify-center" 
-        onClick={handleBack}
-      >
-        <span className="translate-y-[-13px] translate-x-[-1px] text-[24px]">Back</span>
-      </RoButton>
-      </div>
-   
-      {/* Character Frame with Robot */}
-      <div className="flex justify-center mb-4">
-        <Image
-          src="/gameui/chat/character_frame.png"
-          alt="Frame"
-          width={160}
-          height={160}
-          className="w-40 h-40"
-        />
+      <div className="flex items-center justify-start w-full">
+        <RoButton
+
+          variant="chat_back"
+          onClick={handleBack}
+        >
+          <span className="translate-y-[-13px] translate-x-[-1px] text-[24px]">Back</span>
+        </RoButton>
       </div>
 
       {/* Chat Panel */}
-      <div className="flex justify-center w-full">
-      <div
-        className="flex flex-col relative w-[355px]"
-        style={{
-          backgroundImage: `url(/gameui/chat/chatbox_panel.png)`,
-          backgroundSize: "100% 100%",
-          padding: "50px 30px 40px 20px",
-          height: "525px",
-        }}
-      >
-        <MessageList messages={messages} />
-        
-        <div className="absolute bottom-[40px] left-4 right-4">
-          <div className="w-full h-[5px] bg-[#00FFCC] translate-y-[-20px]"/>
-          <ChatInput onSubmit={handleSubmit} className="w-full" />
+      <div className="flex flex-col justify-between w-full pb-10">
+        <div
+          className="w-full py-16 px-5 flex flex-col bg-[url('/gameui/chat/chatbox_panel.png')] bg-contain bg-no-repeat items-center justify-center"
+        >
+
+          <div>
+            <MessageList messages={messages} />
+          </div>
+          <div className="w-full h-1 bg-[#00FFCC]" />
+          <ChatInput onSubmit={handleSubmit} className="w-full self-end" />
         </div>
-      </div>
       </div>
 
     </div>

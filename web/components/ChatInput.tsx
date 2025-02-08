@@ -18,17 +18,20 @@ export function ChatInput({ onSubmit, className }: ChatInputProps) {
   }
 
   return (
-    <div className={`flex gap-2 ${className || ''}`}>
+    <div className="flex gap-2 items-center justify-center">
       <input
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="flex-1 bg-[#2a2a3a] text-white rounded-lg px-3 py-2 font-tiny5 text-sm translate-y-[-15px]"
+        className="flex-1 bg-[#2a2a3a] text-white rounded-lg px-3 font-tiny5 text-sm"
         placeholder="Type your message..."
       />
+      <div className="pt-4">
       <RoButton type="submit" variant="chat_send" onClick={handleSubmit}>
-      <span className="translate-y-[-10px]">Send</span>
+        <span className="translate-y-[-10px]">Send</span>
       </RoButton>
+      </div>
+      
     </div>
   )
 } 

@@ -46,10 +46,15 @@ const RoButton = React.forwardRef<HTMLButtonElement, RoButtonProps>(
           "[&:hover]:scale-105",
           "font-tiny5",
           "transition-transform duration-200",
-          "flex justify-center items-center text-center" // 保证按钮文字居中
+          "flex justify-center items-center text-center",
+          "text-white",
+          "pb-2",
+          "[text-shadow:_-2px_-2px_0_#000,_2px_-2px_0_#000,_-2px_2px_0_#000,_2px_2px_0_#000]",
         )}
         ref={ref}
         {...props}
+
+
       >
         {children || null}
       </Comp>

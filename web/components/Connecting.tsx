@@ -16,7 +16,7 @@ export function Connecting({ setUIState }: ConnectingProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between h-full">
+    <div className="flex flex-col items-center justify-between h-full py-5">
       {/* Logo区域 */}
 
       <div className="flex">

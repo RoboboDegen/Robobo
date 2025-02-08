@@ -135,6 +135,26 @@ const mockMessages: Message[] = [
         text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
         sender: "user",
     },
+    {
+        id: 7,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
+    },{
+        id: 8,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
+
+    },{
+        id: 9,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
+
+    },{
+        id: 10,
+        text: "ABCDEFGrgtsgdfthfth123456 S12435536rgrdshththh.",
+        sender: "user",
+    },
+
 
 ];
 

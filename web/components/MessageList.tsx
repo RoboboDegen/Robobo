@@ -4,7 +4,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Message } from "@/types"
 
 
-interface MessageListProps {  
+interface MessageListProps {
   messages: Message[]
 }
 
@@ -18,40 +18,37 @@ export function MessageList({ messages }: MessageListProps) {
   }, [scrollRef])
 
   return (
-      <ScrollArea className="h-[600px] rounded-md"> 
+    <ScrollArea className="h-[280px] rounded-md">
       <div className="flex flex-col">
-      {messages.map((message) => (
-        <div key={message.id} className="flex items-start gap-1.5">
-          <Image
-            src={
-              message.sender === "user"
-                ? "/gameui/chat/chatbox_user_icon.png"
-                : "/gameui/chat/chatbox_robot_icon.png"
-            }
-            alt={message.sender}
-            width={24}
-            height={24}
-            className="mt-1"
-          />
+        {messages.map((message) => (
+          <div key={message.id} className="flex items-start gap-1.5">
+            <Image
+              src={
+                message.sender === "user"
+                  ? "/gameui/chat/chatbox_user_icon.png"
+                  : "/gameui/chat/chatbox_robot_icon.png"
+              }
+              alt={message.sender}
+              width={24}
+              height={24}
+              className="mt-1"
+            />
 
-          <div className="flex-1 px-1 py-1">
-            <p className={`font-tiny5 break-words whitespace-pre-wrap ${
-              message.sender === "user" ? "text-white" : "text-[#00ffcc]"
-            }`}>
-              {message.text}
-            </p>
+            <div className="flex-1 px-1 py-1">
+              <p className={`font-tiny5 break-words whitespace-pre-wrap ${message.sender === "user" ? "text-white" : "text-[#00ffcc]"
+                }`}>
+                {message.text}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       </div>
-
-
-      <ScrollBar 
-        orientation="vertical" 
-        scrollbarTrackImage="/gameui/pk/info_scrollbar_track.png" 
+      <ScrollBar
+        orientation="vertical"
+        scrollbarTrackImage="/gameui/pk/info_scrollbar_track.png"
         scrollbarThumbImage="/gameui/pk/info_scrollbar_thumb.png"
       />
-      </ScrollArea>
-    
+    </ScrollArea>
+
   )
 } 

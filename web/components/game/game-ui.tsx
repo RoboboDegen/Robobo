@@ -49,7 +49,7 @@ export function GameUI() {
         <div className={cn(
             "absolute inset-0 pointer-events-auto",
             "flex flex-col items-center justify-between p-4",
-            "max-w-[720px] mx-auto", // 与游戏最大宽度匹配
+            "max-w-[360px] mx-auto", // 与游戏最大宽度匹配
         )}>
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
             {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}

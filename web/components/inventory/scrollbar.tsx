@@ -10,16 +10,20 @@ interface InventoryGridProps {
   inventoryItems: Element[]
   selectedItem: Element | null
   setSelectedItem: (item: Element) => void
+  className?: string
 }
+
 
 const InventoryGrid: React.FC<InventoryGridProps> = ({
   inventoryItems,
   selectedItem,
   setSelectedItem,
+  className
 }) => {
   return (
-    <ScrollArea className="h-64 whitespace-nowrap rounded-md">
-      <div className="grid grid-cols-3 gap-2 pr-3">
+    <div className={className}>
+    <ScrollArea className="whitespace-nowrap rounded-md">
+      <div className="grid grid-cols-3 gap-2">
         {inventoryItems.map((item) => (
           <div
             key={item.id}
@@ -49,7 +53,9 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
       scrollbarTrackImage="/gameui/inventory/inventory_scrollbar_track.png"
       scrollbarThumbImage="/gameui/inventory/inventory_scrollbar_thumb.png"/>
     </ScrollArea>
+    </div>
   )
 }
+
 
 export default InventoryGrid

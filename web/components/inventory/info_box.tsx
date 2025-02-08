@@ -7,15 +7,15 @@ export interface InfoBoxProps {
 export function InfoBox({ selectedItem }: InfoBoxProps) {
   return (
 
-    <div className="w-[170px] h-[94px] bg-[url('/gameui/inventory/info_box.png')] bg-cover flex flex-col justify-center">
-      <span className="text-white text-left text-[14px] mt-2 py-0.5 pl-6">
-        {selectedItem?.name}
+    <div className="w-full h-full bg-[url('/gameui/inventory/info_box.png')] bg-contain bg-no-repeat px-4 py-10 flex flex-col justify-start">
+      <span className="text-white text-left text-[14px]">
+        {selectedItem?.name ?? "no item"}
       </span>
-      {selectedItem?.value && (
-        <span className="text-white text-left text-[14px] pl-6">
-          Damage + {selectedItem.value}
+        <span className="text-white text-left text-[14px]">
+          Damage + {selectedItem?.value ?? 0}
+
         </span>
-      )}
     </div>
+
   )
 }

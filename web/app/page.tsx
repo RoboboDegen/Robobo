@@ -17,9 +17,9 @@ export default function Home() {
         <GameView />
         {gameState.uiState !== GameUIState.LOADING && <GameUI />}
       </ResponsiveContainer>
-      <div className='absolute bottom-50 right-10 bg-black/50 rounded-t-lg p-2'>
+      {/* <div className='absolute bottom-50 right-10 bg-black/50 rounded-t-lg p-2'>
         <DebugPanel />
-      </div>
+      </div> */}
     </div>
 
 
