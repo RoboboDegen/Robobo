@@ -102,12 +102,50 @@ export class ChatService {
         return basePrompt;
     }
 
+    private async detectLanguage(text: string): Promise<string> {
+        // 简单的语言检测逻辑
+        const chineseRegex = /[\u4e00-\u9fa5]/;
+        const japaneseRegex = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/;
+        const koreanRegex = /[\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F]/;
+        
+        if (chineseRegex.test(text)) {
+            return 'zh';
+        } else if (japaneseRegex.test(text)) {
+            return 'ja';
+        } else if (koreanRegex.test(text)) {
+            return 'ko';
+        }
+        return 'en';
+    }
+
     public async generateChat(
         message: string,
         systemPrompt: string,
         onChunk?: (chunk: string) => void
     ): Promise<string> {
         try {
+            // 检测用户输入的语言
+            const detectedLang = await this.detectLanguage(message);
+            
+            // 根据检测到的语言添加语言指示
+            let languageInstruction = '';
+            switch (detectedLang) {
+                case 'zh':
+                    languageInstruction = '请使用中文回复。';
+                    break;
+                case 'ja':
+                    languageInstruction = '日本語で返信してください。';
+                    break;
+                case 'ko':
+                    languageInstruction = '한국어로 답변해 주세요.';
+                    break;
+                default:
+                    languageInstruction = 'Please reply in English.';
+            }
+
+            // 在系统提示中添加语言指示
+            const updatedSystemPrompt = `${systemPrompt}\n\n${languageInstruction}`;
+
             const response = await fetch(this.API_URL, {
                 method: 'POST',
                 headers: {
@@ -120,7 +158,7 @@ export class ChatService {
                     messages: [
                         {
                             role: 'system',
-                            content: systemPrompt
+                            content: updatedSystemPrompt
                         },
                         {
                             role: 'user',
