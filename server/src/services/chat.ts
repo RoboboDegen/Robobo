@@ -165,7 +165,7 @@ export class ChatService {
                             content: message
                         }
                     ],
-                    max_tokens: 4096
+                    max_tokens: 8192
                 })
             });
 
@@ -257,7 +257,7 @@ export class ChatService {
                             content: evaluationPrompt
                         }
                     ],
-                    max_tokens: 4096
+                    max_tokens: 8192
                 })
             });
 
@@ -340,7 +340,7 @@ export class ChatService {
                             content: evaluationPrompt
                         }
                     ],
-                    max_tokens: 4096
+                    max_tokens: 8192
                 })
             });
 
