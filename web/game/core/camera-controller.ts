@@ -43,8 +43,34 @@ export class CameraController {
     });
   }
 
+  public focusOnBattle() {
+    this.moveTo({
+      x: this.camera.centerX,
+      y: this.camera.centerY,
+      zoom: 2,
+    });
+  }
+
+
+  public focusOnInventory() {
+    this.moveTo({
+      x: this.camera.centerX-50,
+      y: this.camera.centerY+75,
+      zoom: 2,
+    });
+  }
+
+
+  public focusOnChat(target: Phaser.GameObjects.Sprite | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | Phaser.GameObjects.Components.Transform, zoom: number = 1) {
+    this.moveTo({
+      x: target.x,
+      y: target.y+20,
+      zoom: zoom,
+    });
+  }
   public reset() {
     this.moveTo({
+
       x: this.camera.centerX,
       y: this.camera.centerY,
       zoom: 1

@@ -12,14 +12,14 @@ export default function Home() {
   const { gameState } = useGameStore();
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
+    <div className="w-full flex items-center justify-center">
       <ResponsiveContainer>
         <GameView />
         {gameState.uiState !== GameUIState.LOADING && <GameUI />}
       </ResponsiveContainer>
-      {/* <div className='absolute bottom-50 right-10 bg-black/50 rounded-t-lg p-2'>
+      <div className='absolute bottom-50 right-10 bg-black/50 rounded-t-lg p-2'>
         <DebugPanel />
-      </div> */}
+      </div>
     </div>
 
 

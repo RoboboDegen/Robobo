@@ -44,6 +44,7 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({
                 alt={item.name}
                 fill
                 className="p-1"
+                sizes="100px"
               />
             )}
           </div>

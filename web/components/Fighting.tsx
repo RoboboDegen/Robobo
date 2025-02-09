@@ -8,6 +8,8 @@ import { usePopup } from "@/context/PopupProvider";
 import { MirrorConfig, RobotConfig } from "@/types";
 import { mockMirrorConfig } from "@/mock";
 import AttributeBars from "./AttributeBars";
+import { SceneEventTypes } from "@/game/core/event-types";
+import { triggerEvent } from "@/lib/utils";
 
 
 
@@ -35,19 +37,25 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
             setDefender(battleRecords.defender);
             setAttackerMaxEnergy(battleRecords.attacker.energy);
             setDefenderMaxEnergy(battleRecords.defender.energy);
-
-
         }
         if (userInfo?.robot) {
             getBattleRecords(userInfo.robot, mockMirrorConfig);
         }
-
-
     }, [])
+
+
+    const handleOnFinish = () => {
+        // showPopup("战斗结束", () => {
+        //     handleBackMain();
+        // }, () => {
+        //     handleBackMain();
+        // });
+    }
 
 
     return (
         <div className="flex flex-col h-full items-center justify-between p-5 max-w-[360px]">
+
             {/* Health Bars */}
             <div className="flex justify-between items-center space-x-10">
                 <div className="w-20">
@@ -88,13 +96,9 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
                             width: "100%",
                         }}
                     >
-                        <BattleRecords record={battleRecords?.rounds || []} onFinish={() => {
-                            showPopup("战斗结束", () => {
-                                handleBackMain();
-                            }, () => {
-                                handleBackMain();
-                            });
-                        }} />
+                        <BattleRecords record={battleRecords?.rounds || []} onFinish={handleOnFinish} />
+
+
 
 
                     </div>

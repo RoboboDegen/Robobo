@@ -5,7 +5,7 @@ interface ResponsiveContainerProps {
 export function ResponsiveContainer({ children }: ResponsiveContainerProps) {
   return (
     <div className="relative w-full h-dvh  flex items-center justify-center bg-white">
-      <div className="relative w-full h-full  max-w-[720px] max-h-[calc(100dvh-2rem)]">
+      <div className="relative w-full h-full  max-w-[720px] max-h-[900px]">
         <div 
           className="absolute inset-0"
 

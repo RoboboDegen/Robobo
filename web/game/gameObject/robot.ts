@@ -1,4 +1,4 @@
-import { RobotConfig } from "@/types";
+import { MirrorConfig, RobotConfig } from "@/types";
 import { GameObject, GameObjectConfig } from "../core/game-object";
 import { FSM } from "../core/fsm";
 
@@ -9,15 +9,16 @@ export class RobotObject extends GameObject {
     protected baseSprite?: Phaser.GameObjects.Sprite;
     private fsm: FSM<RobotState>;
     private currentAnimation?: string;
-    private robotConfig: RobotConfig;
+    private robotConfig: RobotConfig | MirrorConfig;
 
-    constructor(config: GameObjectConfig, robot_config: RobotConfig) {
+    constructor(config: GameObjectConfig, robot_config: RobotConfig | MirrorConfig) {
         super(config);
         this.robotConfig = robot_config;
         // 创建基础机器人精灵
         this.baseSprite = this.assetManager.getSprite('baseRobot');
         this.baseSprite?.setPosition(config.x ?? 0, config.y ?? 0);
         this.baseSprite?.setOrigin(0.5, 0.5);
+        this.baseSprite?.setDepth(100);
         
 
         // 根据机器人名字设置颜色
@@ -99,9 +100,9 @@ export class RobotObject extends GameObject {
         // 使用哈希值生成 0-1 之间的色相值
         const hue = ((hash % 360) + 360) / 360;
         
-        // 添加一些随机性到饱和度和亮度，但保持在合理范围内
-        const s = saturation + (hash % 20 - 10) / 100;
-        const l = lightness + (hash % 20 - 10) / 100;
+        // 提高饱和度和亮度的基准值和范围
+        const s = Math.min(1.0, Math.max(0.8, saturation + (hash % 10) / 100));
+        const l = Math.min(0.7, Math.max(0.5, lightness + (hash % 10) / 100));
         
         // 转换 HSL 到 RGB
         return this.hslToRgb(hue, s, l);
@@ -160,5 +161,10 @@ export class RobotObject extends GameObject {
 
     public getRobotId(): string {
         return this.robotConfig.id;
+    }
+
+    public setFlipX(flip: boolean): this {
+        this.sprite.setFlipX(flip);
+        return this;
     }
 }

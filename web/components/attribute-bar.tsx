@@ -80,9 +80,12 @@ export function AttributeBar({
         <Image
           src={`/gameui/mint/attribute_${name.toLowerCase()}_icon.png`}
           alt={name}
-          width={iconSize}
-          height={iconSize}
-          className="mr-2"
+          width={24}    // 设置一个固定的基准尺寸
+          height={24}   // 确保width和height比例正确
+          style={{      // 使用style动态设置实际尺寸
+            width: iconSize,
+            height: iconSize
+          }}
         />
       </div>
     </div>

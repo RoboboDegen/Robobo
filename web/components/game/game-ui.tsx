@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from "@/lib/utils";
+import { cn, triggerEvent } from "@/lib/utils";
 import { Connecting } from "../Connecting";
 import { Mint } from "../Mint";
 import { Home } from "../Main";
@@ -10,35 +10,59 @@ import { Fighting } from "../Fighting";
 import { GameUIState, useGameStore } from "@/hooks/use-game-store";
 import { useEffect } from "react";
 import { useGameData } from "@/context/GameDataProvider";
+import { mockMirrorConfig } from "@/mock";
+import { SceneEventTypes } from "@/game/core/event-types";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 
 
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
-    const { getUserInfo } = useGameData();
+    const {  getUserInfo,userInfo } = useGameData();
+    const currentAccount = useCurrentAccount();
 
-    
+
 
     const handleMint = () => {
+        if (!currentAccount) {
+            return;
+        }
+        getUserInfo(currentAccount.address);
         setUIState(GameUIState.MAIN_MENU);
-    }
-    const handleChat = () => {
-        setUIState(GameUIState.CHAT);
-    }
-    const handleFight = () => {
-        setUIState(GameUIState.FIGHTING);
+        triggerEvent('SCENE', {
+            type: SceneEventTypes.cameraFocusOn,
+            robot: userInfo?.robot
+        });        
     }
 
+    const handleChat = () => {
+        setUIState(GameUIState.CHAT);
+        triggerEvent('SCENE', {
+            type: SceneEventTypes.cameraChat,
+        });
+    }
+
+    const handleFight = () => {
+        setUIState(GameUIState.FIGHTING);
+        triggerEvent('SCENE', {
+            type: SceneEventTypes.cameraBattle,
+            enemy: mockMirrorConfig
+        });
+    }
     const handleInventory = () => {
         setUIState(GameUIState.INVENTORY);
-    }
-    
-    const handleChatSubmit = (message: string) => {
-        console.log(message);
+        triggerEvent('SCENE', {
+            type: SceneEventTypes.cameraInventory,
+        });
     }
     const handleBackMain = () => {
         setUIState(GameUIState.MAIN_MENU);
+        triggerEvent('SCENE', {
+            type: SceneEventTypes.cameraFocusOn,
+        });
     }
+
+
 
     useEffect(() => {
         getUserInfo("0x1234567890123456789012345678901234567890");
@@ -54,9 +78,10 @@ export function GameUI() {
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
             {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home handleChat={handleChat} handleFight={handleFight} handleInventory={handleInventory} />}
-            {gameState.uiState === GameUIState.INVENTORY && <Inventory  handleInventoryBack={handleBackMain}/>}
-            {gameState.uiState === GameUIState.FIGHTING && <Fighting handleBackMain={handleBackMain}/>}
-            {gameState.uiState === GameUIState.CHAT && <Chatting handleSubmit={handleChatSubmit} handleBack={handleBackMain} />}
+            {gameState.uiState === GameUIState.INVENTORY && <Inventory handleInventoryBack={handleBackMain} />}
+            {gameState.uiState === GameUIState.FIGHTING && <Fighting handleBackMain={handleBackMain} />}
+            {gameState.uiState === GameUIState.CHAT && <Chatting handleBack={handleBackMain} />}
         </div>
+
     );
 } 

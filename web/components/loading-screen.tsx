@@ -36,7 +36,7 @@ export function LoadingScreen() {
       unsubscribeProgress();
       unsubscribeComplete();
     };
-  }, [setUIState]);
+  }, []);
 
   return (
     <AnimatePresence>

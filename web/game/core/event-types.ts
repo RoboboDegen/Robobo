@@ -1,3 +1,5 @@
+import { RobotConfig } from "@/types";
+import { MirrorConfig } from "@/types";
 import { ImageKey } from "../config/assets";
 
 /**
@@ -26,6 +28,9 @@ export enum SceneEventTypes{
   cameraFocusOn = 'cameraFocusOn',
   cameraReset = 'cameraReset',
   cameraShake = 'cameraShake',
+  cameraInventory = 'cameraInventory',
+  cameraBattle = 'cameraBattle',
+  cameraChat = 'cameraChat',
 }
 
 export enum RobotEventTypes{
@@ -49,7 +54,7 @@ export enum AudioEventTypes{
 
 export interface GameLogicEventData {
   /** 游戏逻辑事件 */
-  SCENE: {type:SceneEventTypes,background?:ImageKey};
+  SCENE: {type:SceneEventTypes,background?:ImageKey,enemy?:MirrorConfig,robot?:RobotConfig};
   ROBOT: {type:RobotEventTypes,robotId?:string};
   AUDIO: {type:AudioEventTypes,audioKey?:string};
 }
@@ -124,3 +129,4 @@ export interface GameEventData extends
  * ```
  */
 export type GameEventType = keyof GameEventData;
+

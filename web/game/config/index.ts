@@ -17,9 +17,10 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
       height: 640,
     },
     max: {
-      width: 720,
-      height: 1280,
+      width: 340,
+      height: 640,
     },
+
   },
   physics: {
     default: 'arcade',

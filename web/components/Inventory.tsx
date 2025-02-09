@@ -1,12 +1,12 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { RoButton } from "@/components/ro_button"
-import { AttributeBar } from "@/components/attribute-bar"
 import EquipedBar, { type EquipedItemProps } from "./inventory/equipedBar"
 import { InfoBox } from "./inventory/info_box"
 import InventoryGrid from "./inventory/scrollbar"
 import { useGameData } from "@/context/GameDataProvider"
+
 import { Element } from "@/types"
 import AttributeBars from "./AttributeBars"
 
@@ -17,6 +17,7 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
     const handleSelectItem = (item: EquipedItemProps) => {
         console.log(item)
     }
+
 
     const equippedItems: EquipedItemProps[] = [
         { id: "1", name: "Pistol", icon: "/gameui/inventory/test_gun.png" },
@@ -72,13 +73,6 @@ export function Inventory({ handleInventoryBack }: { handleInventoryBack: () => 
                         <div className="flex flex-col justify-start items-center">
                             <div
                                 className="w-32 h-32 mt-12"
-                                style={{
-                                    backgroundImage: `url(/gameui/inventory/character_frame.png)`,
-                                    backgroundSize: "contain",
-                                    backgroundRepeat: "no-repeat",
-                                    height: "140px",
-                                    zIndex: 1,
-                                }}
                             />
                             <h2 className="text-2xl font-bold text-[#ff3366] mb-2">{userInfo?.robot?.name}</h2>
                         </div>

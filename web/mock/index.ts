@@ -94,8 +94,8 @@ const mockUserInfo: UserInfo = {
 
 
 const mockMirrorConfig: MirrorConfig = {
-    id: "0x1234567890123456789012345678901234567890",
-    name: "Robot 1",
+    id: "2",
+    name: "Robot 2",
     attack: 146,  // Example value for attack
     defense: 148,  // Example value for defense
     speed: 134,    // Example value for speed

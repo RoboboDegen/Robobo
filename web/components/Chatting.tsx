@@ -1,12 +1,14 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
-import Image from "next/image"
+import { useEffect, useState } from "react"
 import { RoButton } from "./ro_button";
 import { useGameData } from "@/context/GameDataProvider";
 import { ChatInput } from "./ChatInput";
 import { MessageList } from "./MessageList"
-import { Message } from "@/types";
+import { SceneEventTypes } from "@/game/core/event-types";
+import { triggerEvent } from "@/lib/utils";
+
+
 
 export interface ChattingProps {
   handleBack: () => void;
@@ -19,6 +21,7 @@ export function Chatting({ handleBack }: ChattingProps) {
   useEffect(() => {
     getMessage("1");
   }, []);
+
 
   const handleSubmit = (message: string) => {
     const newMessage = {

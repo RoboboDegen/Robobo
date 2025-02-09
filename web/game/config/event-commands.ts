@@ -77,8 +77,36 @@ const sceneCommands: EventCommand[] = [
 
             type: SceneEventTypes.cameraShake
         })
+    },
+    {
+        id: 'scene-camera-inventory',
+        key: 'SCENE',
+        name: '相机聚焦背包',
+        category: 'scene',
+        getData: () => ({
+            type: SceneEventTypes.cameraInventory
+        })
+    },
+    {
+        id: 'scene-camera-battle',
+        key: 'SCENE',
+        name: '相机聚焦战斗',
+        category: 'scene',
+        getData: () => ({
+            type: SceneEventTypes.cameraBattle
+        })
+    },
+    {
+        id: 'scene-camera-chat',
+        key: 'SCENE',
+        name: '相机聚焦聊天',
+        category: 'scene',
+        getData: () => ({
+            type: SceneEventTypes.cameraChat
+        })
     }
 ];
+
 
 // 机器人相关命令
 const robotCommands: EventCommand[] = [

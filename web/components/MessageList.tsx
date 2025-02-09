@@ -31,7 +31,7 @@ export function MessageList({ displayMessage }: MessageListProps) {
               alt={message.sender}
               width={24}
               height={24}
-              className="mt-1"
+              className="mt-1 w-auto h-auto"
             />
 
             <div className="px-1 py-3">
