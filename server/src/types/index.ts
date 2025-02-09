@@ -47,6 +47,7 @@ export interface RewardData {
 export interface ChatRequest {
   robot_uid: string
   message: string
+  filter_think?: boolean
 }
 
 export interface ChatResponse {
