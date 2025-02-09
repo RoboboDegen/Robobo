@@ -24,7 +24,7 @@ export class CameraController {
       x = this.camera.scrollX,
       y = this.camera.scrollY,
       zoom = config.zoom ?? this.camera.zoom,
-      duration = config.duration ?? 1000,
+      duration = config.duration ?? 200,
       ease = config.ease ?? 'Power2'
 
     } = config;
@@ -38,7 +38,6 @@ export class CameraController {
       x: target.x,
       y: target.y+10,
       zoom: zoom,
-      duration: 1000,
       ease: 'Power2'
     });
   }

@@ -77,7 +77,7 @@ export const GAME_ASSETS_DATA: GameAssetsData = {
         {
             key: 'hit',
             frames: { key: 'baseRobot' },
-            repeat: 2,
+            repeat: 0,
             frameRate: 10
         },
         {

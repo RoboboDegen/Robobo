@@ -74,12 +74,12 @@ const mockOwnedElement: Element[] = [
 
 const mockRobot: RobotConfig = {
     id: "0x1234567890123456789012345678901234567890",
-    name: "Bobo",
-    attack: 148,  // Example value for attack
-    defense: 150,  // Example value for defense
-    speed: 135,    // Example value for speed
-    energy: 175,   // Example value for energy
-    personality: 180,  // Example value for personality
+    name: "Robo",
+    attack: 21,  // Example value for attack
+    defense: 20,  // Example value for defense
+    speed: 6,    // Example value for speed
+    energy: 55,   // Example value for energy
+    personality: 45,  // Example value for personality
     equippedElement: mockEquippedElement,
 }
 
@@ -95,12 +95,12 @@ const mockUserInfo: UserInfo = {
 
 const mockMirrorConfig: MirrorConfig = {
     id: "2",
-    name: "Robot 2",
-    attack: 146,  // Example value for attack
-    defense: 148,  // Example value for defense
-    speed: 134,    // Example value for speed
-    energy: 180,   // Example value for energy
-    personality: 200,  // Example value for personality
+    name: "Cal",
+    attack: 19,  // Example value for attack
+    defense: 20,  // Example value for defense
+    speed: 8,    // Example value for speed
+    energy: 49,   // Example value for energy
+    personality: 67,  // Example value for personality
 }
 
 const mockMessages: Message[] = [
@@ -162,30 +162,10 @@ const mockMessages: Message[] = [
 
 
 
-async function mockBattleRecords(): Promise<BattleRecord> {
-    return {
-        attacker: mockRobot,
-        defender: mockMirrorConfig,
-        result: "win",
-        timestamp: new Date(),
-        rounds: [
-            {
-                attacker_id: mockRobot.id,
-                defender_id: mockMirrorConfig.id,
-                action: 1,
-                result: 1,
-            }
-        ],
-        winner: "attacker",
-        attacker_final_energy: 100,
-        defender_final_energy: 100,
-        reward: "100",
-
-    } satisfies BattleRecord;
-}
 
 
 
 
 
-export { mockUserInfo, mockMirrorConfig, mockMessages, mockBattleRecords };
+
+export { mockUserInfo, mockMirrorConfig, mockMessages}

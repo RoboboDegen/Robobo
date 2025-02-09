@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { useGameData } from "@/context/GameDataProvider";
 import Image from "next/image";
 import { usePopup } from "@/context/PopupProvider";
-import { MirrorConfig, RobotConfig } from "@/types";
+import { BattleRound, MirrorConfig, RobotConfig } from "@/types";
 import { mockMirrorConfig } from "@/mock";
 import AttributeBars from "./AttributeBars";
-import { SceneEventTypes } from "@/game/core/event-types";
+import { RobotEventTypes, SceneEventTypes } from "@/game/core/event-types";
 import { triggerEvent } from "@/lib/utils";
 
 
@@ -21,37 +21,103 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
         getBattleRecords,
     } = useGameData();
 
-
     const { showPopup } = usePopup();
 
     const [attacker, setAttacker] = useState<RobotConfig | null>(null);
     const [defender, setDefender] = useState<MirrorConfig | null>(null);
-    const [attackerMaxEnergy, setAttackerMaxEnergy] = useState<number>(0);
-    const [defenderMaxEnergy, setDefenderMaxEnergy] = useState<number>(0);
-
-
+    const [currentRounds, setCurrentRounds] = useState<BattleRound[]>([]);
+    const [currentAttackerEnergy, setCurrentAttackerEnergy] = useState<number>(0);
+    const [currentDefenderEnergy, setCurrentDefenderEnergy] = useState<number>(0);
 
     useEffect(() => {
-        if (battleRecords) {
+        if (userInfo?.robot && !battleRecords) {
+            getBattleRecords(userInfo.robot, mockMirrorConfig);
+        } else if (battleRecords) {
             setAttacker(battleRecords.attacker);
             setDefender(battleRecords.defender);
-            setAttackerMaxEnergy(battleRecords.attacker.energy);
-            setDefenderMaxEnergy(battleRecords.defender.energy);
-        }
-        if (userInfo?.robot) {
-            getBattleRecords(userInfo.robot, mockMirrorConfig);
-        }
-    }, [])
+            setCurrentAttackerEnergy(battleRecords.attacker.energy);
+            setCurrentDefenderEnergy(battleRecords.defender.energy);
+            
+            const rounds = battleRecords.rounds;
+            let currentIndex = 0;
 
+            const interval = setInterval(() => {
+                if (currentIndex >= rounds.length) {
+                    clearInterval(interval);
+                    setCurrentAttackerEnergy(battleRecords.attacker_final_energy - 128);
+                    setCurrentDefenderEnergy(battleRecords.defender_final_energy - 128);
+                    handleOnFinish();
+                    return;
+                }
+
+                const round = rounds[currentIndex];
+                setCurrentRounds(prev => [...prev, round]);
+
+                if (round.id === battleRecords.attacker.id) {
+                    setCurrentAttackerEnergy(prev => {
+                        const afterBaseCost = Math.max(0, prev - 1); // 基础消耗
+                        if ([1, 3, 4, 6].includes(round.action)) {
+                            triggerEvent('ROBOT', {
+                                type: RobotEventTypes.hit,
+                                robotId: battleRecords.attacker.id
+                            });
+                            return afterBaseCost;
+                        } else {
+                            triggerEvent('ROBOT', {
+                                type: RobotEventTypes.defence,
+                                robotId: battleRecords.attacker.id
+                            });
+                            return Math.min(60, afterBaseCost + round.result);
+                        }
+                    });
+                    
+                    if ([1, 3, 4, 6].includes(round.action)) {
+                        setCurrentDefenderEnergy(prev => Math.max(0, prev - round.result));
+                        triggerEvent('ROBOT', {
+                            type: RobotEventTypes.hit,
+                            robotId: battleRecords.defender.id
+                        });
+                    }
+                } else {
+                    setCurrentDefenderEnergy(prev => {
+                        const afterBaseCost = Math.max(0, prev - 1); // 基础消耗
+                        if ([1, 3, 4, 6].includes(round.action)) {
+                            triggerEvent('ROBOT', {
+                                type: RobotEventTypes.hit,
+                                robotId: battleRecords.defender.id
+                            });
+                            return afterBaseCost;
+                        } else {
+                            triggerEvent('ROBOT', {
+                                type: RobotEventTypes.defence,
+                                robotId: battleRecords.defender.id
+                            });
+                            return Math.min(60, afterBaseCost + round.result);
+                        }
+                    });
+                    
+                    if ([1, 3, 4, 6].includes(round.action)) {
+                        setCurrentAttackerEnergy(prev => Math.max(0, prev - round.result));
+                        triggerEvent('ROBOT', {
+                            type: RobotEventTypes.hit,
+                            robotId: battleRecords.attacker.id
+                        });
+                    }
+                }
+
+                currentIndex++;
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [userInfo, battleRecords, getBattleRecords]);
 
     const handleOnFinish = () => {
-        // showPopup("战斗结束", () => {
-        //     handleBackMain();
-        // }, () => {
-        //     handleBackMain();
-        // });
+        // // triggerEvent('SCENE', {
+        // //     type: SceneEventTypes.BATTLE_END
+        // // });
+        // showPopup("Battle End", handleBackMain, handleBackMain);
     }
-
 
     return (
         <div className="flex flex-col h-full items-center justify-between p-5 max-w-[360px]">
@@ -59,12 +125,8 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
             {/* Health Bars */}
             <div className="flex justify-between items-center space-x-10">
                 <div className="w-20">
-                    <HealthBar
-                        value={attacker?.energy || 0}
-                        maxValue={attackerMaxEnergy || 0}
-                    />
+                    <HealthBar value={currentAttackerEnergy} />
                 </div>
-
                 <Image
                     src="/gameui/pk/pk_label.png"
                     alt="VS"
@@ -73,9 +135,10 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
                 />
 
                 <div className="w-20">
-                    <HealthBar value={defender?.energy || 0} maxValue={defenderMaxEnergy || 0} />
+                    <HealthBar value={currentDefenderEnergy} />
                 </div>
             </div>
+
 
             <div className="flex flex-col items-center justify-between w-full">
                 {/* Stats - Made smaller */}
@@ -96,11 +159,7 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
                             width: "100%",
                         }}
                     >
-                        <BattleRecords record={battleRecords?.rounds || []} onFinish={handleOnFinish} />
-
-
-
-
+                        <BattleRecords record={currentRounds} onFinish={handleOnFinish} />
                     </div>
                 </div>
 

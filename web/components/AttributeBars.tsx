@@ -17,11 +17,6 @@ interface AttributeBarsProps {
   width?: number;
 } 
 
-
-
-
-
-
 const AttributeBars: React.FC<AttributeBarsProps> = ({ attack, energy, speed, personality, width }) => {
 
 
@@ -38,7 +33,7 @@ const AttributeBars: React.FC<AttributeBarsProps> = ({ attack, energy, speed, pe
           <AttributeBar
             key={attr.name}
             name={attr.name}
-            value={attr.value}
+            value={Number(attr.value)}
             color={attr.color}
             width={width ? width : 280}
           />

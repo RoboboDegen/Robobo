@@ -60,6 +60,21 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
     return speed + moveBonus;
   }
 
+
+  /*
+  processAction 函数用于处理每个回合的行动，并返回相关信息
+  action 表示行动类型:
+  1: 攻击
+  2: 防御
+  3: 轻攻击
+  4: 重攻击
+  5: 特殊攻击
+  6: 特殊防御
+  value 表示行动值
+  actorEnergy 表示行动者的能量
+  targetEnergy 表示目标的能量
+  logs 表示行动日志
+  */
   function processAction(
     actor: RobotConfig,
     target: RobotConfig,
@@ -249,11 +264,13 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
         logs.push(...attackerAction.logs);
 
         rounds.push({
-          attacker_id: attacker.id,
-          defender_id: defender.id,
+          id: attacker.id,
+          name: attacker.name,
           action: attackerAction.action,
           result: attackerAction.value,
         });
+
+
 
 
 
@@ -275,10 +292,12 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
         logs.push(...defenderAction.logs);
 
         rounds.push({
-          attacker_id: attacker.id,
-          defender_id: defender.id,
+          id: defender.id,
+          name: defender.name,
           action: defenderAction.action,
           result: defenderAction.value,
+
+
         });
         currentDefenderEnergy = defenderAction.actorEnergy;
         currentAttackerEnergy = defenderAction.targetEnergy;
@@ -297,10 +316,12 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
         logs.push(...defenderAction.logs);
 
         rounds.push({
-          attacker_id: attacker.id,
-          defender_id: defender.id,
+          id: defender.id,
+          name: defender.name,
           action: defenderAction.action,
           result: defenderAction.value,
+
+
         });
         currentDefenderEnergy = defenderAction.actorEnergy;
         currentAttackerEnergy = defenderAction.targetEnergy;
@@ -320,11 +341,13 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
         logs.push(...attackerAction.logs);
 
         rounds.push({
-          attacker_id: attacker.id,
-          defender_id: defender.id,
+          id: attacker.id,
+          name: attacker.name,
           action: attackerAction.action,
           result: attackerAction.value,
         });
+
+
         currentAttackerEnergy = attackerAction.actorEnergy;
         currentDefenderEnergy = attackerAction.targetEnergy;
         if (currentDefenderEnergy <= ZERO_POINT) {
@@ -348,7 +371,31 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
     result.rounds = rounds;
     result.result = currentAttackerEnergy > currentDefenderEnergy ? "win" : "lose";
     console.log("Battle records after setting:", result);
-    return result;
+    const res_attacker = {
+      ...attacker,
+      energy: attacker.energy -128,
+      attack: attacker.attack - 128,
+      defense: attacker.defense - 128,
+      speed: attacker.speed - 128,
+      personality: attacker.personality - 128,
+
+    }
+    const res_defender = {
+      ...defender,
+      energy: defender.energy -128,
+      attack: defender.attack - 128,
+      defense: defender.defense - 128,
+      speed: defender.speed - 128,
+      personality: defender.personality - 128,
+
+    }
+    return {
+      ...result,
+      attacker: res_attacker,
+      defender: res_defender,
+    };
+
   }
   return simulateBattle();
+
 }
