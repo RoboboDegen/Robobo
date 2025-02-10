@@ -1,6 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-node_modules
 # dependencies
 /node_modules
 /.pnp
@@ -11,11 +10,8 @@ node_modules
 !.yarn/releases
 !.yarn/versions
 
-# move
-/contract/*.lock
 # testing
 /coverage
-/test
 
 # next.js
 /.next/
@@ -32,8 +28,9 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
-# env files (can opt-in for commiting if needed)
+# env files (can opt-in for committing if needed)
 .env*
 
 # vercel
@@ -42,9 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-# web
-<<<<<<< HEAD
-package.json
-=======
->>>>>>> upstream/main
-package-lock.json
