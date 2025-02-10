@@ -18,7 +18,7 @@ import { useCurrentAccount } from "@mysten/dapp-kit";
 
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
-    const {  getUserInfo,userInfo } = useGameData();
+    const {  getUserInfo,userInfo,getBattleRecords } = useGameData();
     const currentAccount = useCurrentAccount();
 
 
@@ -42,13 +42,20 @@ export function GameUI() {
         });
     }
 
-    const handleFight = () => {
-        setUIState(GameUIState.FIGHTING);
-        triggerEvent('SCENE', {
-            type: SceneEventTypes.cameraBattle,
-            enemy: mockMirrorConfig
-        });
+    const handleFight = async () => {
+        if (userInfo?.robot) {
+            await getBattleRecords(userInfo.robot, mockMirrorConfig);
+            setUIState(GameUIState.FIGHTING);
+            triggerEvent('SCENE', {
+                type: SceneEventTypes.cameraBattle,
+                enemy: mockMirrorConfig
+            });
+        }
+
     }
+
+
+
     const handleInventory = () => {
         setUIState(GameUIState.INVENTORY);
         triggerEvent('SCENE', {

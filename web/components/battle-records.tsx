@@ -26,43 +26,48 @@ export function BattleRecords({ record }: BattleRecordProps) {
             key={index}
             className="flex items-center gap-2 text-cyan-400 text-[16px] mb-2"
           >
-            {round.action === 1 && (
+            {round.action === 0 && (
               <span className="font-tiny5">
                 {round.name} special attacks and deals{" "}
                 <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
-            {round.action === 2 && (
+            {round.action === 1 && (
               <span className="font-tiny5">
                 {round.name} special recovers{" "}
                 <span className="text-green-400">{round.result}</span> energy
               </span>
             )}
-            {round.action === 3 && (
+
+            {round.action === 2 && (
               <span className="font-tiny5">
                 {round.name} light attacks and deals{" "}
                 <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
-            {round.action === 4 && (
+
+            {round.action === 3 && (
               <span className="font-tiny5">
                 {round.name} heavy attacks and deals{" "}
+
                 <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
-            {round.action === 5 && (
+            {round.action === 4 && (
               <span className="font-tiny5">
                 {round.name} recovers{" "}
                 <span className="text-green-400">{round.result}</span> energy
               </span>
             )}
-            {round.action === 6 && (
+
+            {round.action === 5 && (
               <span className="font-tiny5">
                 {round.name} desperate attacks and deals{" "}
                 <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
-            {round.action === 7 && (
+
+            {round.action === 6 && (
               <span className="font-tiny5">
                 {round.name} desperate recovers{" "}
                 <span className="text-green-400">{round.result}</span> energy

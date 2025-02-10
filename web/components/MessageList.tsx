@@ -4,11 +4,15 @@ import { Message } from "@/types"
 import { useEffect, useRef } from "react";
 
 
+
+
 interface MessageListProps {
   displayMessage: Message[];
+  isGenerating: boolean;
 }
 
-export function MessageList({ displayMessage }: MessageListProps) {
+
+export function MessageList({ displayMessage, isGenerating }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,9 +47,15 @@ export function MessageList({ displayMessage }: MessageListProps) {
           </div>
         ))}
         <div ref={scrollRef} />
+        {isGenerating && (
+          <div className="flex justify-start items-start gap-1">
+            <p className="font-tiny5 text-lg break-words max-w-[200px] text-white">Generating...</p>
+          </div>
+        )}
       </div>
       <ScrollBar
         orientation="vertical"
+
         scrollbarTrackImage="/gameui/pk/info_scrollbar_track.png"
         scrollbarThumbImage="/gameui/pk/info_scrollbar_thumb.png"
       />

@@ -63,8 +63,7 @@ export function AttributeBar({
             className={`h-full transition-all duration-300 ease-out transform origin-left rounded-full ${color}`}
             style={{
               width: `${value / maxValue * 100}%`, // 设置为百分比
-              height,   
-
+              height,  
             }}
           >
             <div className="absolute right-0 top-1/2 -translate-y-1/2 mr-2 w-4 h-4 rounded-full flex items-center justify-center text-lg font-bold font-tiny5 text-white">

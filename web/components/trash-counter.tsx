@@ -14,9 +14,9 @@ export function TrashCounter({ value }: TrashCounterProps) {
         alt="Trash Counter Background" 
         width={210} 
         height={60} 
-        className="object-contain w-auto h-auto max-w-xs"
+        className="object-contain"
       />
-      <span className="absolute inset-0 items-center justify-center text-white font-tiny5 text-2xl pt-3 pl-16">
+      <span className="absolute inset-0 items-center justify-center text-white font-tiny5 text-2xl pt-2 pl-16">
         Trash: {value}
       </span>
     </div>

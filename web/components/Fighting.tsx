@@ -1,4 +1,3 @@
-import { AttributeBar } from "./attribute-bar";
 import { HealthBar } from "./health-bar";
 import { BattleRecords } from "./battle-records";
 import { useEffect, useState } from "react";
@@ -6,10 +5,10 @@ import { useGameData } from "@/context/GameDataProvider";
 import Image from "next/image";
 import { usePopup } from "@/context/PopupProvider";
 import { BattleRound, MirrorConfig, RobotConfig } from "@/types";
-import { mockMirrorConfig } from "@/mock";
 import AttributeBars from "./AttributeBars";
-import { RobotEventTypes, SceneEventTypes } from "@/game/core/event-types";
+import { RobotEventTypes } from "@/game/core/event-types";
 import { triggerEvent } from "@/lib/utils";
+
 
 
 
@@ -30,9 +29,7 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
     const [currentDefenderEnergy, setCurrentDefenderEnergy] = useState<number>(0);
 
     useEffect(() => {
-        if (userInfo?.robot && !battleRecords) {
-            getBattleRecords(userInfo.robot, mockMirrorConfig);
-        } else if (battleRecords) {
+        if (battleRecords) {
             setAttacker(battleRecords.attacker);
             setDefender(battleRecords.defender);
             setCurrentAttackerEnergy(battleRecords.attacker.energy);
@@ -65,7 +62,7 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
                             robotId: battleRecords.defender.id
                         });
                     } 
-                    
+
                     handleOnFinish();
                     return;
                 }
@@ -133,10 +130,7 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
     }, [userInfo, battleRecords, getBattleRecords]);
 
     const handleOnFinish = () => {
-        // // triggerEvent('SCENE', {
-        // //     type: SceneEventTypes.BATTLE_END
-        // // });
-        // showPopup("Battle End", handleBackMain, handleBackMain);
+        showPopup("Battle End", handleBackMain, handleBackMain);
     }
 
     return (
