@@ -4,7 +4,7 @@ import { GameService } from '@/services/game'
 import { StorageService } from '@/services/storage'
 import { ContractService } from '@/services/contract'
 import { ChatService } from '@/services/chat'
-import { ChatRequest, ChatResponse, ChatHistoryResponse } from '@/types'
+import { ChatRequest, ChatResponse, ChatHistoryResponse, ChatServiceResponse } from '@/types'
 
 const gameService = new GameService()
 const storageService = new StorageService()
@@ -82,8 +82,8 @@ const app = new Elysia({ prefix: '/api', aot: false })
 
   // 聊天接口
   .post('/game/chat', async ({ body }) => {
-    const { robot_uid, message } = body as ChatRequest
-    const response = await gameService.chat(robot_uid, message)
+    const { robot_uid, message, filter_think = true } = body as ChatRequest
+    const response = await gameService.chat(robot_uid, message, filter_think)
     const chatResponse: ChatResponse = {
       success: response.success,
       reply: response.reply,
@@ -105,13 +105,15 @@ const app = new Elysia({ prefix: '/api', aot: false })
   }, {
     body: t.Object({
       robot_uid: t.String(),
-      message: t.String()
+      message: t.String(),
+      filter_think: t.Optional(t.Boolean())
     })
   })
 
   // 流式聊天接口
   .post('/game/chat/stream', async ({ body }) => {
-    const { robot_uid, message } = body as ChatRequest
+    const { robot_uid, message, filter_think = true } = body as ChatRequest
+    console.log(`[Stream Chat] 开始处理聊天请求 - robotId: ${robot_uid}`)
     
     // 创建一个 TransformStream 用于处理流式响应
     const stream = new TransformStream()
@@ -122,115 +124,179 @@ const app = new Elysia({ prefix: '/api', aot: false })
 
     // 异步处理聊天响应
     ;(async () => {
+      type ChatRewards = NonNullable<ChatServiceResponse['rewards']>;
+      
+      let rewards: ChatRewards | null = null;
+      let personalityChange: number | null = null;
+      let reply: string = '';
+
       try {
         // 1. 获取机器人信息
+        console.log(`[Stream Chat] 正在获取机器人信息 - robotId: ${robot_uid}`)
         const robot = await storageService.getRobot(robot_uid)
         if (!robot) {
+          console.error(`[Stream Chat] 机器人不存在 - robotId: ${robot_uid}`)
           writer.write(encoder.encode('data: {"error": "机器人不存在"}\n\n'))
           writer.close()
           return
         }
+        console.log(`[Stream Chat] 成功获取机器人信息:`, robot)
 
         // 2. 生成系统提示并获取回复
+        console.log(`[Stream Chat] 正在生成系统提示`)
         const systemPrompt = await chatService.generateSystemPrompt(robot)
-        const reply = await chatService.generateChat(
-          message,
-          systemPrompt,
-          (chunk) => {
-            // 实时返回聊天内容
-            const chatResponse: ChatResponse = {
-              success: true,
-              reply: chunk
-            }
-            writer.write(encoder.encode(`data: ${JSON.stringify(chatResponse)}\n\n`))
-          }
-        )
+        console.log(`[Stream Chat] 系统提示生成完成，开始生成聊天回复`)
         
-        // 3. 评估奖励
-        const rewards = await chatService.evaluateRewards(message, reply)
-        if (rewards.tokens || rewards.element) {
-          // 返回奖励信息
-          const rewardResponse: ChatResponse = {
-            success: true,
-            reply: '',
-            rewards: [
-              ...(rewards.tokens ? [{
-                type: 'token' as const,
-                amount: rewards.tokens
-              }] : []),
-              ...(rewards.element ? [{
-                type: 'element' as const,
-                uid: rewards.element.id
-              }] : [])
-            ]
+        try {
+          reply = await chatService.generateChat(
+            message,
+            systemPrompt,
+            (chunk) => {
+              console.log(`[Stream Chat] 收到聊天流式响应:`, chunk)
+              // 实时返回聊天内容
+              const chatResponse: ChatResponse = {
+                success: true,
+                reply: chunk
+              }
+              writer.write(encoder.encode(`data: ${JSON.stringify(chatResponse)}\n\n`))
+            },
+            filter_think
+          )
+          console.log(`[Stream Chat] 聊天回复生成完成:`, reply)
+        
+          // 3. 评估奖励
+          console.log(`[Stream Chat] 开始评估奖励`)
+          try {
+            console.log(`[Stream Chat] 调用评估奖励API - 输入:`, { message, reply })
+            rewards = await chatService.evaluateRewards(message, reply)
+            console.log(`[Stream Chat] 评估奖励API调用成功，原始响应:`, rewards)
+            console.log(`[Stream Chat] 奖励评估结果:`, {
+              tokens: rewards?.tokens,
+              element: rewards?.element ? {
+                id: rewards.element.id,
+                name: rewards.element.name,
+                mods: {
+                  attack: rewards.element.attackMod,
+                  defense: rewards.element.defenseMod,
+                  speed: rewards.element.speedMod,
+                  energy: rewards.element.energyMod,
+                  personality: rewards.element.personalityMod
+                }
+              } : null
+            })
+            if (rewards.tokens || rewards.element) {
+              // 返回奖励信息
+              const rewardResponse: ChatResponse = {
+                success: true,
+                reply: '',
+                rewards: [
+                  ...(rewards.tokens ? [{
+                    type: 'token' as const,
+                    amount: rewards.tokens
+                  }] : []),
+                  ...(rewards.element ? [{
+                    type: 'element' as const,
+                    uid: rewards.element.id
+                  }] : [])
+                ]
+              }
+              console.log(`[Stream Chat] 发送奖励响应:`, rewardResponse)
+              writer.write(encoder.encode(`data: ${JSON.stringify(rewardResponse)}\n\n`))
+            }
+          } catch (error) {
+            console.error(`[Stream Chat] 评估奖励失败:`, error)
           }
-          writer.write(encoder.encode(`data: ${JSON.stringify(rewardResponse)}\n\n`))
-        }
 
-        // 4. 评估性格变化
-        const personalityChange = await chatService.calculatePersonalityChange(message, reply)
-        if (personalityChange) {
-          // 返回性格变化信息
-          const personalityResponse: ChatResponse = {
-            success: true,
-            reply: '',
-            attribute_changes: {
-              personality: personalityChange
+          // 4. 评估性格变化
+          console.log(`[Stream Chat] 开始评估性格变化`)
+          try {
+            console.log(`[Stream Chat] 调用性格评估API - 输入:`, { message, reply })
+            personalityChange = await chatService.calculatePersonalityChange(message, reply)
+            console.log(`[Stream Chat] 性格评估API调用成功，原始响应:`, personalityChange)
+            console.log(`[Stream Chat] 性格变化评估结果: ${personalityChange || 0} 点`)
+            if (personalityChange) {
+              // 返回性格变化信息
+              const personalityResponse: ChatResponse = {
+                success: true,
+                reply: '',
+                attribute_changes: {
+                  personality: personalityChange
+                }
+              }
+              console.log(`[Stream Chat] 发送性格变化响应:`, personalityResponse)
+              writer.write(encoder.encode(`data: ${JSON.stringify(personalityResponse)}\n\n`))
+            }
+          } catch (error) {
+            console.error(`[Stream Chat] 评估性格变化失败:`, error)
+          }
+
+          // 5. 处理奖励
+          if (rewards?.element) {
+            console.log(`[Stream Chat] 开始处理元素奖励:`, rewards.element)
+            try {
+              await contractService.createElement(
+                rewards.element.name,
+                rewards.element.description || '',
+                [
+                  rewards.element.attackMod,
+                  rewards.element.defenseMod,
+                  rewards.element.speedMod,
+                  rewards.element.energyMod,
+                  rewards.element.personalityMod
+                ],
+                robot_uid
+              )
+              console.log(`[Stream Chat] 元素奖励处理完成`)
+            } catch (error) {
+              console.error(`[Stream Chat] 处理元素奖励失败:`, error)
             }
           }
-          writer.write(encoder.encode(`data: ${JSON.stringify(personalityResponse)}\n\n`))
-        }
 
-        // 5. 处理奖励
-        if (rewards.element) {
-          await contractService.createElement(
-            rewards.element.name,
-            rewards.element.description || '',
-            [
-              rewards.element.attackMod,
-              rewards.element.defenseMod,
-              rewards.element.speedMod,
-              rewards.element.energyMod,
-              rewards.element.personalityMod
-            ],
-            robot_uid
-          )
+          // 6. 保存聊天记录
+          console.log(`[Stream Chat] 开始保存聊天记录`)
+          try {
+            await storageService.saveChat({
+              id: `chat_${Date.now()}`,
+              robotId: robot_uid,
+              message,
+              reply: reply,
+              personalityChange,
+              rewards: [
+                ...(rewards?.tokens ? [{
+                  id: `reward_${Date.now()}_token`,
+                  type: 'token',
+                  amount: rewards.tokens,
+                  elementId: null,
+                  claimed: false,
+                  robotId: robot_uid
+                }] : []),
+                ...(rewards?.element ? [{
+                  id: `reward_${Date.now()}_element`,
+                  type: 'element',
+                  amount: null,
+                  elementId: rewards.element.id,
+                  claimed: false,
+                  robotId: robot_uid
+                }] : [])
+              ]
+            })
+            console.log(`[Stream Chat] 聊天记录保存完成`)
+          } catch (error) {
+            console.error(`[Stream Chat] 保存聊天记录失败:`, error)
+          }
+        } catch (error) {
+          console.error(`[Stream Chat] 生成聊天回复失败:`, error)
+          throw error
         }
-
-        // 6. 保存聊天记录
-        await storageService.saveChat({
-          id: `chat_${Date.now()}`,
-          robotId: robot_uid,
-          message,
-          reply: reply,
-          personalityChange,
-          rewards: [
-            ...(rewards.tokens ? [{
-              id: `reward_${Date.now()}_token`,
-              type: 'token',
-              amount: rewards.tokens,
-              elementId: null,
-              claimed: false,
-              robotId: robot_uid
-            }] : []),
-            ...(rewards.element ? [{
-              id: `reward_${Date.now()}_element`,
-              type: 'element',
-              amount: null,
-              elementId: rewards.element.id,
-              claimed: false,
-              robotId: robot_uid
-            }] : [])
-          ]
-        })
 
       } catch (error) {
-        console.error('Stream chat error:', error)
+        console.error('[Stream Chat] 处理过程发生错误:', error)
         writer.write(encoder.encode(`data: ${JSON.stringify({
           success: false,
           error: String(error)
         })}\n\n`))
       } finally {
+        console.log(`[Stream Chat] 结束处理 - robotId: ${robot_uid}`)
         writer.close()
       }
     })()
@@ -245,7 +311,8 @@ const app = new Elysia({ prefix: '/api', aot: false })
   }, {
     body: t.Object({
       robot_uid: t.String(),
-      message: t.String()
+      message: t.String(),
+      filter_think: t.Optional(t.Boolean())
     })
   })
 

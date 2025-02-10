@@ -15,7 +15,7 @@ export class GameService {
     }
 
     // ======== 聊天相关 ========
-    async chat(robotId: string, message: string): Promise<GameChatResponse> {
+    async chat(robotId: string, message: string, filterThink: boolean = true): Promise<GameChatResponse> {
         try {
             // 1. 获取机器人信息
             const robot = await this.contract.getRobot(robotId)
@@ -27,7 +27,7 @@ export class GameService {
             }
 
             // 2. 使用ChatService生成回复
-            const response = await this.chatService.generateResponse(robotId, message)
+            const response = await this.chatService.generateResponse(robotId, message, filterThink)
 
             // 3. 转换奖励格式
             const rewards: RewardData[] = []
