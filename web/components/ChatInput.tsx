@@ -4,23 +4,18 @@ import { Textarea } from "./ui/textarea"
 
 export interface ChatInputProps {
   onSubmit: (message: string) => void
+  isGenerating: boolean
 }
 
-export function ChatInput({ onSubmit }: ChatInputProps) {
+export function ChatInput({ onSubmit, isGenerating }: ChatInputProps) {
   const [message, setMessage] = useState("")
-  const [isGenerating, setIsGenerating] = useState(false)
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!message.trim() || isGenerating) return
-
-    try {
-      setIsGenerating(true)
-      await onSubmit(message)
-      setMessage("")
-    } finally {
-      setIsGenerating(false)
-    }
+    await onSubmit(message)
+    setMessage("")
   }
 
   return (
