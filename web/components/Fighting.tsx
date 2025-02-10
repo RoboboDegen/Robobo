@@ -46,6 +46,26 @@ export function Fighting({ handleBackMain }: { handleBackMain: () => void }) {
                     clearInterval(interval);
                     setCurrentAttackerEnergy(battleRecords.attacker_final_energy - 128);
                     setCurrentDefenderEnergy(battleRecords.defender_final_energy - 128);
+                    if(battleRecords.attacker_final_energy < battleRecords.defender_final_energy) {
+                        triggerEvent('ROBOT', {
+                            type: RobotEventTypes.lose,
+                            robotId: battleRecords.attacker.id
+                        });
+                        triggerEvent('ROBOT', {
+                            type: RobotEventTypes.win,
+                            robotId: battleRecords.defender.id
+                        });
+                    }else{
+                        triggerEvent('ROBOT', {
+                            type: RobotEventTypes.win,
+                            robotId: battleRecords.attacker.id
+                        });
+                        triggerEvent('ROBOT', {
+                            type: RobotEventTypes.lose,
+                            robotId: battleRecords.defender.id
+                        });
+                    } 
+                    
                     handleOnFinish();
                     return;
                 }

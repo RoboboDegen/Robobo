@@ -72,5 +72,43 @@ export interface BattleRound {
     result: number,
 }
 
+export interface ChatResponse {
+    success: boolean
+    reply: string
+    rewards?: ChatReward[]
+    attribute_changes?: AttributeChanges
+    signature_required?: boolean
+    signature_request?: SignatureRequest
+    error?: string
+  }
+  
+  export interface ChatReward {
+    type: 'token' | 'element'
+    amount?: number
+    uid?: string
+  }
+  
+  export interface AttributeChanges {
+    personality: number
+  }
+  
+  export interface SignatureRequest {
+    sign_data: string
+    nonce: string
+  }
+
+  export interface ChatHistoryResponse {
+    success: boolean
+    history: ChatHistoryEntry[]
+    next_cursor: string | null
+  }
+  
+  export interface ChatHistoryEntry {
+    timestamp: string
+    message: string
+    reply: string
+    rewards?: ChatReward[]
+    attribute_changes?: AttributeChanges
+  }
 
 
