@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Robobo Backend Service
 
-## Getting Started
+The Robobo backend service is built on Next.js, implementing an AI-powered robot pet battle game server with dialogue system, personality evolution, and battle analysis capabilities.
 
-First, run the development server:
+## System Architecture
+
+The system adopts a layered architecture design with the following core modules:
+
+### [Elizant Framework](https://github.com/elizant-labs/elizant) (Core Framework)
+
+Elizant is a flexible Agent framework that manages and coordinates various subsystems:
+
+- **Character System**: 
+  - Robot personality definition
+  - Behavior pattern management
+  - Knowledge system integration
+  
+- **Spec Builder**:
+  - OpenAPI specification generation
+  - Role definition
+  - Capability declaration management
+
+- **Action System**:
+  - Tool registration
+  - Capability mapping
+  - Permission management
+
+- **Memory System**:
+  - RAG engine
+  - Memory retrieval
+  - Knowledge update
+
+### Evaluators
+
+- **Character Evaluator**:
+  - Dialogue analysis
+  - Behavior assessment
+  - Personality evolution evaluation
+
+- **Reward Evaluator**:
+  - Behavior reward calculation
+  - Achievement completion
+  - Incentive mechanism management
+
+- **Battle Evaluator**:
+  - Battle analysis
+  - Strategy evaluation
+  - Element analysis
+
+### Adapters Layer
+
+- **Business Adapter**: Business logic adaptation
+- **Chat Model Adapter**: AI model integration
+- **Chain Adapter**: Blockchain interaction
+
+### Storage Layer
+
+- Relational Database: Structured data storage
+- Vector Database: Semantic vector storage
+- SUI Blockchain: On-chain data storage
+- Caching System: Performance optimization
+
+## Core Processes
+
+1. **Agent Initialization**:
+   - Fetch specifications via robot ID
+   - Construct Agent instance based on specs
+   - Load historical memory and personality traits
+
+2. **Dialogue Process**:
+   - Receive user input
+   - Generate response with memory context
+   - Evaluate personality changes
+   - Calculate dialogue rewards
+   - Return comprehensive results
+
+3. **Memory Management**:
+   - Store dialogue records
+   - Update personality traits
+   - Analyze battle records
+   - Update knowledge base
+
+## Module Status
+
+### Storage Layer
+- Relational Database [WIP]
+- Vector Database Integration [TODO]
+- SUI Chain Interaction [WIP]
+- Caching System [TODO]
+
+### Elizant Framework
+- Spec Builder [WIP]
+- Character System [TODO]
+- Action System [TODO]
+- Memory System [TODO]
+- Agent Runtime [WIP]
+
+### Evaluators
+- Character Evaluator [TODO]
+- Battle Evaluator [TODO]
+- Reward Evaluator [TODO]
+
+### Adapters Layer
+- Chat Model Adapter [WIP]
+- Business Adapter [WIP]
+- Blockchain Adapter [WIP]
+
+[WIP] - Work In Progress
+[TODO] - Not Started
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+
+# Start development server
 pnpm dev
-# or
-bun dev
+
+# Build for production
+pnpm build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Requirements
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js 18+
+- PostgreSQL
+- Redis
+- SUI Node Access
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configuration
 
-## Learn More
+The project uses a .env file for configuration, including:
 
-To learn more about Next.js, take a look at the following resources:
+- Database connections
+- AI model settings
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+# Connect to Supabase via connection pooling with Supavisor.
+DATABASE_URL=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Direct connection to the database. Used for migrations.
+DIRECT_URL=
 
-## Deploy on Vercel
+# Atoma API Configuration
+ATOMA_API_KEY=
+ATOMA_API_URL=
+ATOMA_MODEL=
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+API documentation is auto-generated using OpenAPI specification and can be accessed at:
+http://localhost:3000/api/swagger
