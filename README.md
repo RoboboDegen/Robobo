@@ -2,6 +2,10 @@
 
 Robobo is an innovative AI-Agent based robot pet battle game built on the Sui blockchain. Each robot is not just an NFT, but an independent AI-Agent that you can chat with, bond with, and take into battles for upgrades and growth.
 
+## 🔗 Quick Links
+- Frontend: [Frontend](https://robobo-kohl.vercel.app)
+- Backend: [Backend](https://robobo.vercel.app)
+
 ## 🎮 Core Features
 
 ### Fighting 🤖⚔️
