@@ -125,14 +125,18 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
           zeroPoint;
         newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
         logs.push(`${actorName} used Light Attack: -${damage} damage`);
+        action = 3;
+        value = damage;
       } else if (moveValue <= 6) {
         const damage =
           calculateDamage(actor.attack, 20, actor.personality, true) -
+
           zeroPoint;
         newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
         logs.push(`${actorName} used Heavy Attack: -${damage} damage`);
-        action = 3;
+        action = 4;
         value = damage;
+
       } else if (moveValue <= 8) {
         const recovery = calculateDamage(
           actor.defense,
@@ -145,8 +149,9 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
         logs.push(
           `${actorName} used Defense: +${recovery} energy, total energy: ${newActorEnergy}`
         );
-        action = 4;
+        action = 5;
         value = recovery;
+
       } else {
         if (actor.personality >= 178) {
           const damage =
@@ -155,7 +160,7 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
             zeroPoint;
           newTargetEnergy = Math.max(zeroPoint, target.energy - damage);
           logs.push(`${actorName} used Special Attack: -${damage} damage`);
-          action = 5;
+          action = 6;
           value = damage;
         } else {
           const recovery = calculateDamage(
@@ -169,7 +174,7 @@ export default function CalculateBattleRecords({ attacker, defender }: BattleMoc
           logs.push(
             `${actorName} used Special Defense: +${recovery} energy, total energy: ${newActorEnergy}`
           );
-          action = 6;
+          action = 7;
           value = recovery;
         }
       }
