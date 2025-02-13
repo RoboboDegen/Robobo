@@ -1,31 +1,6 @@
-import { RobotConfig, Element, UserInfo, MirrorConfig, Message, BattleRecord } from "@/types";
+import { Element, MirrorConfig, Message } from "@/types";
 
 
-
-const mockEquippedElement: Element[] = [
-    {
-        id: "1",
-        name: "Element 1",
-        description: "Element 1 description",
-        value: 10,
-        image: "/gameui/inventory/test_gun.png",
-    },
-    {
-        id: "2",
-
-        name: "Element 2",
-        description: "Element 2 description",
-        value: 20,
-        image: "/gameui/inventory/test_gun.png",
-    },
-    {
-        id: "3",
-        name: "Element 3",
-        description: "Element 3 description",
-        value: 30,
-        image: "/gameui/inventory/test_gun.png",
-    },
-]
 
 const mockOwnedElement: Element[] = [
 
@@ -71,25 +46,6 @@ const mockOwnedElement: Element[] = [
 
 
 ]
-
-const mockRobot: RobotConfig = {
-    id: "0x1234567890123456789012345678901234567890",
-    name: "Robo",
-    attack: 21,  // Example value for attack
-    defense: 20,  // Example value for defense
-    speed: 6,    // Example value for speed
-    energy: 55,   // Example value for energy
-    personality: 45,  // Example value for personality
-    equippedElement: mockEquippedElement,
-}
-
-
-const mockUserInfo: UserInfo = {
-    address: "0x1234567890123456789012345678901234567890",
-    robot: mockRobot,
-    trash: 1000,
-    ownedElement: mockOwnedElement,
-}
 
 
 
@@ -168,4 +124,4 @@ const mockMessages: Message[] = [
 
 
 
-export { mockUserInfo, mockMirrorConfig, mockMessages}
+export { mockMirrorConfig, mockMessages, mockOwnedElement}

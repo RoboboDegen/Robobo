@@ -8,26 +8,23 @@ import { Chatting } from "../Chatting";
 import { Inventory } from "../Inventory";
 import { Fighting } from "../Fighting";
 import { GameUIState, useGameStore } from "@/hooks/use-game-store";
-import { useEffect } from "react";
 import { useGameData } from "@/context/GameDataProvider";
 import { mockMirrorConfig } from "@/mock";
 import { SceneEventTypes } from "@/game/core/event-types";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 
 
-
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
-    const {  getUserInfo,userInfo,getBattleRecords } = useGameData();
+    const {  userInfo,getBattleRecords } = useGameData();
     const currentAccount = useCurrentAccount();
-
 
 
     const handleMint = () => {
         if (!currentAccount) {
             return;
         }
-        getUserInfo(currentAccount.address);
+        console.log("handleMint", userInfo);
         setUIState(GameUIState.MAIN_MENU);
         triggerEvent('SCENE', {
             type: SceneEventTypes.cameraFocusOn,
@@ -68,12 +65,6 @@ export function GameUI() {
             type: SceneEventTypes.cameraFocusOn,
         });
     }
-
-
-
-    useEffect(() => {
-        getUserInfo("0x1234567890123456789012345678901234567890");
-    }, [getUserInfo]);
 
 
     return (

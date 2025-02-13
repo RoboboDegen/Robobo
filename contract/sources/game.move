@@ -93,6 +93,7 @@ module robobo::game {
         name: String,
         game_state: &mut GameState,
         game_config: &GameConfig,
+        robot_pool: &mut Robot_Pool,
         token_cap: &mut TrashTokenCap,
         ctx: &mut TxContext
     ) {
@@ -120,9 +121,33 @@ module robobo::game {
             config::get_trash_amount_daily_claim(game_config),
             ctx
         );
-
+        // 创建机器人
+        mint_robot_without_payment(game_state, game_config, robot_pool, name, ctx);
         // 转移 passport 给用户
         user::transfer_passport(passport, sender);
+    }
+
+    fun mint_robot_without_payment(
+        game_state: &mut GameState,
+        game_config: &GameConfig,
+        robot_pool: &mut Robot_Pool,
+        robot_name: String,
+        ctx: &mut TxContext
+    ) { 
+        let sender = tx_context::sender(ctx);
+        assert!(
+            table::contains(&game_state.passports, sender),
+            E_NO_PASSPORT
+        );
+        
+        // 创建初始机器人并获取其 ID
+        let robot = robot::create_robot(robot_name, robot_pool, ctx);
+        let robot_id = robot::get_robot_id(&robot);
+
+        // 记录机器人
+        vector::push_back(&mut game_state.robots, robot_id);
+        // 转移机器人给用户
+        transfer::public_transfer(robot, sender);
     }
 
     /// 用户创建机器人,需要收取TRASH

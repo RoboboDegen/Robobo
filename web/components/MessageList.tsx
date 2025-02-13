@@ -39,7 +39,7 @@ export function MessageList({ displayMessage, isGenerating }: MessageListProps) 
             />
 
             <div className="px-1 py-3">
-              <p className={`font-tiny5 text-lg break-words max-w-[200px] ${message.sender === "user" ? "text-white" : "text-[#00ffcc]"
+              <p className={`break-words max-w-[200px] ${message.sender === "user" ? "text-white" : "text-[#00ffcc]"
                 }`}>
                 {message.sender === "user" ? "You" : "AI"}: {message.text}
               </p>

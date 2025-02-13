@@ -5,7 +5,7 @@ import { RoButton } from "./ro_button";
 import { useGameData } from "@/context/GameDataProvider";
 import { ChatInput } from "./ChatInput";
 import { MessageList } from "./MessageList"
-import { RobotEventTypes, SceneEventTypes } from "@/game/core/event-types";
+import { RobotEventTypes} from "@/game/core/event-types";
 import { triggerEvent } from "@/lib/utils";
 
 
@@ -28,12 +28,12 @@ export function Chatting({ handleBack }: ChattingProps) {
     if(isGenerating){
       triggerEvent('ROBOT', {
         type: RobotEventTypes.chat,
-        robotId: userInfo?.robot.id
+        robotId: userInfo?.robot?.id
       });
     }else{
       triggerEvent('ROBOT', {
         type: RobotEventTypes.idle,
-        robotId: userInfo?.robot.id
+        robotId: userInfo?.robot?.id
       });
     }
   }, [isGenerating]);
@@ -50,7 +50,7 @@ export function Chatting({ handleBack }: ChattingProps) {
   const handleBackClick = () => {
     triggerEvent('ROBOT', {
       type: RobotEventTypes.idle,
-      robotId: userInfo?.robot.id
+      robotId: userInfo?.robot?.id
     });
     handleBack();
   };

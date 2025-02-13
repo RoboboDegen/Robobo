@@ -13,7 +13,6 @@ export interface MainProps {
 
 export function Home({ handleInventory, handleChat, handleFight }: MainProps) {
   const { userInfo } = useGameData();
-
   return (
     <div className="flex flex-col items-center justify-between h-full w-full py-5">
       {/* Top Trash Counter */}

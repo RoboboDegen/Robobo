@@ -1,5 +1,5 @@
 import { BaseEventHandler } from './base-event-handler';
-import { RobotEventTypes, GameLogicEventData } from '../event-types';
+import { RobotEventTypes } from '../event-types';
 import { GameTestScene } from '../../scenes';
 
 export class RobotEventHandler extends BaseEventHandler<GameTestScene> {
