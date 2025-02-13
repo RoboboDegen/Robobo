@@ -38,7 +38,6 @@ export const useGameStore = create<GameStore>((set) => ({
   
   gameState: initialGameState,
   setUIState: (uiState) => {
-    console.log("set: ",uiState);
     set((state) => ({
     gameState: { ...state.gameState, uiState }
   }));

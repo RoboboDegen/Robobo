@@ -18,6 +18,16 @@ export function BattleRecords({ record }: BattleRecordProps) {
     }
   }, [record]);
 
+  
+/*
+1: Special Attack
+2: Special Recovery 
+3: Light Attack
+4: Heavy Attack
+5: Recovery
+6: Desperate Attack
+7: Desperate Recovery
+*/
   return (
     <ScrollArea className="h-[160px] rounded-md">
       <div className="p-2 w-[300px]">
@@ -26,50 +36,49 @@ export function BattleRecords({ record }: BattleRecordProps) {
             key={index}
             className="flex items-center gap-2 text-cyan-400 text-[16px] mb-2"
           >
-            {round.action === 0 && (
-              <span className="font-tiny5">
-                {round.name} special attacks and deals{" "}
-                <span className="text-red-400">{round.result}</span> damage
-              </span>
-            )}
             {round.action === 1 && (
               <span className="font-tiny5">
-                {round.name} special recovers{" "}
-                <span className="text-green-400">{round.result}</span> energy
+                {round.name} used Special Attack and dealt{" "}
+                <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
-
             {round.action === 2 && (
               <span className="font-tiny5">
-                {round.name} light attacks and deals{" "}
-                <span className="text-red-400">{round.result}</span> damage
+                {round.name} used Special Recovery and restored{" "}
+                <span className="text-green-400">{round.result}</span> energy
               </span>
             )}
 
             {round.action === 3 && (
               <span className="font-tiny5">
-                {round.name} heavy attacks and deals{" "}
-
+                {round.name} used Light Attack and dealt{" "}
                 <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
+
             {round.action === 4 && (
               <span className="font-tiny5">
-                {round.name} recovers{" "}
-                <span className="text-green-400">{round.result}</span> energy
+                {round.name} used Heavy Attack and dealt{" "}
+                <span className="text-red-400">{round.result}</span> damage
               </span>
             )}
-
             {round.action === 5 && (
               <span className="font-tiny5">
-                {round.name} desperate attacks and deals{" "}
-                <span className="text-red-400">{round.result}</span> damage
+                {round.name} used Recovery and restored{" "}
+                <span className="text-green-400">{round.result}</span> energy
               </span>
             )}
 
             {round.action === 6 && (
               <span className="font-tiny5">
-                {round.name} desperate recovers{" "}
+                {round.name} used Desperate Attack and dealt{" "}
+                <span className="text-red-400">{round.result}</span> damage
+              </span>
+            )}
+
+            {round.action === 7 && (
+              <span className="font-tiny5">
+                {round.name} used Desperate Recovery and restored{" "}
                 <span className="text-green-400">{round.result}</span> energy
               </span>
             )}

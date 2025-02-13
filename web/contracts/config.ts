@@ -8,7 +8,8 @@ const testnetConfig: ContractConfig = {
     TrashTokenCap: "0x8b3500d96b356ed9c58a75fcd8f3c185ef141a4abf9749f915b5a1e4efa2cda3",
     Robot_Pool:"0xb76ab8e32b63077ced83f70b46c7090715b892def588b1c6ec0d7d13497fe8aa",
     TokenPolicy:"0xe895e1a406d10b30233b364c8de96d1575b33886ea96e24c45168758fc71a7f7",
-    AdminCap:"0xfbfbc17fdec9f49d0d43bd716d31446155e17db47b9da4c0f6e16959e142ef70"
+    AdminCap:"0xfbfbc17fdec9f49d0d43bd716d31446155e17db47b9da4c0f6e16959e142ef70",
+    Package:"0x5571ac5dcc0dbcd3299d59a51a52beb64d775066430b6ea83a3221474a76054c"
 }
 
 const mainnetConfig: ContractConfig = {
@@ -17,7 +18,8 @@ const mainnetConfig: ContractConfig = {
     TrashTokenCap: "0x8b3500d96b356ed9c58a75fcd8f3c185ef141a4abf9749f915b5a1e4efa2cda3",
     Robot_Pool:"0xb76ab8e32b63077ced83f70b46c7090715b892def588b1c6ec0d7d13497fe8aa",
     TokenPolicy:"0xe895e1a406d10b30233b364c8de96d1575b33886ea96e24c45168758fc71a7f7",
-    AdminCap:"0xfbfbc17fdec9f49d0d43bd716d31446155e17db47b9da4c0f6e16959e142ef70"
+    AdminCap:"0xfbfbc17fdec9f49d0d43bd716d31446155e17db47b9da4c0f6e16959e142ef70",
+    Package:"0x5571ac5dcc0dbcd3299d59a51a52beb64d775066430b6ea83a3221474a76054c"
 }
 
 export function getContractConfig(network: 'testnet' | 'mainnet'): ContractConfig {

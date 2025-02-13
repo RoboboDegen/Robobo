@@ -8,9 +8,9 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { mockUserInfo, mockMessages} from "@/mock";
 import CalculateBattleRecords from "@/mock/battleRecords";
-
+import { NetworkVariables } from "@/contracts";
+import { getUserInfo as getUserInfoFromContract } from "@/contracts/query";
 
 interface GameDataContextType {
   userInfo: UserInfo | undefined;
@@ -18,7 +18,8 @@ interface GameDataContextType {
   battleRecords: BattleRecord | undefined;
   isBattleLoading: boolean;
   isGenerating: boolean;
-  getUserInfo: (id: string) => Promise<void>;
+  isUserInfoLoading: boolean;
+  getUserInfo: (id: string, networkVariables: NetworkVariables) => Promise<UserInfo>;
   getMessage: (id: string) => Promise<void>;
   setMessage: (message: Message) => Promise<void>;
   getBattleRecords: (robot: RobotConfig, mirror: MirrorConfig) => Promise<void>;
@@ -36,9 +37,15 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
   const [battleRecords, setBattleRecords] = useState<BattleRecord>();
   const [isBattleLoading, setIsBattleLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isUserInfoLoading, setIsUserInfoLoading] = useState(false);
 
-  const getUserInfo = useCallback(async (id: string) => {
-    setUserInfo(mockUserInfo);
+  const getUserInfo = useCallback(async (id: string, networkVariables: NetworkVariables) => {
+    setIsUserInfoLoading(true);
+    const userInfo = await getUserInfoFromContract(id, networkVariables);
+    console.log("getUserInfo", userInfo);
+    setUserInfo(userInfo);
+    setIsUserInfoLoading(false);
+    return userInfo;
   }, []);
 
   const getMessage = useCallback(async (id: string) => {
@@ -182,6 +189,7 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         battleRecords,
         isBattleLoading,
         isGenerating,
+        isUserInfoLoading,
         getUserInfo,
         getMessage,
         setMessage,

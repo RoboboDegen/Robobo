@@ -30,11 +30,12 @@ export interface Element {
 
 export interface UserInfo {
     address: string;
-    robot: RobotConfig;
-    trash: number,
-    ownedElement: Element[];
+    robot?: RobotConfig | undefined;
+    trash?: number,
+    ownedElement?: Element[];
+    last_mint_token_time?: number;
+    name: string;
 }
-
 
 
 export interface Message {
