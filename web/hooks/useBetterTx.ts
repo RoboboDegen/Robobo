@@ -155,7 +155,7 @@ export function useBetterSignAndExecuteTransactionWithSponsor<TArgs extends unkn
                         method: "POST",
                         body: JSON.stringify(executeSponsoredTxBody),
                     }).then(res => res.json()) as CreateSponsoredTransactionApiResponse
-
+                    await suiClient.waitForTransaction({ digest: executeSponsoredTxResponse.digest })
                     await successCallback?.(executeSponsoredTxResponse)
                     await settledCallback?.(executeSponsoredTxResponse)
                     return executeSponsoredTxResponse

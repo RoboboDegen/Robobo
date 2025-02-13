@@ -12,23 +12,25 @@ import { useGameData } from "@/context/GameDataProvider";
 import { mockMirrorConfig } from "@/mock";
 import { SceneEventTypes } from "@/game/core/event-types";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-
+import { useNetworkVariables } from "@/contracts";
 
 export function GameUI() {
     const { gameState, setUIState } = useGameStore();
-    const {  userInfo,getBattleRecords } = useGameData();
+    const {  userInfo,getBattleRecords,getUserInfo } = useGameData();
     const currentAccount = useCurrentAccount();
+    const networkVariables = useNetworkVariables();
 
 
-    const handleMint = () => {
+    const handleMint = async () => {
         if (!currentAccount) {
             return;
         }
-        console.log("handleMint", userInfo);
+        const userInfoMint = await getUserInfo(currentAccount.address, networkVariables);
+        console.log("handleMint", userInfoMint);
         setUIState(GameUIState.MAIN_MENU);
         triggerEvent('SCENE', {
             type: SceneEventTypes.cameraFocusOn,
-            robot: userInfo?.robot
+            robot: userInfoMint?.robot
         });        
     }
 

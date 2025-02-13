@@ -32,7 +32,7 @@ export function Mint({ handleMint }: MintProps) {
         title: "Minted ROBOBO",
         description: "Congratulations! You have successfully minted your ROBOBO.",
       });
-      handleMint();
+      await handleMint();
     }).execute();
   };
 
