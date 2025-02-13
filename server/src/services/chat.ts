@@ -132,6 +132,7 @@ export class ChatService {
         basePrompt += "3. 展现你对学习和成长的渴望\n";
         basePrompt += "4. 与玩家建立真诚的情感联系\n";
         basePrompt += "5. 记住你是一个独特的、在不断成长的小机器人，偶尔也会在竞技场上展现不一样的一面\n";
+        basePrompt += "6. 回答简单一些!\n";
         
         return basePrompt;
     }
@@ -228,7 +229,7 @@ export class ChatService {
                     stream: true,
                     model: this.MODEL,
                     messages,
-                    max_tokens: 8192
+                    max_tokens: 2048
                 })
             });
 
@@ -263,7 +264,7 @@ export class ChatService {
                             
                             if (content) {
                                 originalContent += content; // 记录原始内容
-                                
+                                console.log(originalContent)
                                 if (filterThink) {
                                     // 检查是否进入think块
                                     if (content.includes('<think>')) {
@@ -310,7 +311,7 @@ export class ChatService {
             return result.trim();
         } catch (error) {
             console.error('[Chat Service] 生成回复失败:', error);
-            const errorMessage = '对不起，我现在无法回答你的问题。';
+            const errorMessage = 'Sorry, I am unable to answer your question at this time.';
             if (onChunk) {
                 onChunk(errorMessage);
             }
@@ -333,6 +334,7 @@ export class ChatService {
 2. 回答是否有帮助
 3. 互动是否积极正面
 4. 是否展现了学习或成长
+5. 不根据对话长度评分
 
 用户: ${message}
 机器人: ${reply}
@@ -358,7 +360,7 @@ export class ChatService {
                             content: evaluationPrompt
                         }
                     ],
-                    max_tokens: 8192
+                    max_tokens: 2048
                 })
             });
 
@@ -424,6 +426,7 @@ export class ChatService {
 2. 是否有情感交流
 3. 是否有助于建立信任
 4. 是否有助于性格发展
+5. 不考虑对话长度的影响
 
 用户: ${message}
 机器人: ${reply}
@@ -449,7 +452,7 @@ export class ChatService {
                             content: evaluationPrompt
                         }
                     ],
-                    max_tokens: 8192
+                    max_tokens: 2048
                 })
             });
 
