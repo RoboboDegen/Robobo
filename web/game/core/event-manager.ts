@@ -34,6 +34,7 @@ export class GameEventManager {
     private static instance: GameEventManager;
     private scene?: Scene;
     private listeners: Map<GameEventType, Set<EventCallback<GameEventType>>>;
+    private eventPool: Array<{ event: GameEventType, data: any }> = [];
 
     private constructor() {
         this.listeners = new Map();
@@ -144,6 +145,29 @@ export class GameEventManager {
         // 如果是游戏事件，同时触发 Phaser 的事件系统
         if (this.scene && event.startsWith('game:')) {
             this.scene.events.emit(event, eventData);
+        }
+    }
+
+    /**
+     * 将事件添加到事件池
+     * @template T 事件类型
+     * @param event 事件名称
+     * @param data 事件数据
+     */
+    public addToEventPool<T extends GameEventType>(
+        event: T,
+        data: GameEventData[T]
+    ): void {
+        this.eventPool.push({ event, data });
+    }
+
+    /**
+     * 处理事件池中的所有事件
+     */
+    public processEventPool(): void {
+        while (this.eventPool.length > 0) {
+            const { event, data } = this.eventPool.shift()!;
+            this.emit(event, data);
         }
     }
 

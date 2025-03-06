@@ -85,6 +85,14 @@ export interface AssetEventData {
   ASSET_LOAD_ERROR: BaseEventData & { key: string; error: string };
 }
 
+export interface CustomEventData {
+  /** 数字序列事件 */
+  NUMBER_SEQUENCE: BaseEventData & { sequence: number[] };
+  
+  /** 字母序列事件 */
+  LETTER_SEQUENCE: BaseEventData & { sequence: string[] };
+}
+
 /**
  * 组合所有事件类型
  * 当需要添加新的事件类型时，在这里扩展
@@ -107,7 +115,8 @@ export interface GameEventData extends
   CoreEventData,
   AssetEventData,
   PlayerEventData,
-  GameLogicEventData {
+  GameLogicEventData,
+  CustomEventData {
   // 可以继续添加其他事件类型
 }
 
