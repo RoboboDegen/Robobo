@@ -1,4 +1,4 @@
-import { Element, MirrorConfig, Message } from "@/types";
+import { Element, MirrorConfig, Message, RobotConfig } from "@/types";
 
 
 
@@ -57,6 +57,16 @@ const mockMirrorConfig: MirrorConfig = {
     speed: 8,    // Example value for speed
     energy: 49,   // Example value for energy
     personality: 67,  // Example value for personality
+}
+
+const mockRobot: RobotConfig = {
+    id: "1",
+    name: "Callum",
+    attack: 18,  // Example value for attack
+    defense: 19,  // Example value for defense
+    speed: 9,    // Example value for speed
+    energy: 50,   // Example value for energy
+    personality: 72,  // Example value for personality
 }
 
 const mockMessages: Message[] = [
@@ -124,4 +134,4 @@ const mockMessages: Message[] = [
 
 
 
-export { mockMirrorConfig, mockMessages, mockOwnedElement}
+export { mockMirrorConfig, mockMessages, mockOwnedElement,mockRobot}

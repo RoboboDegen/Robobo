@@ -7,15 +7,18 @@ import { network } from "@/contracts";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useToast } from "@/hooks/use-toast";
 
+
 export interface MintProps {
   handleMint: () => void;
+  handleTestFight: () => void;
 }
 
-export function Mint({ handleMint }: MintProps) {
+export function Mint({ handleMint, handleTestFight }: MintProps) {
   const { userInfo } = useGameData();
   const { handleSignAndExecuteTransactionWithSponsor, isLoading: isMintingRobotWithSponsor } = useBetterSignAndExecuteTransactionWithSponsor({
     tx: create_passport
   })
+
   const currentAccount = useCurrentAccount();
   const {toast} = useToast();
 
@@ -49,8 +52,11 @@ export function Mint({ handleMint }: MintProps) {
           Mint Your <span className="text-[#00ffcc]">ROBOBO</span> right now!!!
         </p>
         {/* Bottom Action Bar */}
-        <RoButton variant="mint_bottom" onClick={handleMintRobot} disabled={isMintingRobotWithSponsor}>
+        <RoButton variant="mint_bottom" onClick={handleMint} disabled={isMintingRobotWithSponsor}>
           {isMintingRobotWithSponsor ? "Minting..." : "M I N T"}
+        </RoButton>
+        <RoButton variant="mint_bottom" onClick={handleTestFight} disabled={isMintingRobotWithSponsor}>
+          Test Fight
         </RoButton>
       </div>
     </div>

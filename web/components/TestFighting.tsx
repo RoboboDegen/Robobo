@@ -8,20 +8,19 @@ import { BattleRound, MirrorConfig, RobotConfig } from "@/types";
 import AttributeBars from "./AttributeBars";
 import { RobotEventTypes } from "@/game/core/event-types";
 import { triggerEvent } from "@/lib/utils";
+import {mockRobot, mockMirrorConfig} from "@/mock";
 
 
 
-
-
-export interface FightingProps {
-    handleBackMain: () => void;
+export interface TestFightingProps {
+    handleBackMint: () => void;
 }
 
-export function Fighting({ handleBackMain }: FightingProps) {
+export function TestFighting({ handleBackMint }: TestFightingProps) {
     const {
-        userInfo,
-        battleRecords,
-        getBattleRecords,
+        mockUserInfo,
+        mockBattleRecords,
+        getBattleRecords
     } = useGameData();
 
     const { showPopup } = usePopup();
@@ -33,37 +32,39 @@ export function Fighting({ handleBackMain }: FightingProps) {
     const [currentDefenderEnergy, setCurrentDefenderEnergy] = useState<number>(0);
 
     useEffect(() => {
-        if (battleRecords) {
-            setAttacker(battleRecords.attacker);
-            setDefender(battleRecords.defender);
-            setCurrentAttackerEnergy(battleRecords.attacker.energy);
-            setCurrentDefenderEnergy(battleRecords.defender.energy);
-            
-            const rounds = battleRecords.rounds;
+        console.log("mockUserInfo", mockUserInfo);
+        console.log("mockBattleRecords", mockBattleRecords);
+        if (mockBattleRecords) {
+            console.log("mockBattleRecords inside if", mockBattleRecords);
+            setAttacker(mockBattleRecords.attacker);
+            setDefender(mockBattleRecords.defender);
+            setCurrentAttackerEnergy(mockBattleRecords.attacker.energy);
+            setCurrentDefenderEnergy(mockBattleRecords.defender.energy);
+            const rounds = mockBattleRecords.rounds;
             let currentIndex = 0;
 
             const interval = setInterval(() => {
                 if (currentIndex >= rounds.length) {
                     clearInterval(interval);
-                    setCurrentAttackerEnergy(battleRecords.attacker_final_energy - 128);
-                    setCurrentDefenderEnergy(battleRecords.defender_final_energy - 128);
-                    if(battleRecords.attacker_final_energy < battleRecords.defender_final_energy) {
+                    setCurrentAttackerEnergy(mockBattleRecords.attacker_final_energy - 128);
+                    setCurrentDefenderEnergy(mockBattleRecords.defender_final_energy - 128);
+                    if(mockBattleRecords.attacker_final_energy < mockBattleRecords.defender_final_energy) {
                         triggerEvent('ROBOT', {
                             type: RobotEventTypes.lose,
-                            robotId: battleRecords.attacker.id
+                            robotId: mockBattleRecords.attacker.id
                         });
                         triggerEvent('ROBOT', {
                             type: RobotEventTypes.win,
-                            robotId: battleRecords.defender.id
+                            robotId: mockBattleRecords.defender.id
                         });
                     }else{
                         triggerEvent('ROBOT', {
                             type: RobotEventTypes.win,
-                            robotId: battleRecords.attacker.id
+                            robotId: mockBattleRecords.attacker.id
                         });
                         triggerEvent('ROBOT', {
                             type: RobotEventTypes.lose,
-                            robotId: battleRecords.defender.id
+                            robotId: mockBattleRecords.defender.id
                         });
                     } 
 
@@ -74,19 +75,19 @@ export function Fighting({ handleBackMain }: FightingProps) {
                 const round = rounds[currentIndex];
                 setCurrentRounds(prev => [...prev, round]);
 
-                if (round.id === battleRecords.attacker.id) {
+                if (round.id === mockBattleRecords.attacker.id) {
                     setCurrentAttackerEnergy(prev => {
                         const afterBaseCost = Math.max(0, prev - 1); // 基础消耗
                         if ([1, 3, 4, 6].includes(round.action)) {
                             triggerEvent('ROBOT', {
                                 type: RobotEventTypes.hit,
-                                robotId: battleRecords.attacker.id
+                                robotId: mockBattleRecords.attacker.id
                             });
                             return afterBaseCost;
                         } else {
                             triggerEvent('ROBOT', {
                                 type: RobotEventTypes.defence,
-                                robotId: battleRecords.attacker.id
+                                robotId: mockBattleRecords.attacker.id
                             });
                             return Math.min(60, afterBaseCost + round.result);
                         }
@@ -96,7 +97,7 @@ export function Fighting({ handleBackMain }: FightingProps) {
                         setCurrentDefenderEnergy(prev => Math.max(0, prev - round.result));
                         triggerEvent('ROBOT', {
                             type: RobotEventTypes.hit,
-                            robotId: battleRecords.defender.id
+                            robotId: mockBattleRecords.defender.id
                         });
                     }
                 } else {
@@ -105,13 +106,13 @@ export function Fighting({ handleBackMain }: FightingProps) {
                         if ([1, 3, 4, 6].includes(round.action)) {
                             triggerEvent('ROBOT', {
                                 type: RobotEventTypes.hit,
-                                robotId: battleRecords.defender.id
+                                robotId: mockBattleRecords.defender.id
                             });
                             return afterBaseCost;
                         } else {
                             triggerEvent('ROBOT', {
                                 type: RobotEventTypes.defence,
-                                robotId: battleRecords.defender.id
+                                robotId: mockBattleRecords.defender.id
                             });
                             return Math.min(60, afterBaseCost + round.result);
                         }
@@ -121,20 +122,19 @@ export function Fighting({ handleBackMain }: FightingProps) {
                         setCurrentAttackerEnergy(prev => Math.max(0, prev - round.result));
                         triggerEvent('ROBOT', {
                             type: RobotEventTypes.hit,
-                            robotId: battleRecords.attacker.id
+                            robotId: mockBattleRecords.attacker.id
                         });
                     }
                 }
 
                 currentIndex++;
             }, 1000);
-
             return () => clearInterval(interval);
         }
-    }, [userInfo, battleRecords, getBattleRecords]);
+    }, [mockUserInfo, mockBattleRecords]);
 
     const handleOnFinish = () => {
-        showPopup("Battle End", handleBackMain, handleBackMain);
+        showPopup("Battle End", handleBackMint, handleBackMint);
     }
 
     return (

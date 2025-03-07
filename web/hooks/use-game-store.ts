@@ -12,7 +12,8 @@ export enum GameUIState {
   MAIN_MENU,
   INVENTORY,
   FIGHTING,
-  CHAT
+  CHAT,
+  TEST_FIGHTING
 }
 
 interface GameStore {

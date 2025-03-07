@@ -7,9 +7,10 @@ import { Home } from "../Main";
 import { Chatting } from "../Chatting";
 import { Inventory } from "../Inventory";
 import { Fighting } from "../Fighting";
+import { TestFighting } from "../TestFighting";
 import { GameUIState, useGameStore } from "@/hooks/use-game-store";
 import { useGameData } from "@/context/GameDataProvider";
-import { mockMirrorConfig } from "@/mock";
+import { mockMirrorConfig,mockRobot } from "@/mock";
 import { SceneEventTypes } from "@/game/core/event-types";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useNetworkVariables } from "@/contracts";
@@ -43,7 +44,7 @@ export function GameUI() {
 
     const handleFight = async () => {
         if (userInfo?.robot) {
-            await getBattleRecords(userInfo.robot, mockMirrorConfig);
+            await getBattleRecords(mockRobot, mockMirrorConfig);
             setUIState(GameUIState.FIGHTING);
             triggerEvent('SCENE', {
                 type: SceneEventTypes.cameraBattle,
@@ -52,8 +53,26 @@ export function GameUI() {
         }
 
     }
+    const handleTestFight = async () => {
+        if (mockRobot) {
+            await getBattleRecords(mockRobot, mockMirrorConfig);
+            setUIState(GameUIState.TEST_FIGHTING);
+            triggerEvent('SCENE', {
+                type: SceneEventTypes.cameraBattle,
+                enemy: mockMirrorConfig
+            });
+        }
 
+    }
 
+    const handleBackMint = () => {
+        setUIState(GameUIState.MINT);
+        triggerEvent('SCENE', {
+            type: SceneEventTypes.cameraFocusOn,
+        });
+    }
+
+    
 
     const handleInventory = () => {
         setUIState(GameUIState.INVENTORY);
@@ -76,11 +95,12 @@ export function GameUI() {
             "max-w-[360px] mx-auto", // 与游戏最大宽度匹配
         )}>
             {gameState.uiState === GameUIState.CONNECTING && <Connecting setUIState={setUIState} />}
-            {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} />}
+            {gameState.uiState === GameUIState.MINT && <Mint handleMint={handleMint} handleTestFight={handleTestFight} />}
             {gameState.uiState === GameUIState.MAIN_MENU && <Home handleChat={handleChat} handleFight={handleFight} handleInventory={handleInventory} />}
             {gameState.uiState === GameUIState.INVENTORY && <Inventory handleInventoryBack={handleBackMain} />}
             {gameState.uiState === GameUIState.FIGHTING && <Fighting handleBackMain={handleBackMain} />}
             {gameState.uiState === GameUIState.CHAT && <Chatting handleBack={handleBackMain} />}
+            {gameState.uiState === GameUIState.TEST_FIGHTING && <TestFighting handleBackMint={handleBackMint} />}
         </div>
 
     );

@@ -11,14 +11,18 @@ import {
 import CalculateBattleRecords from "@/mock/battleRecords";
 import { NetworkVariables } from "@/contracts";
 import { getUserInfo as getUserInfoFromContract } from "@/contracts/query";
+import { mockMirrorConfig, mockRobot } from "@/mock";
 
 interface GameDataContextType {
+  mockUserInfo: UserInfo | undefined;
+  mockBattleRecords: BattleRecord | undefined;
   userInfo: UserInfo | undefined;
   messages: Message[];
   battleRecords: BattleRecord | undefined;
   isBattleLoading: boolean;
   isGenerating: boolean;
   isUserInfoLoading: boolean;
+  getMockBattleRecords: () => Promise<void>;
   getUserInfo: (id: string, networkVariables: NetworkVariables) => Promise<UserInfo>;
   getMessage: (id: string) => Promise<void>;
   setMessage: (message: Message) => Promise<void>;
@@ -38,6 +42,18 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
   const [isBattleLoading, setIsBattleLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUserInfoLoading, setIsUserInfoLoading] = useState(false);
+  const [mockUserInfo, setMockUserInfo] = useState<UserInfo | undefined>();
+  const [mockBattleRecords, setMockBattleRecords] = useState<BattleRecord>();
+
+
+  const getMockUserInfo = useCallback(async () => {
+    const mockUserInfo = {
+      address: "0x1234567890",
+      name: "Mock User",
+      robot: mockRobot,
+    }
+    setMockUserInfo(mockUserInfo);
+  }, []);
 
   const getUserInfo = useCallback(async (id: string, networkVariables: NetworkVariables) => {
     setIsUserInfoLoading(true);
@@ -172,8 +188,34 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         personality: mirror.personality + 128,
       }
       const records = await CalculateBattleRecords({attacker: cal_robot, defender: cal_mirror});
-      setBattleRecords(records);
+      setMockBattleRecords(records);
+    } finally {
+      setIsBattleLoading(false);
+    }
+  }, []);
 
+
+  const getMockBattleRecords = useCallback(async () => {
+    try {
+      setIsBattleLoading(true);
+      const cal_robot = {
+        ...mockRobot,
+        energy: mockRobot.energy + 128,
+        attack: mockRobot.attack + 128,
+        defense: mockRobot.defense + 128,
+        speed: mockRobot.speed + 128,
+        personality: mockRobot.personality + 128,
+      }
+      const cal_mirror = {
+        ...mockMirrorConfig,
+        energy: mockMirrorConfig.energy + 128,
+        attack: mockMirrorConfig.attack + 128,
+        defense: mockMirrorConfig.defense + 128,
+        speed: mockMirrorConfig.speed + 128,
+        personality: mockMirrorConfig.personality + 128,
+      }
+      const records = await CalculateBattleRecords({attacker: cal_robot, defender: cal_mirror});
+      setMockBattleRecords(records);
 
     } finally {
       setIsBattleLoading(false);
@@ -184,12 +226,15 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
   return (
     <GameDataContext.Provider
       value={{
+        mockUserInfo,
+        mockBattleRecords,
         userInfo,
         messages,
         battleRecords,
         isBattleLoading,
         isGenerating,
         isUserInfoLoading,
+        getMockBattleRecords,
         getUserInfo,
         getMessage,
         setMessage,
