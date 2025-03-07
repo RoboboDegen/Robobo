@@ -32,10 +32,7 @@ export function TestFighting({ handleBackMint }: TestFightingProps) {
     const [currentDefenderEnergy, setCurrentDefenderEnergy] = useState<number>(0);
 
     useEffect(() => {
-        console.log("mockUserInfo", mockUserInfo);
-        console.log("mockBattleRecords", mockBattleRecords);
         if (mockBattleRecords) {
-            console.log("mockBattleRecords inside if", mockBattleRecords);
             setAttacker(mockBattleRecords.attacker);
             setDefender(mockBattleRecords.defender);
             setCurrentAttackerEnergy(mockBattleRecords.attacker.energy);
@@ -129,6 +126,7 @@ export function TestFighting({ handleBackMint }: TestFightingProps) {
 
                 currentIndex++;
             }, 1000);
+            console.log("mockBattleRecords",mockBattleRecords);
             return () => clearInterval(interval);
         }
     }, [mockUserInfo, mockBattleRecords]);

@@ -178,6 +178,49 @@ export class GameTestScene extends Phaser.Scene {
 
   private createGameObjects() {
     this.background = new Background(this, 'loginBackground');
+    
+    // 创建主角机器人
+    this.robot = new RobotObject(
+        {
+            scene: this,
+            x: this.cameras.main.width / 2 - 80,
+            y: this.cameras.main.height / 2 - 150,
+        },
+        {
+          id: "1",
+          name: "Callum",
+          attack: 18,  // Example value for attack
+          defense: 19,  // Example value for defense
+          speed: 9,    // Example value for speed
+          energy: 50,   // Example value for energy
+          personality: 72,  // Example value for personality      
+        }
+    );
+    
+    // 创建敌方机器人
+    this.enemy = new RobotObject(
+        {
+            scene: this,
+            x: this.cameras.main.width / 2 + 80,
+            y: this.cameras.main.height / 2 -150,
+        },
+        {
+          id: "2",
+          name: "Cal",
+          attack: 19,  // Example value for attack
+          defense: 20,  // Example value for defense
+          speed: 8,    // Example value for speed
+          energy: 49,   // Example value for energy
+          personality: 67,  // Example value for personality
+          }
+    );
+    
+    // 设置敌方机器人朝向
+    this.enemy.setFlipX(true);
+    
+    // 设置初始动画
+    this.robot.playAnimation('idle');
+    this.enemy.playAnimation('idle');
   }
 
   update() {
@@ -193,5 +236,15 @@ export class GameTestScene extends Phaser.Scene {
     });
   }
 
+  preload() {
+    // 加载机器人精灵图和动画
+    this.load.spritesheet('baseRobot', '/gameui/robot/base_robot.png', {
+        frameWidth: 100,
+        frameHeight: 100
+    });
+    
+    // 加载背景
+    this.load.image('loginBackground', '/gameui/background/login_background.png');
+  }
 
 }
