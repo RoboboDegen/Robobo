@@ -44,22 +44,28 @@ export class SceneEventHandler extends BaseEventHandler<GameTestScene> {
                 case SceneEventTypes.cameraBattle:
                     this.scene.cameraController?.focusOnBattle();
                     if (data.enemy) {
-                        this.scene.cameraController?.focusOnBattle();
-                        console.log("create enemy");
+                        if (this.scene.enemy) {
+                            console.log("destroying existing enemy");
+                            this.scene.enemy.destroy();
+                            this.scene.enemy = undefined;
+                        }
+
+                        console.log("creating new enemy");
                         this.scene.enemy = new RobotObject(
                             {
                                 scene: this.scene,
-
                                 x: this.scene.cameras.main.width / 2 + 40,
                                 y: this.scene.cameras.main.height / 2 - 55,
-
                             },
                             data.enemy
-                        )
+                        );
                         this.scene.enemy.setFlipX(true);
                         this.scene.enemy.playAnimation('idle');
-                        this.scene.robot?.setPosition(this.scene.cameras.main.width / 2 - 40, this.scene.cameras.main.height / 2 - 55);
-                        this.scene.robot?.setPosition(this.scene.cameras.main.width / 2 - 40, this.scene.cameras.main.height / 2 - 55);
+                        
+                        this.scene.robot?.setPosition(
+                            this.scene.cameras.main.width / 2 - 40, 
+                            this.scene.cameras.main.height / 2 - 55
+                        );
                     }
                     break;
                 case SceneEventTypes.cameraInventory:
