@@ -7,7 +7,7 @@ import { RobotObject } from '../gameObject/robot';
 import { CameraController } from '../core/camera-controller';
 import { AudioEventTypes, RobotEventTypes, SceneEventTypes } from '../core/event-types';
 import { SceneEventHandler, RobotEventHandler, AudioEventHandler, IEventHandler } from '../core/event-handlers';
-
+import { mockRobot, mockMirrorConfig } from '@/mock';
 
 export class GameTestScene extends Phaser.Scene {
   public background?: Background;
@@ -27,16 +27,25 @@ export class GameTestScene extends Phaser.Scene {
 
 
   create() {
+        
+    // 然后再初始化其他内容
     this.cameraController = new CameraController(this);
     this.initializeManagers();
     this.createGameObjects();
     this.initializeEventListeners();
     // 创建调试面板
     //this.debugPanel = new DebugPanel(this, this.cameraController!, this.robot);
+    
+    // 添加更新循环来处理事件池
+    this.events.on('update', () => {
+      this.eventManager?.processEventPool();
+    });
+
+    // 添加调试代码验证事件系统
+    this.eventManager?.on('ROBOT', (data) => {
+        console.log('Scene received ROBOT event:', data);
+    });
   }
-
-
-
   private initializeManagers() {
     this.eventManager = GameEventManager.getInstance();
     this.gameManager = GameManager.getInstance(this);
@@ -186,15 +195,7 @@ export class GameTestScene extends Phaser.Scene {
             x: this.cameras.main.width / 2 - 80,
             y: this.cameras.main.height / 2 - 150,
         },
-        {
-          id: "1",
-          name: "Callum",
-          attack: 18,  // Example value for attack
-          defense: 19,  // Example value for defense
-          speed: 9,    // Example value for speed
-          energy: 50,   // Example value for energy
-          personality: 72,  // Example value for personality      
-        }
+        mockRobot
     );
     
     // 创建敌方机器人
@@ -204,15 +205,7 @@ export class GameTestScene extends Phaser.Scene {
             x: this.cameras.main.width / 2 + 80,
             y: this.cameras.main.height / 2 -150,
         },
-        {
-          id: "2",
-          name: "Cal",
-          attack: 19,  // Example value for attack
-          defense: 20,  // Example value for defense
-          speed: 8,    // Example value for speed
-          energy: 49,   // Example value for energy
-          personality: 67,  // Example value for personality
-          }
+        mockMirrorConfig
     );
     
     // 设置敌方机器人朝向
@@ -237,14 +230,6 @@ export class GameTestScene extends Phaser.Scene {
   }
 
   preload() {
-    // 加载机器人精灵图和动画
-    this.load.spritesheet('baseRobot', '/gameui/robot/base_robot.png', {
-        frameWidth: 100,
-        frameHeight: 100
-    });
-    
-    // 加载背景
-    this.load.image('loginBackground', '/gameui/background/login_background.png');
   }
 
 }

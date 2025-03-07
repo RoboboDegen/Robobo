@@ -20,7 +20,6 @@ export function TestFighting({ handleBackMint }: TestFightingProps) {
     const {
         mockUserInfo,
         mockBattleRecords,
-        getBattleRecords
     } = useGameData();
 
     const { showPopup } = usePopup();
@@ -39,6 +38,16 @@ export function TestFighting({ handleBackMint }: TestFightingProps) {
             setCurrentDefenderEnergy(mockBattleRecords.defender.energy);
             const rounds = mockBattleRecords.rounds;
             let currentIndex = 0;
+
+            // 初始化时触发一次 idle 动画
+            triggerEvent('ROBOT', {
+                type: RobotEventTypes.idle,
+                robotId: mockBattleRecords.attacker.id
+            });
+            triggerEvent('ROBOT', {
+                type: RobotEventTypes.idle,
+                robotId: mockBattleRecords.defender.id
+            });
 
             const interval = setInterval(() => {
                 if (currentIndex >= rounds.length) {
